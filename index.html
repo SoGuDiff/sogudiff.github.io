@@ -288,18 +288,13 @@
 
       <div class="diagram" id="method-diagram">
         <div class="diagram-stage">
-          <div class="dg-figure">
+          <!-- The figure is loaded as an <img> and then, if the browser can
+               fetch it, swapped for the same SVG inlined so individual shapes
+               can be lit. If the fetch fails (opening the page over file://,
+               say) the <img> simply stays and the figure reads as normal. -->
+          <div class="dg-figure" id="dg-figure">
             <img class="dg-base" src="static/images/method_overview.svg"
                  alt="Overview of SoGuDiff. Left: training, where scene and style tokens condition a 1D U-Net that learns to denoise trajectories. Right: inference, where the network is queried under decomposed conditions, combined by per-axis guidance, selected from, and projected onto feasible controls.">
-            <svg class="dg-overlay" viewBox="0 0 2362 573.16" aria-hidden="true" focusable="false">
-              <defs>
-                <mask id="dg-mask">
-                  <rect x="0" y="0" width="2362" height="573.16" fill="#fff"/>
-                  <g id="dg-holes"></g>
-                </mask>
-              </defs>
-              <rect class="dg-scrim" x="0" y="0" width="2362" height="573.16" mask="url(#dg-mask)"/>
-            </svg>
           </div>
         </div>
 

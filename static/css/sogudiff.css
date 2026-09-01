@@ -532,28 +532,21 @@ body.is-draft .draft-note code {
 
 .diagram-stage { padding: 1.25rem 1.25rem 0; background: #fff; }
 
-.dg-figure { position: relative; line-height: 0; }
+.dg-figure { line-height: 0; }
 
 .dg-base { display: block; width: 100%; height: auto; }
 
-/* Same aspect ratio as the figure, so the overlay's user units line up with
-   the image's own coordinate space and the regions land where intended. */
-.dg-overlay {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: 100%;
-  pointer-events: none;
-}
+/* Shape-level highlighting. Every top-level element of the figure carries
+   .dg-el, so a step lights whole shapes rather than a rectangular area: a
+   box, an arrow or a label is always wholly lit or wholly dim, and can never
+   be clipped part way through. */
+.dg-el { transition: opacity 0.4s ease; }
+.is-animated .dg-el { opacity: 0.12; }
+.is-animated .dg-el.is-on { opacity: 1; }
 
-.dg-scrim {
-  fill: #ffffff;
-  opacity: 0;
-  transition: opacity 0.4s ease;
+@media (prefers-reduced-motion: reduce) {
+  .dg-el { transition: none; }
 }
-
-.is-animated .dg-scrim { opacity: 0.86; }
 
 
 .diagram-panel-label {

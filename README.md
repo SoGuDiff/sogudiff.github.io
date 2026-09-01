@@ -115,51 +115,51 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 ### The animated walkthrough
 
 "How It Works" shows `static/images/method_overview.svg` — the manuscript's own
-vector export, **unmodified**. The walkthrough is an overlay on top of it: a
-white scrim with holes cut over the region the current step is about, plus a
-ring around each hole. Ten steps, five on training and five on deployment, with
-autoplay on scroll-into-view, pause on scroll-away, prev / play / next controls
-and clickable step dots. There are no outlines drawn around the active region:
-a rectangle never quite matches the artwork beneath it, so the emphasis is
-carried entirely by what stays undimmed.
+vector export, **unmodified**. On load the page fetches that file and swaps the
+`<img>` for the same SVG inlined, which makes each shape in it addressable.
+A step then simply lights its own shapes and dims the rest.
+
+Ten steps, five on training and five on deployment, with autoplay on
+scroll-into-view, pause on scroll-away, prev / play / next controls and
+clickable step dots.
+
+Selecting **shapes** rather than rectangular areas is the point: a box, an
+arrow or a label is always either wholly lit or wholly dim, so nothing is ever
+clipped halfway through — which rectangles could not avoid, since they have no
+relationship to the artwork underneath them.
 
 To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
 
 ```js
-{ phase: 'a', at: [[632, 128, 420, 234]], title: '...', body: '...' }
+{ phase: 'a', at: [9, [41, 42], 68, 71], title: '...', body: '...' }
 ```
 
 - `phase` is `'a'` (training) or `'b'` (deployment); it only drives the
   Training/Deployment pill.
-- `at` is a list of `[x, y, width, height]` rectangles **in the figure's own
-  coordinate space**, which is `2362 × 573.16`. A step may highlight several
-  disjoint regions — step 4 highlights the U-Net and its two input labels.
+- `at` lists shapes by their position among the figure's top-level elements.
+  `[a, b]` is an inclusive range. Index 0 is the white page backing and is
+  never dimmed.
 - `DWELL` sets the milliseconds per step.
 
-#### Editing the regions the easy way
+#### Editing the steps the easy way
 
-Open **`tools/region-picker.html`** in a browser (through the local server, so
-it can load the figure). It shows the figure with the current regions drawn on
-it, and you can:
+Open **`tools/region-picker.html`** through the local server. It loads the same
+figure and lets you:
 
-- drag empty space to add a rectangle, drag a rectangle to move it, drag its
-  corner to resize
-- nudge with the arrow keys, ×10 with <kbd>Shift</kbd>, remove with
-  <kbd>Delete</kbd>
-- type exact x / y / w / h for the selected rectangle
-- hit **Preview as published** to see the real scrim effect before committing
-- **Copy** the output and paste it over the `at:` lines in `STEPS`
+- **click a shape** to add or remove it from the selected step
+- **drag a lasso** to take everything it touches; <kbd>Alt</kbd>+drag removes
+- toggle **Dim unselected** to see the step exactly as it will publish
+- **Select nothing-assigned shapes** to find anything no step covers yet
+- **Copy** output shaped to paste straight over the `at:` lines in `STEPS`
 
-It round-trips: paste the current `at:` lines back into the text box and press
-**Re-load from text** to pull them onto the figure and adjust from there.
+It round-trips: paste the current `at:` lines back in and press **Re-load from
+text** to start from what the site uses today.
 
-Because the regions are coordinates rather than references to elements inside
-the figure, **re-exporting the figure means re-checking them.** Swapping the
-`.svg` alone is safe only if the layout did not move — the picker is the
-fastest way to redo them if it did.
-
-With JavaScript disabled the scrim never switches on, so the figure just reads
-as the normal static diagram.
+If the figure is re-exported from Lucidchart, the element order can change, so
+re-check the steps in the picker — the **Select nothing-assigned shapes**
+button makes gaps obvious. If the SVG cannot be fetched at all (opening the
+page over `file://`, for instance) the figure stays a plain `<img>` and reads
+as a normal static diagram.
 
 ### Synchronized playback
 
@@ -193,7 +193,7 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
-tools/region-picker.html      drag-and-drop editor for the diagram regions
+tools/region-picker.html      click/lasso editor for the walkthrough steps
 static/css/index.css          template base styles (one copy-button fix)
 static/css/fontawesome.all.min.css  UNUSED - see "Icons" below
 static/css/sogudiff.css       everything specific to this project

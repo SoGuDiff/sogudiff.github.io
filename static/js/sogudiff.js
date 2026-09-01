@@ -254,71 +254,75 @@
     var root = document.getElementById('method-diagram');
     if (!root) return;
 
-    var holes = root.querySelector('#dg-holes');
+    var figure = document.getElementById('dg-figure');
     var capTitle = root.querySelector('.dg-cap-title');
     var capBody = root.querySelector('.dg-cap-body');
     var dotWrap = root.querySelector('.dg-dots');
     var prevBtn = root.querySelector('[data-dg="prev"]');
     var nextBtn = root.querySelector('[data-dg="next"]');
     var playBtn = root.querySelector('[data-dg="play"]');
-    if (!holes || !playBtn) return;
+    if (!figure || !playBtn) return;
 
-    // [x, y, width, height] in the figure's coordinate space (2362 x 573.16).
+    // `at` lists the shapes each step lights up, by their position among the
+    // figure's top-level elements. Selecting whole shapes rather than
+    // rectangular areas means a box, an arrow or a label is always either
+    // wholly lit or wholly dim - it can never be clipped part way through.
+    // Ranges are written [first, last]. Use tools/region-picker.html to edit.
     var STEPS = [
-      { phase: 'a', at: [[8, 8, 164, 556]],
+      { phase: 'a', at: [9, [41, 42], [44, 45], [47, 48], [50, 51], [53, 55], [60, 62], [64, 65], 68, 71, 74],
         title: 'Conditioning inputs',
         body: 'The robot state, goal pose, neighboring pedestrian states, and a local ' +
               'occupancy map together define the scene context. The four-dimensional ' +
               'social style vector is supplied through the same conditioning interface, ' +
               'so the desired conduct is specified at deployment rather than fixed ' +
               'during training.' },
-      { phase: 'a', at: [[171, 198, 190, 256], [354, 228, 28, 152]],
+      { phase: 'a', at: [[10, 12], [19, 22], [56, 58], 63, 66, [155, 157], [181, 182]],
         title: 'Dedicated encoders for map and style',
         body: 'A convolutional encoder compresses the occupancy map into tokens, and ' +
               'each style axis is embedded as a token of its own. Both paths are subject ' +
               'to structured conditioning dropout during training, so the model remains ' +
               'well defined when either group is replaced by its learned null embedding.' },
-      { phase: 'a', at: [[171, 22, 375, 172], [382, 194, 164, 192]],
+      { phase: 'a', at: [[15, 18], 26, 67, [69, 70], [72, 73], 75, [158, 160]],
         title: 'Joint encoding of scene and style',
         body: 'Scene and style tokens are concatenated and processed by a self-attention ' +
               'encoder, allowing the two to interact before they condition the denoiser. ' +
               'The requested style is therefore interpreted in the context of the ' +
               'observed geometry rather than applied independently of it.' },
-      { phase: 'a', at: [[541, 128, 497, 258], [366, 381, 284, 187]],
+      { phase: 'a', at: [[6, 7], [13, 14], 25, 27, [29, 36], [77, 79], 95, [149, 154]],
         title: 'Conditional trajectory denoising',
         body: 'A one-dimensional conditional U-Net denoises a corrupted trajectory while ' +
               'cross-attending to the encoded tokens, with the diffusion timestep ' +
               'entering as an embedding that modulates the residual block features. The ' +
               'output is a full trajectory over the planning horizon.' },
-      { phase: 'a', at: [[1032, 140, 146, 272]],
+      { phase: 'a', at: [8, [38, 39], [88, 93]],
         title: 'Training objective',
         body: 'The network is trained to predict the noise introduced by the forward ' +
               'process, under a mean squared error loss. Each demonstration carries a ' +
               'label on exactly one style axis, so composed styles are never observed ' +
               'during training.' },
-      { phase: 'b', at: [[1198, 44, 142, 390], [1198, 430, 136, 78]],
+      { phase: 'b', at: [86, 100, 167, 169, 171, 173, 175, 177, 180],
         title: 'Decomposed conditioning at inference',
         body: 'The trained network is queried under several conditioning subsets: ' +
               'unconditional, scene-only, and scene combined with a single style axis at ' +
               'a time. The structured dropout applied during training is what makes ' +
               'these partial queries well posed.' },
-      { phase: 'b', at: [[1338, 80, 382, 360]],
+      { phase: 'b', at: [4, [80, 81], [83, 85], [98, 99], 109, [120, 121], 126, [162, 164], 176, 178, [185, 188]],
         title: 'Parallel evaluation of the variants',
         body: 'All conditioning variants, across the N candidate trajectories, are ' +
               'evaluated in a single batched forward pass. Guidance therefore introduces ' +
               'no additional sequential denoising steps.' },
-      { phase: 'b', at: [[1722, 78, 194, 322], [1822, 76, 308, 138]],
+      { phase: 'b', at: [[101, 106], [110, 112], [165, 166], 189],
         title: 'Per-axis classifier-free guidance',
         body: 'Each style axis contributes a score difference taken relative to the ' +
               'scene-conditional estimate and scaled by its own guidance weight. Because ' +
               'the contributions are summed independently, the axes can be weighted ' +
               'separately and composed into styles never demonstrated jointly.' },
-      { phase: 'b', at: [[1330, 437, 724, 41], [2026, 308, 26, 174]],
+      { phase: 'b', at: [[2, 3], [107, 108], [118, 119], 125, 127, 184],
         title: 'Iterated denoising',
         body: 'The guided noise estimate drives one reverse diffusion step, and the ' +
               'procedure repeats across the sampling schedule, propagating all N ' +
               'candidate trajectories simultaneously.' },
-      { phase: 'b', at: [[1908, 210, 450, 102], [2130, 308, 232, 260]],
+      { phase: 'b', at: [[114, 117], [122, 124], [128, 131], [133, 147]],
         title: 'Selection and feasibility projection',
         body: 'A goal-directed cost selects the lowest-cost candidate. A ' +
               'soft-constrained optimal control problem then refines it into a ' +
@@ -344,25 +348,63 @@
       return d;
     });
 
-    function rect(parent, r) {
-      var el = document.createElementNS(SVGNS, 'rect');
-      el.setAttribute('x', r[0]);
-      el.setAttribute('y', r[1]);
-      el.setAttribute('width', r[2]);
-      el.setAttribute('height', r[3]);
-      el.setAttribute('rx', 12);
-      el.setAttribute('fill', '#000');
-      parent.appendChild(el);
+    // Expand [a, b] pairs into the individual indices they stand for.
+    function expand(list) {
+      var out = [];
+      list.forEach(function (v) {
+        if (typeof v === 'number') { out.push(v); return; }
+        for (var n = v[0]; n <= v[1]; n++) out.push(n);
+      });
+      return out;
+    }
+
+    var els = null;   // index -> element, filled in once the SVG is inlined
+
+    // Swap the <img> for the same SVG inlined, so its shapes become
+    // addressable. Falls back to leaving the <img> in place.
+    function inlineFigure(done) {
+      var img = figure.querySelector('img');
+      if (!img) { done(false); return; }
+      fetch(img.getAttribute('src'))
+        .then(function (r) { return r.ok ? r.text() : Promise.reject(r.status); })
+        .then(function (text) {
+          var doc = new DOMParser().parseFromString(text, 'image/svg+xml');
+          var svg = doc.documentElement;
+          if (!svg || svg.nodeName.toLowerCase() !== 'svg') { done(false); return; }
+          svg.setAttribute('class', 'dg-base');
+          svg.removeAttribute('width');
+          svg.removeAttribute('height');
+          if (img.alt) svg.setAttribute('aria-label', img.alt);
+          svg.setAttribute('role', 'img');
+          figure.replaceChild(document.importNode(svg, true), img);
+
+          var root2 = figure.querySelector('svg > g');
+          if (!root2) { done(false); return; }
+          els = {};
+          Array.prototype.forEach.call(root2.children, function (el, i) {
+            // Index 0 is the white page backing; leave it alone so the figure
+            // keeps a solid background when everything else is dimmed.
+            if (i === 0 || el.nodeName.toLowerCase() === 'defs') return;
+            el.setAttribute('data-e', i);
+            el.classList.add('dg-el');
+            els[i] = el;
+          });
+          done(true);
+        })
+        .catch(function () { done(false); });
     }
 
     function show(i) {
       current = (i + STEPS.length) % STEPS.length;
       var step = STEPS[current];
 
-      while (holes.firstChild) holes.removeChild(holes.firstChild);
-      // Black in the mask means the scrim is cut away there, so the region
-      // stays at full strength while the rest of the figure fades back.
-      step.at.forEach(function (r) { rect(holes, r); });
+      if (els) {
+        var on = {};
+        expand(step.at).forEach(function (n) { on[n] = true; });
+        Object.keys(els).forEach(function (n) {
+          els[n].classList.toggle('is-on', !!on[n]);
+        });
+      }
 
       phases.forEach(function (ph) {
         ph.classList.toggle('is-current', ph.dataset.phase === step.phase);
@@ -399,9 +441,12 @@
     nextBtn.addEventListener('click', function () { stop(); show(current + 1); });
     playBtn.addEventListener('click', function () { playing ? stop() : start(); });
 
-    root.classList.add('is-animated');
-    show(0);
-    start();
+    inlineFigure(function (ok) {
+      if (!ok) { show(0); return; }   // static figure; captions still render
+      root.classList.add('is-animated');
+      show(0);
+      start();
+    });
 
     if ('IntersectionObserver' in window) {
       var seen = false;
