@@ -441,13 +441,19 @@
 .media-item figcaption b { color: var(--text-primary); }
 
 .section-lead {
-  max-width: 62ch;
+  /* Wide enough that these leads do not strand a single word on the last
+     line; text-wrap: pretty handles the rest where the browser supports it. */
+  max-width: 72ch;
   margin: 0 auto;
   color: var(--text-secondary);
   font-size: 1rem;
   line-height: 1.7;
   text-align: center;
+  text-wrap: pretty;
 }
+
+/* For a lead short enough to sit on one line, given the room. */
+.section-lead.is-wide { max-width: 88ch; }
 
 /* --------------------------------------------------------------------------
    Editorial notes — visible only when the page is served with ?draft
