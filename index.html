@@ -11,7 +11,7 @@
          * no lab "More Works" list (it would deanonymize instantly)
          * robots = noindex, nofollow  (search engines told to stay away)
        BEFORE PUBLIC RELEASE, search this file for "RELEASE:" and act on
-       each one. There are 13, plus 5 occurrences of REPLACE_WITH_PROJECT_URL.
+       each one. There are 14, plus 5 occurrences of REPLACE_WITH_PROJECT_URL.
        ====================================================================== -->
 
   <!-- RELEASE: change to "index, follow" once the paper is public. Until then
@@ -141,7 +141,8 @@
   <!-- ====================== HERO ====================== -->
   <section class="hero">
     <div class="hero-body">
-      <div class="container is-max-desktop">
+      <!-- Wider than the rest of the page so the title holds to two lines. -->
+      <div class="container is-max-widescreen">
         <div class="columns is-centered">
           <div class="column has-text-centered">
 
@@ -192,6 +193,16 @@
                   </a>
                 </span>
 
+                <!-- RELEASE: point at the YouTube video of the real-world demos
+                     and drop is-pending. -->
+                <span class="link-block">
+                  <a href="#" class="external-link button is-normal is-rounded is-dark is-pending"
+                     aria-disabled="true" tabindex="-1">
+                    <span class="icon"><i class="fab fa-youtube"></i></span>
+                    <span>Video</span>
+                  </a>
+                </span>
+
               </div>
 
               <p class="link-note">
@@ -199,9 +210,9 @@
               </p>
 
               <div class="draft-note">
-                <b>Draft note.</b> 13 <code>RELEASE:</code> markers in
+                <b>Draft note.</b> 14 <code>RELEASE:</code> markers in
                 <code>index.html</code> gate everything that must change before this
-                page goes public: robots meta, author block, three link buttons,
+                page goes public: robots meta, author block, four link buttons,
                 Scholar citation tags, JSON-LD, canonical URL, and the BibTeX entry.
                 Run <code>grep -n "RELEASE:" index.html</code> to list them.
               </div>
@@ -217,18 +228,16 @@
   <section class="hero teaser">
     <div class="container is-max-desktop">
       <div class="hero-body">
-        <video id="teaser-video" autoplay controls muted loop playsinline preload="metadata"
-               poster=""
-               data-slot="Teaser video"
-               data-slot-path="static/videos/teaser.mp4"
-               data-slot-hint="Suggested: a 20-40s reel opening on the real-world Jackal deployment, then cutting between the same scene under contrasting styles. This is the single highest-value asset on the page - it is what a reader sees in the first two seconds.">
-          <source src="static/videos/teaser.mp4" type="video/mp4">
-        </video>
+        <img class="teaser-figure" src="static/images/teaser_figure.png"
+             alt="SoGuDiff steers one diffusion planner along composable social style axes at deployment."
+             data-slot="Teaser figure (paper Fig. 1)"
+             data-slot-path="static/images/teaser_figure.png"
+             data-slot-hint="Export Figures/MainFigureV3.png from the manuscript at 2000px or wider and save it here.">
         <h2 class="subtitle has-text-centered">
           One diffusion planner, four interpretable social style axes. The desired
           conduct is named at deployment &mdash; how closely the robot passes, which
           side it yields to, how much it defers to groups &mdash; and the planner
-          adapts without retraining.
+          adapts its social style based on the social setting at runtime.
         </h2>
       </div>
     </div>
@@ -266,6 +275,30 @@
     </div>
   </section>
 
+  <!-- ====================== METHOD ====================== -->
+  <section class="section">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">How It Works</h2>
+      <figure class="method-figure">
+        <img src="static/images/method_overview.png"
+             alt="Overview of SoGuDiff: token-based conditioning, a conditional U-Net denoiser, per-axis guidance at inference, and a feasibility projection layer."
+             data-slot="Method overview (paper Fig. 2)"
+             data-slot-path="static/images/method_overview.png"
+             data-slot-hint="Export Figures/SocialStyleUNetV3.png from the manuscript at 2400px or wider and save it here. It is a wide two-panel figure, so give it plenty of resolution.">
+        <figcaption>
+          <b>Training (a).</b> The scene &mdash; initial state, goal, pedestrian
+          states, and occupancy map &mdash; and the social style vector are embedded
+          as tokens under structured conditioning dropout, and a one-dimensional
+          conditional U-Net learns to denoise trajectories.
+          <b>Inference (b).</b> The network is queried under decomposed conditions
+          and combined by per-axis classifier-free guidance. Candidates are denoised
+          in parallel, the best is selected, and a feasibility projection layer
+          returns an executable trajectory or commands a controlled stop.
+        </figcaption>
+      </figure>
+    </div>
+  </section>
+
   <!-- ====================== THE FOUR AXES ====================== -->
   <section class="section">
     <div class="container is-max-desktop">
@@ -274,8 +307,8 @@
         Conduct is requested as a four-dimensional vector
         <span class="vec">s = [s<sub>prox</sub>, s<sub>pass</sub>, s<sub>yield</sub>, s<sub>group</sub>]</span>,
         each axis continuous in <span class="vec">[-1, +1]</span>. Every axis is
-        grounded in a documented navigation convention rather than a free parameter,
-        and each is steered by its own guidance weight at inference.
+        grounded in a documented navigation convention, and each is steered by its
+        own guidance weight at inference.
       </p>
 
       <div class="axis-grid">
@@ -283,9 +316,8 @@
         <article class="axis-card" style="--axis-color: var(--ax-prox);">
           <h3>Proxemic conservatism</h3>
           <span class="axis-symbol">s_prox</span>
-          <p>How much personal space the robot preserves, and whether it declines to
-          approach a pedestrian from directly behind. Zone radii interpolate between
-          Hall's intimate, personal, and social distances.</p>
+          <p>How much personal space the robot preserves. Zone radii interpolate
+          between Hall's intimate, personal, and social distances.</p>
           <div class="axis-poles">
             <span class="pole-neg">&minus;1</span> tight, efficient lines<br>
             <span class="pole-pos">+1</span> wide berth, generous clearance
@@ -296,8 +328,8 @@
           <h3>Passing side</h3>
           <span class="axis-symbol">s_pass</span>
           <p>Which side the robot takes when passing or overtaking. The sign selects
-          the convention and the magnitude sets how firmly it is enforced, so this axis
-          reverses cleanly between left- and right-hand traffic regions.</p>
+          the convention, and the magnitude sets how firmly it is enforced. The axis
+          therefore reverses cleanly between left- and right-hand traffic regions.</p>
           <div class="axis-poles">
             <span class="pole-neg">&minus;1</span> left-hand convention<br>
             <span class="pole-pos">+1</span> right-hand convention
@@ -320,11 +352,12 @@
           <h3>Group deference</h3>
           <span class="axis-symbol">s_group</span>
           <p>Whether the robot routes around co-moving social groups or drives between
-          their members. Groups are never labeled explicitly &mdash; the model has to
-          infer them from pedestrian motion.</p>
+          their members. Lowering the axis narrows what counts as a group at all, while
+          raising it admits wider, more loosely spaced formations and enforces
+          deference to them more strictly.</p>
           <div class="axis-poles">
-            <span class="pole-neg">&minus;1</span> splits groups freely<br>
-            <span class="pole-pos">+1</span> routes around them
+            <span class="pole-neg">&minus;1</span> agnostic to groups<br>
+            <span class="pole-pos">+1</span> defers to even loose groups
           </div>
         </article>
 
@@ -338,10 +371,7 @@
       <h2 class="title is-3 has-text-centered">Steering One Axis at a Time</h2>
       <p class="section-lead">
         Each axis is swept from &minus;1 to +1 with the other three held neutral, on a
-        scenario chosen to isolate that interaction. The three clips play in step, so
-        the divergence is visible at the moment of the encounter. Overlays show the
-        candidate samples, the selected trajectory, and the projected one that is
-        actually executed.
+        scenario chosen to isolate that interaction.
       </p>
 
       <div class="axis-tabs" role="tablist" aria-label="Social style axis">
@@ -364,14 +394,14 @@
               <span class="style-chip is-neg">s_prox = &minus;1</span>
               <span class="cell-name">Efficient</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/prox_-1.jpg"
                    data-slot="prox = -1" data-slot-path="static/videos/prox_-1.mp4" data-slot-shape="square">
               <source src="static/videos/prox_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Threads the gap between the two pedestrians, accepting a close pass to
-              keep the path short.
+              Makes the most assertive, shortest path, cutting close to the
+              pedestrians.
             </figcaption>
           </figure>
 
@@ -380,14 +410,13 @@
               <span class="style-chip is-zero">s_prox = 0</span>
               <span class="cell-name">Neutral</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/prox_+0.jpg"
                    data-slot="prox = 0" data-slot-path="static/videos/prox_+0.mp4" data-slot-shape="square">
               <source src="static/videos/prox_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              The default convention: a moderate offset that neither crowds the
-              pedestrians nor detours around them.
+              Steers clear of the pedestrians while balancing path efficiency.
             </figcaption>
           </figure>
 
@@ -396,14 +425,13 @@
               <span class="style-chip is-pos">s_prox = +1</span>
               <span class="cell-name">Conservative</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/prox_+1.jpg"
                    data-slot="prox = +1" data-slot-path="static/videos/prox_+1.mp4" data-slot-shape="square">
               <source src="static/videos/prox_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Swings wide and early, holding the pedestrians outside personal space for
-              the whole crossing.
+              Takes the widest arc around the pedestrians to preserve clearance.
             </figcaption>
           </figure>
 
@@ -416,11 +444,6 @@
                  data-sync-scrub aria-label="Scrub all three proxemic clips together">
         </div>
 
-        <p class="panel-note" style="--tab-color: var(--ax-prox);">
-          <strong>Across 500 geometric scenarios,</strong> sweeping this axis moves mean
-          clearance from 2.27&nbsp;m at &minus;1 to 3.28&nbsp;m at +1, with 2.38&nbsp;m
-          at neutral &mdash; and no style in the sweep produces a collision.
-        </p>
       </div>
 
       <!-- ---------- Passing side ---------- -->
@@ -432,14 +455,14 @@
               <span class="style-chip is-neg">s_pass = &minus;1</span>
               <span class="cell-name">Left-hand</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/pass_-1.jpg"
                    data-slot="pass = -1" data-slot-path="static/videos/pass_-1.mp4" data-slot-shape="square">
               <source src="static/videos/pass_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Head-on in a corridor: the robot commits left, the mirror image of the
-              +1 run in the same scene.
+              Passes the oncoming pedestrian to the left side, consistent with the
+              left-hand traffic convention.
             </figcaption>
           </figure>
 
@@ -448,14 +471,14 @@
               <span class="style-chip is-zero">s_pass = 0</span>
               <span class="cell-name">No preference</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/pass_+0.jpg"
                    data-slot="pass = 0" data-slot-path="static/videos/pass_+0.mp4" data-slot-shape="square">
               <source src="static/videos/pass_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              With no side requested, the choice falls to scene geometry &mdash; the
-              multimodality the diffusion model represents natively.
+              Indifferent to passing side. In this case, passes the oncoming
+              pedestrian on the left.
             </figcaption>
           </figure>
 
@@ -464,14 +487,14 @@
               <span class="style-chip is-pos">s_pass = +1</span>
               <span class="cell-name">Right-hand</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/pass_+1.jpg"
                    data-slot="pass = +1" data-slot-path="static/videos/pass_+1.mp4" data-slot-shape="square">
               <source src="static/videos/pass_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              The robot keeps right, resolving the encounter the way a pedestrian in a
-              right-hand traffic region would expect.
+              Passes the oncoming pedestrian to the right side, consistent with the
+              right-hand traffic convention.
             </figcaption>
           </figure>
 
@@ -484,11 +507,6 @@
                  data-sync-scrub aria-label="Scrub all three passing-side clips together">
         </div>
 
-        <p class="panel-note" style="--tab-color: var(--ax-pass);">
-          <strong>This is the axis that reverses.</strong> Passing-side bias moves from
-          &minus;0.705 (left-dominant) to +0.763 (right-dominant), while neutral sits at
-          +0.071 &mdash; no consistent side at all.
-        </p>
       </div>
 
       <!-- ---------- Yielding ---------- -->
@@ -500,14 +518,14 @@
               <span class="style-chip is-neg">s_yield = &minus;1</span>
               <span class="cell-name">Assertive</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/yield_-1.jpg"
                    data-slot="yield = -1" data-slot-path="static/videos/yield_-1.mp4" data-slot-shape="square">
               <source src="static/videos/yield_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Takes the doorway first, crossing ahead of the pedestrian rather than
-              waiting for the gap to clear.
+              Takes the shortest path, making only a minor detour to avoid the
+              oncoming pedestrian.
             </figcaption>
           </figure>
 
@@ -516,13 +534,14 @@
               <span class="style-chip is-zero">s_yield = 0</span>
               <span class="cell-name">Neutral</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/yield_+0.jpg"
                    data-slot="yield = 0" data-slot-path="static/videos/yield_+0.mp4" data-slot-shape="square">
               <source src="static/videos/yield_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Negotiates the constriction without a strong commitment either way.
+              Yields to the oncoming pedestrian before proceeding through the
+              doorway.
             </figcaption>
           </figure>
 
@@ -531,14 +550,14 @@
               <span class="style-chip is-pos">s_yield = +1</span>
               <span class="cell-name">Deferential</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/yield_+1.jpg"
                    data-slot="yield = +1" data-slot-path="static/videos/yield_+1.mp4" data-slot-shape="square">
               <source src="static/videos/yield_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Anticipates the conflict, slows, and lets the pedestrian through the gap
-              before committing.
+              Makes the most drastic yielding maneuver to avoid impeding the
+              oncoming pedestrian.
             </figcaption>
           </figure>
 
@@ -551,11 +570,6 @@
                  data-sync-scrub aria-label="Scrub all three yielding clips together">
         </div>
 
-        <p class="panel-note" style="--tab-color: var(--ax-yield);">
-          <strong>Both yielding metrics fall together.</strong> Time-to-collision
-          infractions drop from 1.03% to 0.19% of episode time, and path cutoffs from
-          3.00% to 0.58%, as the axis moves from &minus;1 to +1.
-        </p>
       </div>
 
       <!-- ---------- Group deference ---------- -->
@@ -567,14 +581,14 @@
               <span class="style-chip is-neg">s_group = &minus;1</span>
               <span class="cell-name">Group-agnostic</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/group_-1.jpg"
                    data-slot="group = -1" data-slot-path="static/videos/group_-1.mp4" data-slot-shape="square">
               <source src="static/videos/group_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Treats the pair as two independent obstacles and drives straight between
-              them.
+              Agnostic to the social group, and attains the shortest path through
+              the pair.
             </figcaption>
           </figure>
 
@@ -583,13 +597,13 @@
               <span class="style-chip is-zero">s_group = 0</span>
               <span class="cell-name">Neutral</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/group_+0.jpg"
                    data-slot="group = 0" data-slot-path="static/videos/group_+0.mp4" data-slot-shape="square">
               <source src="static/videos/group_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Splits the pair only when the geometry makes going around expensive.
+              Considerate of the social group and passes around the pair.
             </figcaption>
           </figure>
 
@@ -598,14 +612,14 @@
               <span class="style-chip is-pos">s_group = +1</span>
               <span class="cell-name">Deferential</span>
             </div>
-            <video muted loop playsinline preload="metadata"
+            <video muted playsinline preload="metadata"
                    poster="static/videos/posters/group_+1.jpg"
                    data-slot="group = +1" data-slot-path="static/videos/group_+1.mp4" data-slot-shape="square">
               <source src="static/videos/group_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
-              Recognizes the co-moving pair implicitly and routes around the formation
-              rather than through it.
+              Makes the most significant detour around the pair to avoid disturbing
+              the social group.
             </figcaption>
           </figure>
 
@@ -618,11 +632,6 @@
                  data-sync-scrub aria-label="Scrub all three group-deference clips together">
         </div>
 
-        <p class="panel-note" style="--tab-color: var(--ax-group);">
-          <strong>The hardest axis to learn,</strong> since groups are never labeled.
-          Even so, the group split rate falls from 20.00% to 7.54% of episode time
-          across the sweep.
-        </p>
       </div>
 
     </div>
@@ -633,16 +642,14 @@
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Composing Axes at Inference</h2>
       <p class="section-lead">
-        Every demonstration the model saw carried a label on exactly one axis. It never
-        observed a composed style during training. The behaviors below are produced
-        entirely at inference, by summing per-axis guidance terms in the same scene.
+        Distinct, interpretable behaviors are composed at inference using per-axis
+        guidance.
       </p>
 
-      <div class="compose-grid">
+      <div class="compose-grid" data-sync-group="compose">
 
         <figure class="compose-card">
-          <video muted loop playsinline preload="metadata" controls
-                 data-autoplay-in-view
+          <video muted playsinline preload="metadata"
                  poster="static/videos/posters/Neutral.jpg"
                  data-slot="Neutral composition" data-slot-path="static/videos/Neutral.mp4" data-slot-shape="square">
             <source src="static/videos/Neutral.mp4" type="video/mp4">
@@ -655,8 +662,7 @@
         </figure>
 
         <figure class="compose-card">
-          <video muted loop playsinline preload="metadata" controls
-                 data-autoplay-in-view
+          <video muted playsinline preload="metadata"
                  poster="static/videos/posters/Assertive___Left_Side_Passing.jpg"
                  data-slot="Assertive composition" data-slot-path="static/videos/Assertive___Left_Side_Passing.mp4" data-slot-shape="square">
             <source src="static/videos/Assertive___Left_Side_Passing.mp4" type="video/mp4">
@@ -664,14 +670,13 @@
           <figcaption class="compose-body">
             <h4>Assertive &amp; Left-Side Passing</h4>
             <span class="vec">[&minus;1, &minus;1, &minus;1, &minus;1]</span>
-            <p>All four axes pushed negative in the same scene as the neutral run above:
-            tight clearances, left-hand passing, no deference to groups or oncomers.</p>
+            <p>Produces the most assertive path and passes all pedestrians on the
+            left.</p>
           </figcaption>
         </figure>
 
         <figure class="compose-card">
-          <video muted loop playsinline preload="metadata" controls
-                 data-autoplay-in-view
+          <video muted playsinline preload="metadata"
                  poster="static/videos/posters/Cautious___Right_Side_Passing.jpg"
                  data-slot="Cautious composition" data-slot-path="static/videos/Cautious___Right_Side_Passing.mp4" data-slot-shape="square">
             <source src="static/videos/Cautious___Right_Side_Passing.mp4" type="video/mp4">
@@ -679,14 +684,13 @@
           <figcaption class="compose-body">
             <h4>Cautious &amp; Right-Side Passing</h4>
             <span class="vec">[+1, +1, +1, +1]</span>
-            <p>The opposite corner of the style space. Mean clearance rises to
-            2.87&nbsp;m, cutoffs fall to 0.18%, and group splits to 0.97%.</p>
+            <p>Makes the widest arc around all pedestrians, passing on the right
+            side.</p>
           </figcaption>
         </figure>
 
         <figure class="compose-card">
-          <video muted loop playsinline preload="metadata" controls
-                 data-autoplay-in-view
+          <video muted playsinline preload="metadata"
                  poster="static/videos/posters/Yielding___Group_Agnostic.jpg"
                  data-slot="Mixed composition" data-slot-path="static/videos/Yielding___Group_Agnostic.mp4" data-slot-shape="square">
             <source src="static/videos/Yielding___Group_Agnostic.mp4" type="video/mp4">
@@ -694,11 +698,18 @@
           <figcaption class="compose-body">
             <h4>Yielding &amp; Group-Agnostic</h4>
             <span class="vec">[0, 0, +1, &minus;1]</span>
-            <p>A deliberately conflicting request: defer to individuals, but feel free
-            to cut through a group. Both instructions are legible in the result.</p>
+            <p>Yields to the first pedestrian before cutting through the oncoming
+            social group.</p>
           </figcaption>
         </figure>
 
+      </div>
+
+      <div class="sync-bar" data-sync-controls="compose">
+        <button class="sync-btn" data-sync-play><i class="fas fa-play"></i><span>Play all</span></button>
+        <button class="sync-btn" data-sync-restart><i class="fas fa-rotate-left"></i><span>Restart</span></button>
+        <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+               data-sync-scrub aria-label="Scrub all four composition clips together">
       </div>
 
       <div class="draft-note">
@@ -716,7 +727,7 @@
       <p class="section-lead">
         SoGuDiff runs at 10&nbsp;Hz on a Clearpath Jackal with YOLO11n pedestrian
         detection and tracking, on a tethered laptop with a Ryzen 7 7745HX and an RTX
-        4070. The same style vector that steers the simulator steers the robot.
+        4070.
       </p>
 
       <div class="media-grid">
@@ -873,14 +884,8 @@
         <div class="column is-8">
           <div class="content">
             <p>
-              This page was built using the
-              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>
-              which was adopted from the
-              <a href="https://nerfies.github.io" target="_blank" rel="noopener">Nerfies</a> project page.
-              You are free to borrow the source code of this website, we just ask that you link back to this page in the footer.
-              <br>
-              This website is licensed under a
-              <a rel="license" href="http://creativecommons.org/licenses/by-sa/4.0/" target="_blank">Creative Commons Attribution-ShareAlike 4.0 International License</a>.
+              This website was constructed using the
+              <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>.
             </p>
           </div>
         </div>

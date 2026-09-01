@@ -35,16 +35,27 @@ is visible to a normal viewer.
 
 ---
 
-## Adding the videos that are still missing
+## Adding the assets that are still missing
 
-Nine media slots are wired up but have no file yet. Each renders as a labelled
+Ten media slots are wired up but have no file yet. Each renders as a labelled
 dashed placeholder naming the exact path to drop in — so the page is never
-broken while you are still producing footage. **Adding a video is one step: put
-the file at the named path.** No HTML edit needed.
+broken while you are still producing material. **Adding an asset is one step:
+put the file at the named path.** No HTML edit needed.
 
-| Path (in `static/videos/`) | What it is | Priority |
+### Figures, exported from the manuscript
+
+| Path | Source in the paper | Where it appears |
 | --- | --- | --- |
-| `teaser.mp4` | Top-of-page reel. Real-world footage, then the same scene under contrasting styles. | **Highest** — first thing anyone sees |
+| `static/images/teaser_figure.png` | `Figures/MainFigureV3.png` | Top of the page, under the title |
+| `static/images/method_overview.png` | `Figures/SocialStyleUNetV3.png` | "How It Works" section |
+
+Export both at generous width — 2000px for the teaser, 2400px for the
+two-panel method figure — since they are shown full-bleed.
+
+### Videos (in `static/videos/`)
+
+| Path | What it is | Priority |
+| --- | --- | --- |
 | `real_style_comparison.mp4` | One repeated hardware scene under two or three styles, ideally side by side | **Highest** — the core real-world claim |
 | `real_onboard_detections.mp4` | Camera feed with YOLO boxes/tracks beside the planner's own view | High |
 | `real_group_encounter.mp4` | A real co-moving pair at `s_group = -1` vs `+1` | High |
@@ -88,20 +99,43 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 
 ## Layout of the page
 
-1. **Hero** — title, anonymous author block, inert Paper/arXiv/Code buttons
-2. **Teaser** — slot for the headline video
+1. **Hero** — title, anonymous author block, inert Paper/arXiv/Code/Video buttons
+2. **Teaser figure** — the paper's Fig. 1
 3. **Abstract** — verbatim from the paper
-4. **The Style Vector** — four cards explaining the axes and what ±1 mean
-5. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
+4. **How It Works** — the paper's Fig. 2, with a condensed caption
+5. **The Style Vector** — four cards explaining the axes and what ±1 mean
+6. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
    clips play in step with shared play / restart / scrub controls
-6. **Composing Axes at Inference** — the four composed-style runs
-7. **Real-World Deployment** — four slots
-8. **Beyond the Paper** — four slots for supplementary comparisons
-9. **BibTeX** and footer
+7. **Composing Axes at Inference** — the four composed-style runs, also synced
+8. **Real-World Deployment** — four slots
+9. **Beyond the Paper** — four slots for supplementary comparisons
+10. **BibTeX** and footer
 
-The page deliberately does **not** reproduce the paper's tables and figures.
-It carries the video evidence that would not fit in the page limit; only a few
-headline numbers appear, as captions to the clips they explain.
+### Synchronized playback
+
+The triptychs and the composition grid each form a sync group. The clips in a
+group share one wall-clock timeline: a clip that finishes early **holds on its
+last frame** until every clip in the group has finished, and only then do they
+all restart together. Individual `loop` attributes would break that alignment,
+so synced clips deliberately do not carry one — the standalone slot videos in
+the later sections still do, since they play independently.
+
+### Axis colors
+
+Each axis is drawn in the clips with a matplotlib sequential colormap that
+darkens from +1 to −1: **prox = Purples, pass = Blues, yield = Greens,
+group = Oranges**. The style chips and the explorer tabs in `sogudiff.css`
+are set to the exact shades sampled from the robot marker in the clips, so
+the page and the videos agree. If you re-render the videos with a different
+colormap, update the `--prox-*` / `--pass-*` / `--yield-*` / `--group-*`
+variables at the top of that file.
+
+### Scope
+
+Beyond the two figures above, the page deliberately does **not** reproduce the
+paper's tables or results plots. It carries the video evidence that would not
+fit in the page limit, and the captions describe what each clip does rather
+than restating numbers the paper already reports.
 
 ---
 
@@ -109,14 +143,15 @@ headline numbers appear, as captions to the clips they explain.
 
 ```
 index.html                    the whole page
-static/css/index.css          template base styles (unmodified)
+static/css/index.css          template base styles (one copy-button fix)
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
 static/js/index.js            BibTeX copy + scroll-to-top
 static/js/sogudiff.js         asset slots, axis tabs, synchronized playback
 static/images/favicon.svg     source for the favicon
 static/images/favicon.ico     generated: rsvg-convert + ImageMagick
-static/images/social_preview.png  1200x630 link-preview card
+static/images/social_preview.svg  source for the link-preview card
+static/images/social_preview.png  generated: rsvg-convert -w 1200 -h 630
 static/videos/                clips
 static/videos/posters/        poster frames
 ```
@@ -136,7 +171,7 @@ uses CSS grid instead. Safe to delete if you never add a carousel.
 
 ## Before going public
 
-`index.html` contains **13 `RELEASE:` markers**, plus 5 occurrences of
+`index.html` contains **14 `RELEASE:` markers**, plus 5 occurrences of
 `REPLACE_WITH_PROJECT_URL`. Grep for both:
 
 ```bash
@@ -154,7 +189,8 @@ Between them they gate everything that must change before the page is public:
    complete them; Scholar will skip a page with a partial author list, so fill
    every field or leave them commented.
 6. Author block in the hero — replace "Anonymous Authors"
-7. The three link buttons — real URLs, and remove `is-pending` from each
+7. The four link buttons (Paper, arXiv, Code, Video) — real URLs, and remove
+   `is-pending` from each
 8. JSON-LD — author, `datePublished`, publisher
 9. BibTeX — the real citation
 

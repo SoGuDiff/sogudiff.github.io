@@ -414,9 +414,9 @@ code {
   background: #10b981;
 }
 
-.copy-bibtex-btn.copied .copy-text::after {
-  content: "ied!";
-}
+/* The label is written in full by copyBibTeX() in static/js/index.js.
+   This rule used to append "ied!" to a truncated "Cop", which double-suffixed
+   any complete word the script set. */
 
 /* Scroll to Top Button */
 .scroll-to-top {

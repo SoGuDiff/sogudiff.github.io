@@ -5,10 +5,21 @@
    ========================================================================== */
 
 :root {
-  --ax-prox:  #e0921a;
-  --ax-pass:  #2f9e6a;
-  --ax-yield: #d1526e;
-  --ax-group: #3f76c9;
+  /* Each axis is rendered in the clips with a matplotlib sequential colormap
+     that darkens from +1 to -1. These are sampled from the robot marker in
+     the clips themselves, so the page and the videos agree.
+       prox = Purples   pass = Blues   yield = Greens   group = Oranges
+     The --ax-* value is the NEUTRAL (0) shade, used for tabs and card rules. */
+  --ax-prox:  #807dba;
+  --ax-pass:  #4292c6;
+  --ax-yield: #41ab5d;
+  --ax-group: #f16913;
+
+  --prox-neg: #3f007d;  --prox-mid: #807dba;  --prox-pos: #bcbddc;
+  --pass-neg: #08306b;  --pass-mid: #4292c6;  --pass-pos: #9ecae1;
+  --yield-neg:#00441b;  --yield-mid:#41ab5d;  --yield-pos:#a1d99b;
+  --group-neg:#7f2704;  --group-mid:#f16913;  --group-pos:#fdae6b;
+
   --neg-tone: #b45309;
   --pos-tone: #1d4ed8;
   --surface:  #ffffff;
@@ -18,6 +29,13 @@
 /* --------------------------------------------------------------------------
    Hero / header
    -------------------------------------------------------------------------- */
+
+/* Scaled so "Steerable, Norm-Grounded Robot Navigation" fits on one line
+   inside the widescreen container, keeping the title to two lines total. */
+.publication-title {
+  font-size: clamp(1.6rem, 3.4vw, 2.7rem);
+  line-height: 1.22;
+}
 
 .venue-badge {
   display: inline-block;
@@ -96,14 +114,53 @@
 }
 
 /* --------------------------------------------------------------------------
+   Paper figures (teaser, method overview)
+   -------------------------------------------------------------------------- */
+
+.teaser-figure {
+  display: block;
+  width: 100%;
+  height: auto;
+  border-radius: var(--border-radius);
+}
+
+.method-figure { margin: 1.75rem 0 0; }
+
+.method-figure img {
+  display: block;
+  width: 100%;
+  height: auto;
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius);
+  background: #fff;
+}
+
+.method-figure figcaption {
+  max-width: 78ch;
+  margin: 1rem auto 0;
+  color: var(--text-secondary);
+  font-size: 0.9rem;
+  line-height: 1.65;
+  text-align: left;
+}
+
+.method-figure figcaption b { color: var(--text-primary); }
+
+/* --------------------------------------------------------------------------
    Style axis cards
    -------------------------------------------------------------------------- */
 
 .axis-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  /* Explicit 2x2. auto-fit produced a 3+1 split at desktop widths, which
+     left a conspicuous gap on the second row. */
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
   margin-top: 2rem;
+}
+
+@media screen and (max-width: 640px) {
+  .axis-grid { grid-template-columns: 1fr; }
 }
 
 .axis-card {
@@ -223,9 +280,24 @@
   white-space: nowrap;
 }
 
-.style-chip.is-neg { background: #fef3c7; color: #92400e; }
-.style-chip.is-zero { background: var(--background-accent); color: var(--text-secondary); }
-.style-chip.is-pos { background: #dbeafe; color: #1e40af; }
+/* Each chip carries the robot colour that clip actually uses, so the label
+   and the moving robot in the frame below it match. Dark shades take white
+   text, light shades take a dark tint of the same hue. */
+.axis-panel[data-axis="prox"]  .style-chip.is-neg  { background: var(--prox-neg);  color: #fff; }
+.axis-panel[data-axis="prox"]  .style-chip.is-zero { background: var(--prox-mid);  color: #fff; }
+.axis-panel[data-axis="prox"]  .style-chip.is-pos  { background: var(--prox-pos);  color: #34155e; }
+
+.axis-panel[data-axis="pass"]  .style-chip.is-neg  { background: var(--pass-neg);  color: #fff; }
+.axis-panel[data-axis="pass"]  .style-chip.is-zero { background: var(--pass-mid);  color: #fff; }
+.axis-panel[data-axis="pass"]  .style-chip.is-pos  { background: var(--pass-pos);  color: #0b3a5c; }
+
+.axis-panel[data-axis="yield"] .style-chip.is-neg  { background: var(--yield-neg); color: #fff; }
+.axis-panel[data-axis="yield"] .style-chip.is-zero { background: var(--yield-mid); color: #fff; }
+.axis-panel[data-axis="yield"] .style-chip.is-pos  { background: var(--yield-pos); color: #14401f; }
+
+.axis-panel[data-axis="group"] .style-chip.is-neg  { background: var(--group-neg); color: #fff; }
+.axis-panel[data-axis="group"] .style-chip.is-zero { background: var(--group-mid); color: #fff; }
+.axis-panel[data-axis="group"] .style-chip.is-pos  { background: var(--group-pos); color: #5a2a06; }
 
 .triptych-head .cell-name {
   font-size: 0.85rem;
@@ -291,9 +363,13 @@
 
 .compose-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 1.25rem;
   margin-top: 1.5rem;
+}
+
+@media screen and (max-width: 640px) {
+  .compose-grid { grid-template-columns: 1fr; }
 }
 
 .compose-card {

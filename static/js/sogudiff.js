@@ -81,13 +81,6 @@
     return Array.prototype.slice.call(group.querySelectorAll('video'));
   }
 
-  function longest(videos) {
-    return videos.reduce(function (best, v) {
-      var d = isFinite(v.duration) ? v.duration : 0;
-      return d > best ? d : best;
-    }, 0);
-  }
-
   function setupSyncGroup(group) {
     var name = group.dataset.syncGroup;
     var controls = document.querySelector('[data-sync-controls="' + name + '"]');
@@ -97,12 +90,36 @@
     var playBtn = controls && controls.querySelector('[data-sync-play]');
     var restartBtn = controls && controls.querySelector('[data-sync-restart]');
     var scrub = controls && controls.querySelector('[data-sync-scrub]');
-    var driver = videos[0];
+
+    // The clips differ in length. They share one wall-clock timeline: a clip
+    // that finishes early holds on its last frame until every clip has
+    // finished, and only then do they all restart together. Looping each clip
+    // on its own would silently break the alignment the comparison depends on.
+    function groupDuration() {
+      return videos.reduce(function (max, v) {
+        return isFinite(v.duration) && v.duration > max ? v.duration : max;
+      }, 0);
+    }
+
+    function allEnded() {
+      return videos.every(function (v) { return v.ended; });
+    }
+
+    function rewindAll() {
+      videos.forEach(function (v) { v.currentTime = 0; });
+    }
 
     function playAll() {
-      videos.forEach(function (v) { v.play().catch(function () { /* autoplay policy */ }); });
+      // Seeking clears the ended flag, so rewind before replaying a finished set.
+      if (allEnded()) rewindAll();
+      videos.forEach(function (v) {
+        if (!v.ended) v.play().catch(function () { /* autoplay policy */ });
+      });
     }
-    function pauseAll() { videos.forEach(function (v) { v.pause(); }); }
+
+    function pauseAll() {
+      videos.forEach(function (v) { v.pause(); });
+    }
 
     function setPlayIcon(playing) {
       if (!playBtn) return;
@@ -112,48 +129,55 @@
       if (text) text.textContent = playing ? 'Pause' : 'Play all';
     }
 
+    // When the last clip finishes, restart the whole group in step.
+    videos.forEach(function (v) {
+      v.addEventListener('ended', function () {
+        if (allEnded()) { rewindAll(); playAll(); }
+      });
+    });
+
     if (playBtn) {
       playBtn.addEventListener('click', function () {
-        if (driver.paused) { playAll(); setPlayIcon(true); }
-        else { pauseAll(); setPlayIcon(false); }
+        var playing = videos.some(function (v) { return !v.paused && !v.ended; });
+        if (playing) { pauseAll(); setPlayIcon(false); }
+        else { playAll(); setPlayIcon(true); }
       });
     }
 
     if (restartBtn) {
       restartBtn.addEventListener('click', function () {
-        videos.forEach(function (v) { v.currentTime = 0; });
+        rewindAll();
         playAll();
         setPlayIcon(true);
       });
     }
 
-    // Clips differ slightly in length; scrub by fraction of each clip's own
-    // duration so the three stay visually aligned through the manoeuvre.
     if (scrub) {
+      // Scrubbing moves the shared timeline, not each clip's own fraction, so
+      // a short clip parks on its final frame instead of racing ahead.
       scrub.addEventListener('input', function () {
-        var frac = Number(scrub.value) / 1000;
+        var total = groupDuration();
+        if (!total) return;
+        var t = (Number(scrub.value) / 1000) * total;
         pauseAll();
         setPlayIcon(false);
         videos.forEach(function (v) {
-          if (isFinite(v.duration) && v.duration > 0) v.currentTime = frac * v.duration;
+          if (!isFinite(v.duration) || v.duration <= 0) return;
+          // Nudge just inside the end so the frame renders rather than firing 'ended'.
+          v.currentTime = Math.min(t, Math.max(0, v.duration - 0.02));
         });
       });
 
-      driver.addEventListener('timeupdate', function () {
-        if (!isFinite(driver.duration) || driver.duration <= 0) return;
-        scrub.value = String(Math.round((driver.currentTime / driver.duration) * 1000));
+      // Drive the readout from whichever clip is longest, so the bar keeps
+      // advancing after the shorter ones have parked.
+      videos.forEach(function (v) {
+        v.addEventListener('timeupdate', function () {
+          var total = groupDuration();
+          if (!total || !isFinite(v.duration) || v.duration < total) return;
+          scrub.value = String(Math.round((v.currentTime / total) * 1000));
+        });
       });
     }
-
-    // Keep the group in step: when the longest clip wraps, restart them all.
-    var lead = videos[0];
-    videos.forEach(function (v) {
-      if (isFinite(v.duration) && isFinite(lead.duration) && v.duration > lead.duration) lead = v;
-    });
-    lead.addEventListener('ended', function () {
-      videos.forEach(function (v) { v.currentTime = 0; });
-      playAll();
-    });
 
     group._syncPlay = playAll;
     group._syncPause = pauseAll;
@@ -220,18 +244,27 @@
   }
 
   /* ----------------------------------------------------------------------
-     Standalone clips elsewhere on the page: play while visible, pause when
-     scrolled away, so a page full of video stays cheap.
+     Sync groups outside the tabbed explorer (the composition grid) start
+     when scrolled into view and pause when scrolled away, so a page full of
+     video stays cheap. The explorer has its own trigger above.
      ---------------------------------------------------------------------- */
-  var lazyVideos = document.querySelectorAll('video[data-autoplay-in-view]');
-  if (lazyVideos.length && 'IntersectionObserver' in window) {
-    var vo = new IntersectionObserver(function (entries) {
+  var looseGroups = Array.prototype.filter.call(
+    document.querySelectorAll('[data-sync-group]'),
+    function (g) { return !explorer || !explorer.contains(g); }
+  );
+
+  if (looseGroups.length && 'IntersectionObserver' in window) {
+    var go = new IntersectionObserver(function (entries) {
       entries.forEach(function (entry) {
-        var v = entry.target;
-        if (entry.isIntersecting) v.play().catch(function () {});
-        else v.pause();
+        var g = entry.target;
+        if (entry.isIntersecting) {
+          if (g._syncPlay) { g._syncPlay(); if (g._syncReset) g._syncReset(true); }
+        } else if (g._syncPause) {
+          g._syncPause();
+          if (g._syncReset) g._syncReset(false);
+        }
       });
-    }, { threshold: 0.4 });
-    lazyVideos.forEach(function (v) { vo.observe(v); });
+    }, { threshold: 0.25 });
+    looseGroups.forEach(function (g) { go.observe(g); });
   }
 })();
