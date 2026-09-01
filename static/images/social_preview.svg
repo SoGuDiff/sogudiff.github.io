@@ -21,12 +21,15 @@
        closest stays outside the innermost proxemic zone.
        These colours are deliberately unrelated to the axis chips below. -->
   <g fill="none" stroke-linecap="round" stroke-width="9">
+    <!-- The robot has a fixed heading, so all three leave the start with the
+         same tangent: every first control point sits on the vertical ray
+         above (800,580). They diverge only as curvature accumulates. -->
     <!-- wide, left: commits early and wide, then straightens out toward the goal -->
-    <path d="M800 580 C 698 524, 664 418, 692 330 C 716 252, 744 194, 758 118" stroke="#6ecf8f" opacity="0.95"/>
-    <!-- medium, right: holds its line at first, swings out late, then cuts back -->
-    <path d="M800 580 C 904 570, 988 490, 1008 374 C 1024 280, 990 194, 936 132" stroke="#ff7f6e" opacity="0.95"/>
+    <path d="M800 580 C 800 496, 690 442, 692 330 C 694 240, 740 190, 758 118" stroke="#6ecf8f" opacity="0.95"/>
+    <!-- medium, right: holds its line longer, swings out late, then cuts back -->
+    <path d="M800 580 C 800 500, 996 486, 1008 374 C 1020 274, 988 194, 936 132" stroke="#ff7f6e" opacity="0.95"/>
     <!-- close, left: a tight S, hugging the personal-space boundary -->
-    <path d="M800 580 C 852 508, 828 428, 807 352 C 788 286, 806 210, 850 152" stroke="#f5b544" opacity="0.95"/>
+    <path d="M800 580 C 800 508, 824 424, 807 352 C 788 286, 806 210, 850 152" stroke="#f5b544" opacity="0.95"/>
   </g>
 
   <!-- robot -->
@@ -40,15 +43,15 @@
   <!-- Axis chips. Tinted, but kept entirely within the blue family so they
        read as one set of labels and cannot be mistaken for a legend for the
        green/coral/amber trajectories above. -->
-  <g font-family="DejaVu Sans" font-size="20">
+  <g font-family="DejaVu Sans" font-size="20" text-anchor="middle">
     <rect x="80"  y="440" width="128" height="42" rx="21" fill="#8ab4f8" fill-opacity="0.16" stroke="#8ab4f8" stroke-opacity="0.55"/>
-    <text x="102" y="468" fill="#a9c9fb">proxemic</text>
+    <text x="144" y="467" fill="#a9c9fb">proxemic</text>
     <rect x="222" y="440" width="112" height="42" rx="21" fill="#7fc4e8" fill-opacity="0.16" stroke="#7fc4e8" stroke-opacity="0.55"/>
-    <text x="248" y="468" fill="#a2d5ef">passing</text>
+    <text x="278" y="467" fill="#a2d5ef">passing</text>
     <rect x="348" y="440" width="112" height="42" rx="21" fill="#9aa8f0" fill-opacity="0.16" stroke="#9aa8f0" stroke-opacity="0.55"/>
-    <text x="376" y="468" fill="#b6c0f5">yielding</text>
+    <text x="404" y="467" fill="#b6c0f5">yielding</text>
     <rect x="474" y="440" width="104" height="42" rx="21" fill="#6f9fe0" fill-opacity="0.16" stroke="#6f9fe0" stroke-opacity="0.55"/>
-    <text x="500" y="468" fill="#9dbdea">group</text>
+    <text x="526" y="467" fill="#9dbdea">group</text>
   </g>
 
   <text x="80" y="543" font-family="DejaVu Sans" font-size="22" fill="#93accf">Four continuous style axes,</text>
