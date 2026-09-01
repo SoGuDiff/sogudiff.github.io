@@ -1,0 +1,451 @@
+/* ==========================================================================
+   SoGuDiff project page — components layered on top of the template's
+   index.css. Everything specific to this paper lives here so the upstream
+   template stylesheet stays clean and can be updated independently.
+   ========================================================================== */
+
+:root {
+  --ax-prox:  #e0921a;
+  --ax-pass:  #2f9e6a;
+  --ax-yield: #d1526e;
+  --ax-group: #3f76c9;
+  --neg-tone: #b45309;
+  --pos-tone: #1d4ed8;
+  --surface:  #ffffff;
+  --hairline: #e2e8f0;
+}
+
+/* --------------------------------------------------------------------------
+   Hero / header
+   -------------------------------------------------------------------------- */
+
+.venue-badge {
+  display: inline-block;
+  margin-top: 0.6rem;
+  padding: 0.3rem 0.9rem;
+  border: 1px solid var(--border-color);
+  border-radius: 999px;
+  background: var(--background-accent);
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  font-weight: 600;
+  letter-spacing: 0.02em;
+}
+
+/* Link buttons that have no destination yet: visibly present, clearly inert. */
+.external-link.is-pending {
+  opacity: 0.45;
+  cursor: not-allowed;
+  pointer-events: none;
+}
+
+.link-note {
+  margin-top: 1rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
+/* --------------------------------------------------------------------------
+   Asset slots — a placeholder that renders wherever a file has not been
+   dropped in yet. Any <video>/<img> whose source fails to load is swapped
+   for one of these by sogudiff.js, so the page is never broken mid-build.
+   -------------------------------------------------------------------------- */
+
+.asset-slot {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5rem;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  padding: 1.5rem;
+  border: 2px dashed #cbd5e1;
+  border-radius: var(--border-radius);
+  background:
+    repeating-linear-gradient(45deg, #f8fafc, #f8fafc 12px, #f1f5f9 12px, #f1f5f9 24px);
+  color: var(--text-secondary);
+  text-align: center;
+}
+
+.asset-slot.is-square { aspect-ratio: 1 / 1; }
+
+.asset-slot .slot-icon { font-size: 1.6rem; color: var(--text-light); }
+
+.asset-slot .slot-label {
+  font-weight: 700;
+  font-size: 0.95rem;
+  color: var(--text-primary);
+}
+
+.asset-slot .slot-path {
+  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  color: var(--primary-color);
+  word-break: break-all;
+  background: rgba(37, 99, 235, 0.07);
+  padding: 0.2rem 0.5rem;
+  border-radius: 6px;
+}
+
+.asset-slot .slot-hint {
+  font-size: 0.8rem;
+  color: var(--text-light);
+  max-width: 42ch;
+  line-height: 1.4;
+}
+
+/* --------------------------------------------------------------------------
+   Style axis cards
+   -------------------------------------------------------------------------- */
+
+.axis-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(230px, 1fr));
+  gap: 1.25rem;
+  margin-top: 2rem;
+}
+
+.axis-card {
+  padding: 1.4rem;
+  border: 1px solid var(--hairline);
+  border-top: 4px solid var(--axis-color, var(--primary-color));
+  border-radius: var(--border-radius);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.axis-card:hover { box-shadow: var(--shadow-md); transform: translateY(-2px); }
+
+.axis-card h3 {
+  margin: 0 0 0.15rem;
+  font-size: 1.05rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.axis-card .axis-symbol {
+  display: block;
+  margin-bottom: 0.75rem;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.8rem;
+  color: var(--axis-color, var(--primary-color));
+  font-weight: 600;
+}
+
+.axis-card .axis-poles {
+  margin-top: 0.9rem;
+  padding-top: 0.9rem;
+  border-top: 1px solid var(--hairline);
+  font-size: 0.85rem;
+  line-height: 1.55;
+}
+
+.axis-card .pole-neg { color: var(--neg-tone); font-weight: 600; }
+.axis-card .pole-pos { color: var(--pos-tone); font-weight: 600; }
+
+/* --------------------------------------------------------------------------
+   Axis explorer — tabbed, three synchronized clips per axis
+   -------------------------------------------------------------------------- */
+
+.axis-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin: 1.75rem 0 1.25rem;
+}
+
+.axis-tab {
+  padding: 0.55rem 1.3rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.axis-tab:hover { border-color: var(--tab-color, var(--primary-color)); color: var(--text-primary); }
+
+.axis-tab[aria-selected="true"] {
+  background: var(--tab-color, var(--primary-color));
+  border-color: var(--tab-color, var(--primary-color));
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.axis-panel[hidden] { display: none; }
+
+.triptych {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 1.1rem;
+}
+
+.triptych-cell {
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.triptych-cell video,
+.triptych-cell .asset-slot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #0f172a;
+  border: none;
+  border-radius: 0;
+}
+
+.triptych-head {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.5rem;
+  padding: 0.65rem 0.9rem;
+  border-bottom: 1px solid var(--hairline);
+}
+
+.style-chip {
+  padding: 0.18rem 0.6rem;
+  border-radius: 999px;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 700;
+  white-space: nowrap;
+}
+
+.style-chip.is-neg { background: #fef3c7; color: #92400e; }
+.style-chip.is-zero { background: var(--background-accent); color: var(--text-secondary); }
+.style-chip.is-pos { background: #dbeafe; color: #1e40af; }
+
+.triptych-head .cell-name {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-primary);
+  text-align: right;
+  line-height: 1.25;
+}
+
+.triptych-caption {
+  padding: 0.7rem 0.9rem;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.panel-note {
+  margin-top: 1.25rem;
+  padding: 0.9rem 1.1rem;
+  border-left: 3px solid var(--tab-color, var(--primary-color));
+  border-radius: 0 8px 8px 0;
+  background: var(--background-secondary);
+  font-size: 0.88rem;
+  line-height: 1.6;
+  color: var(--text-secondary);
+}
+
+.panel-note strong { color: var(--text-primary); }
+
+/* Shared playback controls for a synchronized group */
+.sync-bar {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.75rem;
+  margin-top: 1.1rem;
+}
+
+.sync-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.sync-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+
+.sync-scrub { width: min(320px, 60vw); accent-color: var(--primary-color); cursor: pointer; }
+
+/* --------------------------------------------------------------------------
+   Composition grid
+   -------------------------------------------------------------------------- */
+
+.compose-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.compose-card {
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+  transition: var(--transition);
+}
+
+.compose-card:hover { box-shadow: var(--shadow-md); }
+
+.compose-card video,
+.compose-card .asset-slot {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #0f172a;
+  border: none;
+  border-radius: 0;
+}
+
+.compose-body { padding: 0.85rem 1rem 1rem; }
+
+.compose-body h4 {
+  margin: 0 0 0.4rem;
+  font-size: 0.98rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.compose-body p {
+  margin: 0.5rem 0 0;
+  font-size: 0.83rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.vec {
+  display: inline-block;
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.78rem;
+  font-weight: 600;
+  color: var(--primary-color);
+  background: rgba(37, 99, 235, 0.08);
+  padding: 0.15rem 0.5rem;
+  border-radius: 6px;
+}
+
+/* --------------------------------------------------------------------------
+   Generic media grid for the "to be filled" sections
+   -------------------------------------------------------------------------- */
+
+.media-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+  gap: 1.25rem;
+  margin-top: 1.5rem;
+}
+
+.media-item {
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+.media-item video,
+.media-item img,
+.media-item .asset-slot {
+  display: block;
+  width: 100%;
+  background: #0f172a;
+  border: none;
+  border-radius: 0;
+}
+
+.media-item figcaption {
+  padding: 0.75rem 1rem 0.9rem;
+  font-size: 0.85rem;
+  line-height: 1.5;
+  color: var(--text-secondary);
+}
+
+.media-item figcaption b { color: var(--text-primary); }
+
+.section-lead {
+  max-width: 62ch;
+  margin: 0 auto;
+  color: var(--text-secondary);
+  font-size: 1rem;
+  line-height: 1.7;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Editorial notes — visible only when the page is served with ?draft
+   so you can audit what is still unfilled, then share without the clutter.
+   -------------------------------------------------------------------------- */
+
+.draft-note { display: none; }
+
+body.is-draft .draft-note {
+  display: block;
+  margin: 0.9rem auto 0;
+  max-width: 70ch;
+  padding: 0.75rem 1rem;
+  border: 1px dashed #f59e0b;
+  border-radius: 8px;
+  background: #fffbeb;
+  color: #92400e;
+  font-size: 0.83rem;
+  line-height: 1.55;
+  text-align: left;
+}
+
+body.is-draft .draft-note code {
+  background: rgba(146, 64, 14, 0.1);
+  padding: 0.1rem 0.35rem;
+  border-radius: 4px;
+}
+
+.draft-banner {
+  position: sticky;
+  top: 0;
+  z-index: 60;
+  padding: 0.5rem 1rem;
+  background: #92400e;
+  color: #fff;
+  font-size: 0.85rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+/* --------------------------------------------------------------------------
+   Responsive
+   -------------------------------------------------------------------------- */
+
+@media screen and (max-width: 900px) {
+  .triptych { grid-template-columns: 1fr; gap: 1rem; }
+  .triptych-cell video,
+  .triptych-cell .asset-slot { max-height: 62vh; }
+}
+
+@media screen and (max-width: 600px) {
+  .axis-tabs { gap: 0.4rem; }
+  .axis-tab { padding: 0.45rem 0.9rem; font-size: 0.85rem; }
+  .sync-scrub { width: 100%; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .axis-card:hover { transform: none; }
+}

@@ -1,0 +1,31 @@
+# ---------------------------------------------------------------------------
+# Paper sources must never land in this repo. The website repo is intended to
+# become public at release; the manuscript is not ours to publish that way.
+# ---------------------------------------------------------------------------
+*.tex
+*.bib
+*.aux
+*.log
+*.out
+*.synctex.gz
+*.bbl
+*.blg
+*.fdb_latexmk
+*.fls
+root.pdf
+
+# Working files
+*.mp4.tmp
+*.orig
+*.rej
+scratch/
+_local/
+
+# OS / editor cruft
+.DS_Store
+Thumbs.db
+desktop.ini
+*.swp
+*~
+.vscode/
+.idea/
