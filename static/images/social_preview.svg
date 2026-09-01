@@ -1,0 +1,56 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="1200" height="630" viewBox="0 0 1200 630">
+  <defs>
+    <linearGradient id="bg" x1="0" y1="0" x2="1" y2="1">
+      <stop offset="0%" stop-color="#16233d"/>
+      <stop offset="100%" stop-color="#24406e"/>
+    </linearGradient>
+  </defs>
+  <rect width="1200" height="630" fill="url(#bg)"/>
+
+  <!-- proxemic zones around the pedestrian -->
+  <g opacity="0.18" stroke="#9dc0f5" fill="none">
+    <circle cx="880" cy="335" r="62"  stroke-width="2"/>
+    <circle cx="880" cy="335" r="122" stroke-width="2" stroke-dasharray="6 8"/>
+    <circle cx="880" cy="335" r="186" stroke-width="2" stroke-dasharray="4 12"/>
+  </g>
+  <circle cx="880" cy="335" r="14" fill="#7aa5e8" opacity="0.9"/>
+
+  <!-- Three distinct styled routes past the same pedestrian: close on the
+       left, medium on the right, wide on the left. Each has its own shape
+       rather than being a parallel offset of the others, and even the
+       closest stays outside the innermost proxemic zone.
+       These colours are deliberately unrelated to the axis chips below. -->
+  <g fill="none" stroke-linecap="round" stroke-width="9">
+    <!-- wide, left: commits early and wide, then straightens out toward the goal -->
+    <path d="M800 580 C 698 524, 664 418, 692 330 C 716 252, 744 194, 758 118" stroke="#6ecf8f" opacity="0.95"/>
+    <!-- medium, right: holds its line at first, swings out late, then cuts back -->
+    <path d="M800 580 C 904 570, 988 490, 1008 374 C 1024 280, 990 194, 936 132" stroke="#ff7f6e" opacity="0.95"/>
+    <!-- close, left: a tight S, hugging the personal-space boundary -->
+    <path d="M800 580 C 852 508, 828 428, 807 352 C 788 286, 806 210, 850 152" stroke="#f5b544" opacity="0.95"/>
+  </g>
+
+  <!-- robot -->
+  <circle cx="800" cy="580" r="14" fill="#f5f7fa"/>
+
+  <text x="80" y="215" font-family="DejaVu Sans" font-size="72" font-weight="bold" fill="#ffffff">SoGuDiff</text>
+  <text x="80" y="285" font-family="DejaVu Sans" font-size="31" fill="#c8d8f2">Socially Guided Diffusion for</text>
+  <text x="80" y="330" font-family="DejaVu Sans" font-size="31" fill="#c8d8f2">Steerable, Norm-Grounded</text>
+  <text x="80" y="375" font-family="DejaVu Sans" font-size="31" fill="#c8d8f2">Robot Navigation</text>
+
+  <!-- Axis chips. Tinted, but kept entirely within the blue family so they
+       read as one set of labels and cannot be mistaken for a legend for the
+       green/coral/amber trajectories above. -->
+  <g font-family="DejaVu Sans" font-size="20">
+    <rect x="80"  y="440" width="128" height="42" rx="21" fill="#8ab4f8" fill-opacity="0.16" stroke="#8ab4f8" stroke-opacity="0.55"/>
+    <text x="102" y="468" fill="#a9c9fb">proxemic</text>
+    <rect x="222" y="440" width="112" height="42" rx="21" fill="#7fc4e8" fill-opacity="0.16" stroke="#7fc4e8" stroke-opacity="0.55"/>
+    <text x="248" y="468" fill="#a2d5ef">passing</text>
+    <rect x="348" y="440" width="112" height="42" rx="21" fill="#9aa8f0" fill-opacity="0.16" stroke="#9aa8f0" stroke-opacity="0.55"/>
+    <text x="376" y="468" fill="#b6c0f5">yielding</text>
+    <rect x="474" y="440" width="104" height="42" rx="21" fill="#6f9fe0" fill-opacity="0.16" stroke="#6f9fe0" stroke-opacity="0.55"/>
+    <text x="500" y="468" fill="#9dbdea">group</text>
+  </g>
+
+  <text x="80" y="543" font-family="DejaVu Sans" font-size="22" fill="#93accf">Four continuous style axes,</text>
+  <text x="80" y="576" font-family="DejaVu Sans" font-size="22" fill="#93accf">composed during runtime.</text>
+</svg>
