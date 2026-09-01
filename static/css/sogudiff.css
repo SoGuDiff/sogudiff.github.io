@@ -516,9 +516,9 @@ body.is-draft .draft-note code {
 
 /* --------------------------------------------------------------------------
    Animated method walkthrough
-   The diagram is drawn as inline SVG so each stage can be revealed, dimmed
-   and animated independently. Without JS every stage stays fully visible,
-   so the figure still reads as a complete static diagram.
+   The figure is the manuscript's own vector export, shown unmodified. The
+   walkthrough is a scrim laid over it with holes cut where the current step
+   is. Without JS the scrim never turns on, so the figure reads normally.
    -------------------------------------------------------------------------- */
 
 .diagram {
@@ -530,59 +530,43 @@ body.is-draft .draft-note code {
   overflow: hidden;
 }
 
-.diagram-stage {
-  position: relative;
-  padding: 1.25rem 1.25rem 0;
-  background: #fff;
+.diagram-stage { padding: 1.25rem 1.25rem 0; background: #fff; }
+
+.dg-figure { position: relative; line-height: 0; }
+
+.dg-base { display: block; width: 100%; height: auto; }
+
+/* Same aspect ratio as the figure, so the overlay's user units line up with
+   the image's own coordinate space and the regions land where intended. */
+.dg-overlay {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  pointer-events: none;
 }
 
-.diagram-svg { display: block; width: 100%; height: auto; }
+.dg-scrim {
+  fill: #ffffff;
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
 
-/* Diagram primitives, matching the palette of the figure in the paper. */
-.diagram-svg .bx { stroke: #3a414a; stroke-width: 2.2; }
-.diagram-svg .yl { fill: #fcfcca; }
-.diagram-svg .bl { fill: #edf5ff; }
-.diagram-svg .gr { fill: #e3fae3; }
-.diagram-svg .pu { fill: #f2f2ff; }
-.diagram-svg .pk { fill: #fff0f0; }
-.diagram-svg .wh { fill: #ffffff; }
-.diagram-svg text { font-family: Inter, system-ui, sans-serif; fill: #1e293b; }
-.diagram-svg .t  { font-size: 16px; }
-.diagram-svg .tb { font-size: 16px; font-weight: 700; }
-.diagram-svg .ts { font-size: 13px; }
-.diagram-svg .sub { font-size: 11px; }
-.diagram-svg .eq { font-size: 17px; font-family: Georgia, "Times New Roman", serif; }
-.diagram-svg .dg-sum { font-size: 30px; }
-.diagram-svg .fl { fill: none; stroke: #64748b; stroke-width: 2.2; }
-.diagram-svg marker path { fill: #64748b; }
+.is-animated .dg-scrim { opacity: 0.82; }
 
-/* Only one phase is on screen at a time. */
-.diagram-svg .dg-panel { transition: opacity 0.4s ease; }
-.is-animated .dg-panel { opacity: 0; pointer-events: none; }
-.is-animated .dg-panel.is-current { opacity: 1; pointer-events: auto; }
-
-/* Stage reveal: unseen stages are ghosted, past stages settle back, the
-   active stage is at full strength with its flow lines marching. */
-.diagram-svg .dg-stage { transition: opacity 0.45s ease; }
-.is-animated .dg-stage { opacity: 0.1; }
-.is-animated .dg-stage.is-seen { opacity: 0.5; }
-.is-animated .dg-stage.is-active { opacity: 1; }
-
-.is-animated .dg-stage.is-active .fl {
+.dg-ring {
+  fill: none;
   stroke: var(--primary-color);
-  stroke-dasharray: 9 7;
-  animation: dg-flow 0.75s linear infinite;
+  stroke-width: 4;
+  animation: dg-ring-in 0.4s ease both;
 }
 
-.is-animated .dg-stage.is-active .bx { stroke: #1f2937; }
-
-@keyframes dg-flow { to { stroke-dashoffset: -16; } }
-
-@media (prefers-reduced-motion: reduce) {
-  .is-animated .dg-stage.is-active .fl { animation: none; }
+@keyframes dg-ring-in {
+  from { opacity: 0; }
+  to   { opacity: 1; }
 }
 
-/* Phase label */
 .diagram-panel-label {
   display: flex;
   justify-content: center;
@@ -688,3 +672,21 @@ body.is-draft .draft-note code {
   .diagram-caption { min-height: 10rem; padding: 0.9rem 1rem 0.25rem; }
   .dg-dots { width: 100%; justify-content: center; margin: 0.4rem 0 0; }
 }
+
+/* --------------------------------------------------------------------------
+   Inline button icons
+   Font Awesome's JS build rewrites <i> into <svg>, which breaks any script
+   that later looks the <i> up. Buttons whose icon changes therefore carry
+   both states inline and swap them with a class.
+   -------------------------------------------------------------------------- */
+
+.ic {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  vertical-align: -0.125em;
+}
+
+.ic-pause { display: none; }
+.is-playing .ic-play { display: none; }
+.is-playing .ic-pause { display: inline-block; }

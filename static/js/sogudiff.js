@@ -123,9 +123,10 @@
 
     function setPlayIcon(playing) {
       if (!playBtn) return;
-      var icon = playBtn.querySelector('i');
+      // Font Awesome's JS build replaces <i> with <svg>, so the button carries
+      // its own inline icons and we toggle a class rather than an <i>'s class.
+      playBtn.classList.toggle('is-playing', playing);
       var text = playBtn.querySelector('span');
-      if (icon) icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
       if (text) text.textContent = playing ? 'Pause' : 'Play all';
     }
 
@@ -245,77 +246,88 @@
 
   /* ----------------------------------------------------------------------
      Animated method walkthrough
-     Steps through the architecture diagram, revealing one stage at a time.
-     The markup stays a complete static figure if this never runs.
+     The figure itself is the manuscript's vector export, untouched. This
+     drives an overlay: a scrim with holes cut over the region each step is
+     about. Regions are in the figure's own coordinate space (2362 x 573.16).
      ---------------------------------------------------------------------- */
   (function () {
     var root = document.getElementById('method-diagram');
     if (!root) return;
 
-    var STEPS = [
-      { phase: 'a', title: 'Everything the planner is told',
-        body: 'The robot\u2019s own state, its goal, the people around it, and a local ' +
-              'occupancy map describe the situation. The four-number social style vector ' +
-              'arrives through the same door as the rest, which is what makes conduct ' +
-              'something you set at deployment rather than something you retrain.' },
-      { phase: 'a', title: 'Two inputs need their own encoder',
-        body: 'The occupancy map is compressed into tokens by a small convolutional ' +
-              'encoder, and each style axis becomes a token of its own. Both pass through ' +
-              'conditioning dropout during training, so the network learns to cope when ' +
-              'either one is withheld \u2014 the property the whole guidance scheme rests on.' },
-      { phase: 'a', title: 'Scene and style are fused, not stacked',
-        body: 'A self-attention encoder mixes the scene and style tokens before either ' +
-              'reaches the denoiser. The requested manners are therefore interpreted in ' +
-              'light of the actual geometry, rather than applied blindly on top of it.' },
-      { phase: 'a', title: 'A U-Net denoises a whole trajectory',
-        body: 'A one-dimensional conditional U-Net takes a noised trajectory and ' +
-              'cross-attends to those tokens, with the diffusion timestep modulating its ' +
-              'residual blocks. It predicts a path, not a single next action.' },
-      { phase: 'a', title: 'The only thing it is trained to do',
-        body: 'The network learns to predict the noise that was added, scored by mean ' +
-              'squared error. Crucially, every demonstration carries a label on exactly ' +
-              'one style axis \u2014 combinations are never trained for, which is what makes ' +
-              'the next panel interesting.' },
-      { phase: 'b', title: 'One network, asked several different questions',
-        body: 'At deployment the same weights are queried under different conditioning: ' +
-              'nothing at all, the scene alone, and the scene plus a single style axis at ' +
-              'a time. Conditioning dropout is what makes those partial queries meaningful.' },
-      { phase: 'b', title: 'Asked in parallel, not in sequence',
-        body: 'Every conditioning variant is evaluated in one batched forward pass, ' +
-              'repeated across the N candidate trajectories. Steering the style therefore ' +
-              'costs no extra denoising steps \u2014 only a wider batch.' },
-      { phase: 'b', title: 'Each axis contributes its own nudge',
-        body: 'Every axis is measured as a difference against the scene-conditional ' +
-              'estimate and scaled by its own weight. Because the terms are summed ' +
-              'separately, the axes can be dialled independently and combined into styles ' +
-              'the model was never shown together.' },
-      { phase: 'b', title: 'Repeat down the noise schedule',
-        body: 'The combined estimate drives one denoising step and the loop runs again, ' +
-              'twenty times at inference, carrying all N candidates along together.' },
-      { phase: 'b', title: 'Choose one, then make it executable',
-        body: 'A goal-directed cost picks the best candidate, and an optimal-control layer ' +
-              'projects it onto the robot\u2019s kinematics and clearance constraints \u2014 or ' +
-              'commands a controlled stop when it cannot. Social behavior stays learned; ' +
-              'feasibility stays enforced.' }
-    ];
-
-    var stages = Array.prototype.slice.call(root.querySelectorAll('.dg-stage'));
-    var panels = Array.prototype.slice.call(root.querySelectorAll('.dg-panel'));
-    var phases = Array.prototype.slice.call(root.querySelectorAll('.dg-phase'));
+    var holes = root.querySelector('#dg-holes');
+    var rings = root.querySelector('#dg-rings');
     var capTitle = root.querySelector('.dg-cap-title');
     var capBody = root.querySelector('.dg-cap-body');
     var dotWrap = root.querySelector('.dg-dots');
     var prevBtn = root.querySelector('[data-dg="prev"]');
     var nextBtn = root.querySelector('[data-dg="next"]');
     var playBtn = root.querySelector('[data-dg="play"]');
+    if (!holes || !rings || !playBtn) return;
 
-    if (!stages.length) return;
-    root.classList.add('is-animated');
+    // [x, y, width, height] in the figure's coordinate space.
+    var STEPS = [
+      { phase: 'a', at: [[10, 12, 176, 540]],
+        title: 'Everything the planner is told',
+        body: 'The robot\u2019s own state, its goal, the people around it, and a local ' +
+              'occupancy map describe the situation. The four-number social style ' +
+              'vector arrives through the same door as the rest, which is what makes ' +
+              'conduct something you set at deployment rather than something you retrain.' },
+      { phase: 'a', at: [[190, 210, 172, 238]],
+        title: 'Two inputs need their own encoder',
+        body: 'The occupancy map is compressed into tokens by a small convolutional ' +
+              'encoder, and each style axis becomes a token of its own. Both pass ' +
+              'through conditioning dropout during training, so the network learns to ' +
+              'cope when either is withheld \u2014 the property the whole guidance scheme ' +
+              'later rests on.' },
+      { phase: 'a', at: [[372, 28, 182, 362]],
+        title: 'Scene and style are fused, not stacked',
+        body: 'A self-attention encoder mixes the scene and style tokens before either ' +
+              'reaches the denoiser. The requested manners are therefore interpreted in ' +
+              'light of the actual geometry, rather than applied blindly on top of it.' },
+      { phase: 'a', at: [[632, 128, 420, 234], [356, 386, 228, 158]],
+        title: 'A U-Net denoises a whole trajectory',
+        body: 'A one-dimensional conditional U-Net takes a noised trajectory and ' +
+              'cross-attends to those tokens, with the diffusion timestep modulating ' +
+              'its residual blocks. It produces a path, not a single next action.' },
+      { phase: 'a', at: [[1040, 186, 152, 156]],
+        title: 'The only thing it is trained to do',
+        body: 'The network learns to predict the noise that was added, scored by mean ' +
+              'squared error. Every demonstration carries a label on exactly one style ' +
+              'axis \u2014 combinations are never trained for, which is what makes the ' +
+              'right-hand panel interesting.' },
+      { phase: 'b', at: [[1208, 28, 184, 516]],
+        title: 'One network, asked several different questions',
+        body: 'At deployment the same weights are queried under different conditioning: ' +
+              'nothing at all, the scene alone, and the scene plus a single style axis ' +
+              'at a time. Conditioning dropout is what makes those partial queries mean ' +
+              'anything.' },
+      { phase: 'b', at: [[1378, 96, 354, 354]],
+        title: 'Asked in parallel, not in sequence',
+        body: 'Every conditioning variant is evaluated in one batched forward pass, ' +
+              'across all N candidate trajectories at once. Steering the style costs no ' +
+              'extra denoising steps \u2014 only a wider batch.' },
+      { phase: 'b', at: [[1735, 76, 415, 236]],
+        title: 'Each axis contributes its own nudge',
+        body: 'Every axis is measured as a difference against the scene-conditional ' +
+              'estimate and scaled by its own weight. Because the terms are summed ' +
+              'separately, the axes can be dialled independently and combined into ' +
+              'styles the model was never shown together.' },
+      { phase: 'b', at: [[1348, 426, 732, 84]],
+        title: 'Repeat down the noise schedule',
+        body: 'The combined estimate drives one denoising step and the loop runs again, ' +
+              'twenty times at inference, carrying all N candidates along together.' },
+      { phase: 'b', at: [[1948, 202, 404, 344]],
+        title: 'Choose one, then make it executable',
+        body: 'A goal-directed cost picks the best candidate, and an optimal-control ' +
+              'layer projects it onto the robot\u2019s kinematics and clearance ' +
+              'constraints \u2014 or commands a controlled stop when it cannot. Social ' +
+              'behavior stays learned; feasibility stays enforced.' }
+    ];
 
-    var current = 0;
-    var timer = null;
-    var playing = false;
-    var DWELL = 5200;
+    var phases = Array.prototype.slice.call(root.querySelectorAll('.dg-phase'));
+    var SVGNS = 'http://www.w3.org/2000/svg';
+    var current = 0, timer = null, playing = false;
+    var DWELL = 5600;
 
     var dots = STEPS.map(function (step, i) {
       var d = document.createElement('button');
@@ -327,20 +339,29 @@
       return d;
     });
 
+    function rect(parent, r, cls) {
+      var el = document.createElementNS(SVGNS, 'rect');
+      el.setAttribute('x', r[0]);
+      el.setAttribute('y', r[1]);
+      el.setAttribute('width', r[2]);
+      el.setAttribute('height', r[3]);
+      el.setAttribute('rx', 10);
+      if (cls) el.setAttribute('class', cls);
+      else el.setAttribute('fill', '#000');
+      parent.appendChild(el);
+    }
+
     function show(i) {
       current = (i + STEPS.length) % STEPS.length;
       var step = STEPS[current];
 
-      stages.forEach(function (g) {
-        var n = parseInt(g.dataset.s, 10) - 1;
-        var samePhase = STEPS[n] && STEPS[n].phase === step.phase;
-        g.classList.toggle('is-active', n === current);
-        g.classList.toggle('is-seen', samePhase && n < current);
+      while (holes.firstChild) holes.removeChild(holes.firstChild);
+      while (rings.firstChild) rings.removeChild(rings.firstChild);
+      step.at.forEach(function (r) {
+        rect(holes, r);              // black in the mask = not dimmed
+        rect(rings, r, 'dg-ring');
       });
 
-      panels.forEach(function (pnl) {
-        pnl.classList.toggle('is-current', pnl.dataset.panel === step.phase);
-      });
       phases.forEach(function (ph) {
         ph.classList.toggle('is-current', ph.dataset.phase === step.phase);
       });
@@ -350,10 +371,12 @@
       capBody.textContent = step.body;
     }
 
+    // The icon is two inline SVGs toggled by a class. Font Awesome's JS build
+    // rewrites <i> elements into <svg>, so anything that looked up the <i>
+    // afterwards found nothing.
     function setPlayUI() {
-      var icon = playBtn.querySelector('i');
+      playBtn.classList.toggle('is-playing', playing);
       var label = playBtn.querySelector('span');
-      icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
       if (label) label.textContent = playing ? 'Pause' : 'Play';
     }
 
@@ -374,11 +397,10 @@
     nextBtn.addEventListener('click', function () { stop(); show(current + 1); });
     playBtn.addEventListener('click', function () { playing ? stop() : start(); });
 
+    root.classList.add('is-animated');
     show(0);
     stop();
 
-    // Run only while on screen: no point animating a diagram nobody is looking
-    // at, and it should not be part-way through when the reader arrives.
     if ('IntersectionObserver' in window) {
       var seen = false;
       var mo = new IntersectionObserver(function (entries) {

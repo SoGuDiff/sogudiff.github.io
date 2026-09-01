@@ -50,9 +50,8 @@ put the file at the named path.** No HTML edit needed.
 
 Export at 2000px or wider, since it is shown full-bleed.
 
-`static/images/method_overview.png` is already in place — it is the supplied
-`SocialStyleUNetV3.png`, kept only as the "static figure" link under the
-animated walkthrough.
+`static/images/method_overview.svg` is already in place — it is the supplied
+Lucidchart export, shown as-is in the "How It Works" section.
 
 ### Videos (in `static/videos/`)
 
@@ -115,30 +114,33 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 
 ### The animated walkthrough
 
-"How It Works" is not the paper's figure as an image — it is redrawn as inline
-SVG in `index.html` so each stage can be revealed and animated separately. It
-steps through ten stages, five on training and five on deployment, cross-fading
-between the two phases; the active stage is brought to full strength with its
-flow lines marching, earlier stages settle back, and later ones stay ghosted.
+"How It Works" shows `static/images/method_overview.svg` — the manuscript's own
+vector export, **unmodified**. The walkthrough is an overlay on top of it: a
+white scrim with holes cut over the region the current step is about, plus a
+ring around each hole. Ten steps, five on training and five on deployment, with
+autoplay on scroll-into-view, pause on scroll-away, prev / play / next controls
+and clickable step dots.
 
-It autoplays when scrolled into view, pauses when scrolled away, and has
-prev / play / next controls plus clickable step dots.
+To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
 
-To edit it:
+```js
+{ phase: 'a', at: [[632, 128, 420, 234]], title: '...', body: '...' }
+```
 
-- **Step text** lives in the `STEPS` array in `static/js/sogudiff.js`. Each
-  entry is `{ phase, title, body }`, where `phase` is `'a'` (training) or
-  `'b'` (deployment).
-- **Which shapes belong to a step** is set by `data-s="N"` on the
-  `<g class="dg-stage">` wrappers in `index.html`. The number matches the
-  step's position in `STEPS`. Moving a shape between steps means moving it
-  between those groups — nothing else to update.
-- **Colors** are `.yl/.bl/.gr/.pu/.pk` in `sogudiff.css`, sampled from the
-  paper figure.
-- **Pace** is the `DWELL` constant (milliseconds per step).
+- `phase` is `'a'` (training) or `'b'` (deployment); it only drives the
+  Training/Deployment pill.
+- `at` is a list of `[x, y, width, height]` rectangles **in the figure's own
+  coordinate space**, which is `2362 × 573.16`. A step may highlight several
+  disjoint regions — step 4 highlights the U-Net and its two input labels.
+- `DWELL` sets the milliseconds per step.
 
-With JavaScript disabled every stage stays fully visible, so the diagram still
-reads as one complete static figure.
+Because the regions are coordinates rather than references to elements inside
+the figure, **re-exporting the figure means re-checking them.** Swapping the
+`.svg` alone is safe only if the layout did not move. To re-derive them, render
+the SVG with a coordinate grid over it and read the boxes off.
+
+With JavaScript disabled the scrim never switches on, so the figure just reads
+as the normal static diagram.
 
 ### Synchronized playback
 
@@ -173,6 +175,7 @@ than restating numbers the paper already reports.
 ```
 index.html                    the whole page
 static/css/index.css          template base styles (one copy-button fix)
+static/css/fontawesome.all.min.css  UNUSED - see "Icons" below
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
 static/js/index.js            BibTeX copy + scroll-to-top
@@ -195,6 +198,20 @@ convert -background "#1b2a4a" favicon.svg -flatten -resize 180x180 apple-touch-i
 
 `bulma-carousel` and `bulma-slider` are still vendored but unused — the page
 uses CSS grid instead. Safe to delete if you never add a carousel.
+
+### Icons
+
+Icons come from `static/js/fontawesome.all.min.js`, which renders them as
+inline `<svg>`. The matching **stylesheet is deliberately not loaded**: the
+template shipped `fontawesome.all.min.css` without the `static/webfonts/`
+directory it references, so every glyph 404s. Academicons was dropped for the
+same class of reason — it came from a CDN that ad blockers commonly refuse, and
+the arXiv button now uses a Font Awesome document glyph.
+
+One consequence worth knowing: the JS build **replaces `<i>` elements with
+`<svg>`**, so any script that sets a class on an `<i>` after page load finds
+nothing there. Buttons whose icon toggles (play/pause) therefore carry both
+icons inline and swap them with a CSS class instead.
 
 ---
 
