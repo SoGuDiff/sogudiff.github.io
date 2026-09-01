@@ -679,3 +679,10 @@ body.is-draft .draft-note code {
 .ic-pause { display: none; }
 .is-playing .ic-play { display: none; }
 .is-playing .ic-pause { display: inline-block; }
+
+/* The arXiv mark is taller than it is wide, so let width follow the aspect
+   ratio instead of being forced square like the other button icons. */
+.ic-arxiv {
+  width: auto;
+  height: 1em;
+}

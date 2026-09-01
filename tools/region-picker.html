@@ -1,0 +1,291 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>SoGuDiff — diagram region picker</title>
+<style>
+  :root { --ink:#1e293b; --mut:#64748b; --line:#e2e8f0; --acc:#2563eb; }
+  * { box-sizing: border-box; }
+  body { margin:0; padding:20px; font:14px/1.5 Inter, system-ui, sans-serif; color:var(--ink); background:#f8fafc; }
+  h1 { font-size:1.1rem; margin:0 0 4px; }
+  .sub { color:var(--mut); margin:0 0 16px; max-width:80ch; }
+  .wrap { max-width:1500px; margin:0 auto; }
+  .card { background:#fff; border:1px solid var(--line); border-radius:12px; padding:14px; margin-bottom:14px; }
+  .steps { display:flex; flex-wrap:wrap; gap:6px; margin-bottom:12px; }
+  .steps button { padding:6px 12px; border:1px solid var(--line); background:#fff; border-radius:999px;
+                  font:inherit; font-weight:600; cursor:pointer; color:var(--mut); }
+  .steps button.on { background:var(--acc); border-color:var(--acc); color:#fff; }
+  .stage { position:relative; line-height:0; user-select:none; touch-action:none; }
+  .stage img { width:100%; height:auto; display:block; }
+  .stage svg { position:absolute; inset:0; width:100%; height:100%; }
+  .hit { fill:rgba(37,99,235,.16); stroke:var(--acc); stroke-width:3; cursor:move; }
+  .hit.sel { fill:rgba(37,99,235,.28); stroke:#dc2626; }
+  .hnd { fill:#fff; stroke:#dc2626; stroke-width:2.5; cursor:nwse-resize; }
+  .scrim { fill:#fff; }
+  .bar { display:flex; flex-wrap:wrap; gap:10px; align-items:center; margin-top:12px; }
+  .bar label { color:var(--mut); font-weight:600; }
+  input[type=number] { width:78px; padding:5px 7px; border:1px solid var(--line); border-radius:7px; font:inherit; }
+  button.act { padding:7px 13px; border:1px solid var(--line); background:#fff; border-radius:8px;
+               font:inherit; font-weight:600; cursor:pointer; }
+  button.act:hover { border-color:var(--acc); color:var(--acc); }
+  textarea { width:100%; height:230px; font:12px/1.5 ui-monospace, Menlo, Consolas, monospace;
+             border:1px solid var(--line); border-radius:8px; padding:10px; resize:vertical; }
+  kbd { background:#f1f5f9; border:1px solid var(--line); border-bottom-width:2px; border-radius:4px;
+        padding:1px 5px; font:12px ui-monospace, monospace; }
+  .hint { color:var(--mut); font-size:.86rem; }
+</style>
+</head>
+<body>
+<div class="wrap">
+  <h1>Diagram region picker</h1>
+  <p class="sub">
+    Pick the highlight regions for the “How It Works” walkthrough by dragging them on the figure,
+    then paste the output into <code>STEPS</code> in <code>static/js/sogudiff.js</code>.
+    Coordinates are in the figure’s own space (2362 &times; 573.16), which is exactly what that array wants.
+  </p>
+
+  <div class="card">
+    <div class="steps" id="steps"></div>
+
+    <div class="stage" id="stage">
+      <img id="fig" src="../static/images/method_overview.svg" alt="">
+      <svg id="ov" viewBox="0 0 2362 573.16" preserveAspectRatio="xMidYMid meet">
+        <defs><mask id="mk"><rect x="0" y="0" width="2362" height="573.16" fill="#fff"/><g id="holes"></g></mask></defs>
+        <rect id="scrim" class="scrim" x="0" y="0" width="2362" height="573.16" mask="url(#mk)" style="opacity:0"></rect>
+        <g id="boxes"></g>
+      </svg>
+    </div>
+
+    <div class="bar">
+      <button class="act" id="preview">Preview as published</button>
+      <button class="act" id="del">Delete selected</button>
+      <button class="act" id="clear">Clear this step</button>
+      <span class="hint">
+        Drag empty space to add a rectangle · drag a rectangle to move · drag its corner to resize ·
+        <kbd>←↑↓→</kbd> nudge, <kbd>Shift</kbd> ×10 · <kbd>Delete</kbd> removes
+      </span>
+    </div>
+
+    <div class="bar">
+      <label>x</label><input type="number" id="nx">
+      <label>y</label><input type="number" id="ny">
+      <label>w</label><input type="number" id="nw">
+      <label>h</label><input type="number" id="nh">
+      <span class="hint">exact values for the selected rectangle</span>
+    </div>
+  </div>
+
+  <div class="card">
+    <div class="bar" style="margin:0 0 10px">
+      <strong style="flex:1">Paste into <code>static/js/sogudiff.js</code></strong>
+      <button class="act" id="copy">Copy</button>
+      <button class="act" id="load">Re-load from text</button>
+    </div>
+    <textarea id="out" spellcheck="false"></textarea>
+    <p class="hint" style="margin:8px 0 0">
+      Editing this box and pressing <em>Re-load from text</em> pulls the rectangles back onto the figure,
+      so you can paste in what the site currently uses and adjust from there.
+    </p>
+  </div>
+</div>
+
+<script>
+(function () {
+  'use strict';
+  var W = 2362, H = 573.16;
+
+  // Titles are only labels for the picker; the real copy lives in sogudiff.js.
+  var TITLES = ['Conditioning inputs','Dedicated encoders','Joint encoding','Conditional denoising',
+                'Training objective','Decomposed conditioning','Parallel evaluation',
+                'Per-axis guidance','Iterated denoising','Selection and projection'];
+
+  // Starting point: whatever the site ships with today.
+  var REG = [
+    [[8,8,164,556]],
+    [[171,198,190,256],[354,228,28,152]],
+    [[171,22,375,172],[382,194,164,192]],
+    [[541,128,497,258],[366,381,284,187]],
+    [[1032,140,146,272]],
+    [[1198,44,142,390],[1198,430,136,78]],
+    [[1338,80,382,360]],
+    [[1722,78,194,322],[1822,76,308,138]],
+    [[1330,437,724,41],[2026,308,26,174]],
+    [[1908,210,450,102],[2130,308,232,260]]
+  ];
+
+  var cur = 0, sel = -1, preview = false;
+  var stage = document.getElementById('stage');
+  var boxes = document.getElementById('boxes');
+  var holes = document.getElementById('holes');
+  var scrim = document.getElementById('scrim');
+  var out   = document.getElementById('out');
+  var NS = 'http://www.w3.org/2000/svg';
+
+  function stepsBar() {
+    var bar = document.getElementById('steps');
+    bar.innerHTML = '';
+    REG.forEach(function (_, i) {
+      var b = document.createElement('button');
+      b.textContent = (i + 1) + '. ' + TITLES[i];
+      if (i === cur) b.className = 'on';
+      b.onclick = function () { cur = i; sel = -1; draw(); };
+      bar.appendChild(b);
+    });
+  }
+
+  // Figure units per CSS pixel, from the rendered image box.
+  function scale() { return stage.getBoundingClientRect().width / W; }
+  function toFig(ev) {
+    var r = stage.getBoundingClientRect(), s = scale();
+    return { x: (ev.clientX - r.left) / s, y: (ev.clientY - r.top) / s };
+  }
+  var round = function (v) { return Math.round(v); };
+
+  function draw() {
+    stepsBar();
+    boxes.innerHTML = '';
+    holes.innerHTML = '';
+    scrim.style.opacity = preview ? 0.86 : 0;
+
+    REG[cur].forEach(function (r, i) {
+      var h = document.createElementNS(NS, 'rect');
+      h.setAttribute('x', r[0]); h.setAttribute('y', r[1]);
+      h.setAttribute('width', r[2]); h.setAttribute('height', r[3]);
+      h.setAttribute('rx', 12); h.setAttribute('fill', '#000');
+      holes.appendChild(h);
+
+      if (preview) return;
+      var b = document.createElementNS(NS, 'rect');
+      b.setAttribute('x', r[0]); b.setAttribute('y', r[1]);
+      b.setAttribute('width', r[2]); b.setAttribute('height', r[3]);
+      b.setAttribute('class', 'hit' + (i === sel ? ' sel' : ''));
+      b.dataset.i = i;
+      boxes.appendChild(b);
+
+      if (i === sel) {
+        var k = document.createElementNS(NS, 'rect');
+        k.setAttribute('x', r[0] + r[2] - 9); k.setAttribute('y', r[1] + r[3] - 9);
+        k.setAttribute('width', 18); k.setAttribute('height', 18);
+        k.setAttribute('class', 'hnd'); k.dataset.h = i;
+        boxes.appendChild(k);
+      }
+    });
+    fields();
+    emit();
+  }
+
+  function fields() {
+    var r = REG[cur][sel];
+    ['nx','ny','nw','nh'].forEach(function (id, n) {
+      var el = document.getElementById(id);
+      el.value = r ? r[n] : '';
+      el.disabled = !r;
+    });
+  }
+
+  function emit() {
+    out.value = REG.map(function (rects, i) {
+      var body = rects.map(function (r) { return '[' + r.map(round).join(', ') + ']'; }).join(', ');
+      return '      // ' + (i + 1) + '. ' + TITLES[i] + '\n      at: [' + body + '],';
+    }).join('\n');
+  }
+
+  // ---- pointer interaction -------------------------------------------------
+  var mode = null, start = null, orig = null;
+
+  stage.addEventListener('pointerdown', function (ev) {
+    if (preview) return;
+    ev.preventDefault();
+    stage.setPointerCapture(ev.pointerId);
+    var p = toFig(ev), t = ev.target;
+
+    if (t.dataset && t.dataset.h !== undefined) {
+      sel = +t.dataset.h; mode = 'resize';
+    } else if (t.dataset && t.dataset.i !== undefined) {
+      sel = +t.dataset.i; mode = 'move';
+    } else {
+      REG[cur].push([round(p.x), round(p.y), 1, 1]);
+      sel = REG[cur].length - 1; mode = 'new';
+    }
+    start = p; orig = REG[cur][sel].slice();
+    draw();
+  });
+
+  stage.addEventListener('pointermove', function (ev) {
+    if (!mode) return;
+    var p = toFig(ev), r = REG[cur][sel];
+    var dx = p.x - start.x, dy = p.y - start.y;
+
+    if (mode === 'move') {
+      r[0] = round(orig[0] + dx); r[1] = round(orig[1] + dy);
+    } else if (mode === 'resize') {
+      r[2] = Math.max(4, round(orig[2] + dx)); r[3] = Math.max(4, round(orig[3] + dy));
+    } else if (mode === 'new') {
+      r[0] = round(Math.min(start.x, p.x)); r[1] = round(Math.min(start.y, p.y));
+      r[2] = Math.max(4, round(Math.abs(dx))); r[3] = Math.max(4, round(Math.abs(dy)));
+    }
+    draw();
+  });
+
+  ['pointerup','pointercancel'].forEach(function (e) {
+    stage.addEventListener(e, function () { mode = null; });
+  });
+
+  // ---- keyboard ------------------------------------------------------------
+  document.addEventListener('keydown', function (ev) {
+    if (/INPUT|TEXTAREA/.test(document.activeElement.tagName)) return;
+    var r = REG[cur][sel];
+    if (!r) return;
+    var d = ev.shiftKey ? 10 : 1, k = ev.key, moved = true;
+    if (k === 'ArrowLeft') r[0] -= d;
+    else if (k === 'ArrowRight') r[0] += d;
+    else if (k === 'ArrowUp') r[1] -= d;
+    else if (k === 'ArrowDown') r[1] += d;
+    else if (k === 'Delete' || k === 'Backspace') { REG[cur].splice(sel, 1); sel = -1; }
+    else moved = false;
+    if (moved || k === 'Delete' || k === 'Backspace') { ev.preventDefault(); draw(); }
+  });
+
+  ['nx','ny','nw','nh'].forEach(function (id, n) {
+    document.getElementById(id).addEventListener('input', function () {
+      var r = REG[cur][sel];
+      if (!r) return;
+      var v = parseInt(this.value, 10);
+      if (!isNaN(v)) { r[n] = v; draw(); }
+    });
+  });
+
+  document.getElementById('preview').onclick = function () {
+    preview = !preview;
+    this.textContent = preview ? 'Back to editing' : 'Preview as published';
+    draw();
+  };
+  document.getElementById('del').onclick = function () {
+    if (sel >= 0) { REG[cur].splice(sel, 1); sel = -1; draw(); }
+  };
+  document.getElementById('clear').onclick = function () { REG[cur] = []; sel = -1; draw(); };
+  document.getElementById('copy').onclick = function () {
+    out.select();
+    try { document.execCommand('copy'); this.textContent = 'Copied'; } catch (e) { this.textContent = 'Press Ctrl+C'; }
+    var b = this;
+    setTimeout(function () { b.textContent = 'Copy'; }, 1500);
+  };
+  document.getElementById('load').onclick = function () {
+    // Pull every [x, y, w, h] group back out of the text, one line per step.
+    var lines = out.value.split('\n').filter(function (l) { return l.indexOf('at:') !== -1; });
+    var next = lines.map(function (l) {
+      return (l.match(/\[\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*,\s*-?\d+\s*\]/g) || [])
+        .map(function (m) { return JSON.parse(m.replace(/\s+/g, '')); });
+    });
+    if (next.length !== REG.length) { alert('Expected ' + REG.length + ' lines containing "at:", found ' + next.length); return; }
+    REG = next; sel = -1; draw();
+  };
+
+  window.addEventListener('resize', draw);
+  document.getElementById('fig').addEventListener('load', draw);
+  draw();
+})();
+</script>
+</body>
+</html>

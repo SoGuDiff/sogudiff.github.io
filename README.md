@@ -136,10 +136,27 @@ To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
   disjoint regions — step 4 highlights the U-Net and its two input labels.
 - `DWELL` sets the milliseconds per step.
 
+#### Editing the regions the easy way
+
+Open **`tools/region-picker.html`** in a browser (through the local server, so
+it can load the figure). It shows the figure with the current regions drawn on
+it, and you can:
+
+- drag empty space to add a rectangle, drag a rectangle to move it, drag its
+  corner to resize
+- nudge with the arrow keys, ×10 with <kbd>Shift</kbd>, remove with
+  <kbd>Delete</kbd>
+- type exact x / y / w / h for the selected rectangle
+- hit **Preview as published** to see the real scrim effect before committing
+- **Copy** the output and paste it over the `at:` lines in `STEPS`
+
+It round-trips: paste the current `at:` lines back into the text box and press
+**Re-load from text** to pull them onto the figure and adjust from there.
+
 Because the regions are coordinates rather than references to elements inside
 the figure, **re-exporting the figure means re-checking them.** Swapping the
-`.svg` alone is safe only if the layout did not move. To re-derive them, render
-the SVG with a coordinate grid over it and read the boxes off.
+`.svg` alone is safe only if the layout did not move — the picker is the
+fastest way to redo them if it did.
 
 With JavaScript disabled the scrim never switches on, so the figure just reads
 as the normal static diagram.
@@ -176,6 +193,7 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
+tools/region-picker.html      drag-and-drop editor for the diagram regions
 static/css/index.css          template base styles (one copy-button fix)
 static/css/fontawesome.all.min.css  UNUSED - see "Icons" below
 static/css/sogudiff.css       everything specific to this project
