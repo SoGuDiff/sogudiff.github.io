@@ -26,8 +26,8 @@
          above (800,580). They diverge only as curvature accumulates. -->
     <!-- wide, left: commits early and wide, then straightens out toward the goal -->
     <path d="M800 580 C 800 496, 690 442, 692 330 C 694 240, 740 190, 758 118" stroke="#6ecf8f" opacity="0.95"/>
-    <!-- medium, right: holds its line longer, swings out late, then cuts back -->
-    <path d="M800 580 C 800 500, 996 486, 1008 374 C 1020 274, 988 194, 936 132" stroke="#ff7f6e" opacity="0.95"/>
+    <!-- medium, right (purple): holds its line longer, swings out late, then cuts back -->
+    <path d="M800 580 C 800 500, 996 486, 1008 374 C 1020 274, 988 194, 936 132" stroke="#c17ef0" opacity="0.95"/>
     <!-- close, left: a tight S, hugging the personal-space boundary -->
     <path d="M800 580 C 800 508, 824 424, 807 352 C 788 286, 806 210, 850 152" stroke="#f5b544" opacity="0.95"/>
   </g>
@@ -42,7 +42,7 @@
 
   <!-- Axis chips. Tinted, but kept entirely within the blue family so they
        read as one set of labels and cannot be mistaken for a legend for the
-       green/coral/amber trajectories above. -->
+       green/purple/amber trajectories above. -->
   <g font-family="DejaVu Sans" font-size="20" text-anchor="middle">
     <rect x="80"  y="440" width="128" height="42" rx="21" fill="#8ab4f8" fill-opacity="0.16" stroke="#8ab4f8" stroke-opacity="0.55"/>
     <text x="144" y="467" fill="#a9c9fb">proxemic</text>
