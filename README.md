@@ -119,7 +119,9 @@ vector export, **unmodified**. The walkthrough is an overlay on top of it: a
 white scrim with holes cut over the region the current step is about, plus a
 ring around each hole. Ten steps, five on training and five on deployment, with
 autoplay on scroll-into-view, pause on scroll-away, prev / play / next controls
-and clickable step dots.
+and clickable step dots. There are no outlines drawn around the active region:
+a rectangle never quite matches the artwork beneath it, so the emphasis is
+carried entirely by what stays undimmed.
 
 To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
 
@@ -212,6 +214,17 @@ One consequence worth knowing: the JS build **replaces `<i>` elements with
 `<svg>`**, so any script that sets a class on an `<i>` after page load finds
 nothing there. Buttons whose icon toggles (play/pause) therefore carry both
 icons inline and swap them with a CSS class instead.
+
+Two things to watch when adding an icon:
+
+- The vendored build is **Font Awesome Free 5.15.1**, so use FA5 names. Several
+  were renamed in FA6 and an FA6 name renders as a "missing icon" glyph rather
+  than failing loudly — `fa-file-alt` not `fa-file-lines`, `fa-undo` not
+  `fa-rotate-left`. Check a name is present with
+  `grep -o "\"NAME\"" static/js/fontawesome.all.min.js`.
+- The JS build **replaces `<i>` with `<svg>`**, so any script that sets a class
+  on an `<i>` after page load finds nothing there. Buttons whose icon toggles
+  carry both icons inline and swap them with a CSS class instead.
 
 ---
 

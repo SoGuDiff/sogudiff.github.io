@@ -255,73 +255,76 @@
     if (!root) return;
 
     var holes = root.querySelector('#dg-holes');
-    var rings = root.querySelector('#dg-rings');
     var capTitle = root.querySelector('.dg-cap-title');
     var capBody = root.querySelector('.dg-cap-body');
     var dotWrap = root.querySelector('.dg-dots');
     var prevBtn = root.querySelector('[data-dg="prev"]');
     var nextBtn = root.querySelector('[data-dg="next"]');
     var playBtn = root.querySelector('[data-dg="play"]');
-    if (!holes || !rings || !playBtn) return;
+    if (!holes || !playBtn) return;
 
-    // [x, y, width, height] in the figure's coordinate space.
+    // [x, y, width, height] in the figure's coordinate space (2362 x 573.16).
     var STEPS = [
       { phase: 'a', at: [[10, 12, 176, 540]],
-        title: 'Everything the planner is told',
-        body: 'The robot\u2019s own state, its goal, the people around it, and a local ' +
-              'occupancy map describe the situation. The four-number social style ' +
-              'vector arrives through the same door as the rest, which is what makes ' +
-              'conduct something you set at deployment rather than something you retrain.' },
+        title: 'Conditioning inputs',
+        body: 'The robot state, goal pose, neighboring pedestrian states, and a local ' +
+              'occupancy map together define the scene context. The four-dimensional ' +
+              'social style vector is supplied through the same conditioning interface, ' +
+              'so the desired conduct is specified at deployment rather than fixed ' +
+              'during training.' },
       { phase: 'a', at: [[190, 210, 172, 238]],
-        title: 'Two inputs need their own encoder',
-        body: 'The occupancy map is compressed into tokens by a small convolutional ' +
-              'encoder, and each style axis becomes a token of its own. Both pass ' +
-              'through conditioning dropout during training, so the network learns to ' +
-              'cope when either is withheld \u2014 the property the whole guidance scheme ' +
-              'later rests on.' },
+        title: 'Dedicated encoders for map and style',
+        body: 'A convolutional encoder compresses the occupancy map into tokens, and ' +
+              'each style axis is embedded as a token of its own. Both paths are subject ' +
+              'to structured conditioning dropout during training, so the model remains ' +
+              'well defined when either group is replaced by its learned null embedding.' },
       { phase: 'a', at: [[372, 28, 182, 362]],
-        title: 'Scene and style are fused, not stacked',
-        body: 'A self-attention encoder mixes the scene and style tokens before either ' +
-              'reaches the denoiser. The requested manners are therefore interpreted in ' +
-              'light of the actual geometry, rather than applied blindly on top of it.' },
+        title: 'Joint encoding of scene and style',
+        body: 'Scene and style tokens are concatenated and processed by a self-attention ' +
+              'encoder, allowing the two to interact before they condition the denoiser. ' +
+              'The requested style is therefore interpreted in the context of the ' +
+              'observed geometry rather than applied independently of it.' },
       { phase: 'a', at: [[632, 128, 420, 234], [356, 386, 228, 158]],
-        title: 'A U-Net denoises a whole trajectory',
-        body: 'A one-dimensional conditional U-Net takes a noised trajectory and ' +
-              'cross-attends to those tokens, with the diffusion timestep modulating ' +
-              'its residual blocks. It produces a path, not a single next action.' },
+        title: 'Conditional trajectory denoising',
+        body: 'A one-dimensional conditional U-Net denoises a corrupted trajectory while ' +
+              'cross-attending to the encoded tokens, with the diffusion timestep ' +
+              'entering as an embedding that modulates the residual block features. The ' +
+              'output is a full trajectory over the planning horizon.' },
       { phase: 'a', at: [[1040, 186, 152, 156]],
-        title: 'The only thing it is trained to do',
-        body: 'The network learns to predict the noise that was added, scored by mean ' +
-              'squared error. Every demonstration carries a label on exactly one style ' +
-              'axis \u2014 combinations are never trained for, which is what makes the ' +
-              'right-hand panel interesting.' },
+        title: 'Training objective',
+        body: 'The network is trained to predict the noise introduced by the forward ' +
+              'process, under a mean squared error loss. Each demonstration carries a ' +
+              'label on exactly one style axis, so composed styles are never observed ' +
+              'during training.' },
       { phase: 'b', at: [[1208, 28, 184, 516]],
-        title: 'One network, asked several different questions',
-        body: 'At deployment the same weights are queried under different conditioning: ' +
-              'nothing at all, the scene alone, and the scene plus a single style axis ' +
-              'at a time. Conditioning dropout is what makes those partial queries mean ' +
-              'anything.' },
+        title: 'Decomposed conditioning at inference',
+        body: 'The trained network is queried under several conditioning subsets: ' +
+              'unconditional, scene-only, and scene combined with a single style axis at ' +
+              'a time. The structured dropout applied during training is what makes ' +
+              'these partial queries well posed.' },
       { phase: 'b', at: [[1378, 96, 354, 354]],
-        title: 'Asked in parallel, not in sequence',
-        body: 'Every conditioning variant is evaluated in one batched forward pass, ' +
-              'across all N candidate trajectories at once. Steering the style costs no ' +
-              'extra denoising steps \u2014 only a wider batch.' },
+        title: 'Parallel evaluation of the variants',
+        body: 'All conditioning variants, across the N candidate trajectories, are ' +
+              'evaluated in a single batched forward pass. Guidance therefore introduces ' +
+              'no additional sequential denoising steps.' },
       { phase: 'b', at: [[1735, 76, 415, 236]],
-        title: 'Each axis contributes its own nudge',
-        body: 'Every axis is measured as a difference against the scene-conditional ' +
-              'estimate and scaled by its own weight. Because the terms are summed ' +
-              'separately, the axes can be dialled independently and combined into ' +
-              'styles the model was never shown together.' },
+        title: 'Per-axis classifier-free guidance',
+        body: 'Each style axis contributes a score difference taken relative to the ' +
+              'scene-conditional estimate and scaled by its own guidance weight. Because ' +
+              'the contributions are summed independently, the axes can be weighted ' +
+              'separately and composed into styles never demonstrated jointly.' },
       { phase: 'b', at: [[1348, 426, 732, 84]],
-        title: 'Repeat down the noise schedule',
-        body: 'The combined estimate drives one denoising step and the loop runs again, ' +
-              'twenty times at inference, carrying all N candidates along together.' },
+        title: 'Iterated denoising',
+        body: 'The guided noise estimate drives one reverse diffusion step, and the ' +
+              'procedure repeats across the sampling schedule, using twenty DDIM steps at ' +
+              'inference and propagating all N candidates simultaneously.' },
       { phase: 'b', at: [[1948, 202, 404, 344]],
-        title: 'Choose one, then make it executable',
-        body: 'A goal-directed cost picks the best candidate, and an optimal-control ' +
-              'layer projects it onto the robot\u2019s kinematics and clearance ' +
-              'constraints \u2014 or commands a controlled stop when it cannot. Social ' +
-              'behavior stays learned; feasibility stays enforced.' }
+        title: 'Selection and feasibility projection',
+        body: 'A goal-directed cost selects the lowest-cost candidate, which is then ' +
+              'projected onto the robot kinematic and clearance constraints by a ' +
+              'soft-constrained optimal control problem, or a controlled stop is ' +
+              'commanded if the acceptance criteria are not met. Social behavior remains ' +
+              'learned, while feasibility is enforced separately.' }
     ];
 
     var phases = Array.prototype.slice.call(root.querySelectorAll('.dg-phase'));
@@ -339,15 +342,14 @@
       return d;
     });
 
-    function rect(parent, r, cls) {
+    function rect(parent, r) {
       var el = document.createElementNS(SVGNS, 'rect');
       el.setAttribute('x', r[0]);
       el.setAttribute('y', r[1]);
       el.setAttribute('width', r[2]);
       el.setAttribute('height', r[3]);
-      el.setAttribute('rx', 10);
-      if (cls) el.setAttribute('class', cls);
-      else el.setAttribute('fill', '#000');
+      el.setAttribute('rx', 12);
+      el.setAttribute('fill', '#000');
       parent.appendChild(el);
     }
 
@@ -356,11 +358,9 @@
       var step = STEPS[current];
 
       while (holes.firstChild) holes.removeChild(holes.firstChild);
-      while (rings.firstChild) rings.removeChild(rings.firstChild);
-      step.at.forEach(function (r) {
-        rect(holes, r);              // black in the mask = not dimmed
-        rect(rings, r, 'dg-ring');
-      });
+      // Black in the mask means the scrim is cut away there, so the region
+      // stays at full strength while the rest of the figure fades back.
+      step.at.forEach(function (r) { rect(holes, r); });
 
       phases.forEach(function (ph) {
         ph.classList.toggle('is-current', ph.dataset.phase === step.phase);
@@ -399,7 +399,7 @@
 
     root.classList.add('is-animated');
     show(0);
-    stop();
+    start();
 
     if ('IntersectionObserver' in window) {
       var seen = false;
