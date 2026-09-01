@@ -244,6 +244,160 @@
   }
 
   /* ----------------------------------------------------------------------
+     Animated method walkthrough
+     Steps through the architecture diagram, revealing one stage at a time.
+     The markup stays a complete static figure if this never runs.
+     ---------------------------------------------------------------------- */
+  (function () {
+    var root = document.getElementById('method-diagram');
+    if (!root) return;
+
+    var STEPS = [
+      { phase: 'a', title: 'Everything the planner is told',
+        body: 'The robot\u2019s own state, its goal, the people around it, and a local ' +
+              'occupancy map describe the situation. The four-number social style vector ' +
+              'arrives through the same door as the rest, which is what makes conduct ' +
+              'something you set at deployment rather than something you retrain.' },
+      { phase: 'a', title: 'Two inputs need their own encoder',
+        body: 'The occupancy map is compressed into tokens by a small convolutional ' +
+              'encoder, and each style axis becomes a token of its own. Both pass through ' +
+              'conditioning dropout during training, so the network learns to cope when ' +
+              'either one is withheld \u2014 the property the whole guidance scheme rests on.' },
+      { phase: 'a', title: 'Scene and style are fused, not stacked',
+        body: 'A self-attention encoder mixes the scene and style tokens before either ' +
+              'reaches the denoiser. The requested manners are therefore interpreted in ' +
+              'light of the actual geometry, rather than applied blindly on top of it.' },
+      { phase: 'a', title: 'A U-Net denoises a whole trajectory',
+        body: 'A one-dimensional conditional U-Net takes a noised trajectory and ' +
+              'cross-attends to those tokens, with the diffusion timestep modulating its ' +
+              'residual blocks. It predicts a path, not a single next action.' },
+      { phase: 'a', title: 'The only thing it is trained to do',
+        body: 'The network learns to predict the noise that was added, scored by mean ' +
+              'squared error. Crucially, every demonstration carries a label on exactly ' +
+              'one style axis \u2014 combinations are never trained for, which is what makes ' +
+              'the next panel interesting.' },
+      { phase: 'b', title: 'One network, asked several different questions',
+        body: 'At deployment the same weights are queried under different conditioning: ' +
+              'nothing at all, the scene alone, and the scene plus a single style axis at ' +
+              'a time. Conditioning dropout is what makes those partial queries meaningful.' },
+      { phase: 'b', title: 'Asked in parallel, not in sequence',
+        body: 'Every conditioning variant is evaluated in one batched forward pass, ' +
+              'repeated across the N candidate trajectories. Steering the style therefore ' +
+              'costs no extra denoising steps \u2014 only a wider batch.' },
+      { phase: 'b', title: 'Each axis contributes its own nudge',
+        body: 'Every axis is measured as a difference against the scene-conditional ' +
+              'estimate and scaled by its own weight. Because the terms are summed ' +
+              'separately, the axes can be dialled independently and combined into styles ' +
+              'the model was never shown together.' },
+      { phase: 'b', title: 'Repeat down the noise schedule',
+        body: 'The combined estimate drives one denoising step and the loop runs again, ' +
+              'twenty times at inference, carrying all N candidates along together.' },
+      { phase: 'b', title: 'Choose one, then make it executable',
+        body: 'A goal-directed cost picks the best candidate, and an optimal-control layer ' +
+              'projects it onto the robot\u2019s kinematics and clearance constraints \u2014 or ' +
+              'commands a controlled stop when it cannot. Social behavior stays learned; ' +
+              'feasibility stays enforced.' }
+    ];
+
+    var stages = Array.prototype.slice.call(root.querySelectorAll('.dg-stage'));
+    var panels = Array.prototype.slice.call(root.querySelectorAll('.dg-panel'));
+    var phases = Array.prototype.slice.call(root.querySelectorAll('.dg-phase'));
+    var capTitle = root.querySelector('.dg-cap-title');
+    var capBody = root.querySelector('.dg-cap-body');
+    var dotWrap = root.querySelector('.dg-dots');
+    var prevBtn = root.querySelector('[data-dg="prev"]');
+    var nextBtn = root.querySelector('[data-dg="next"]');
+    var playBtn = root.querySelector('[data-dg="play"]');
+
+    if (!stages.length) return;
+    root.classList.add('is-animated');
+
+    var current = 0;
+    var timer = null;
+    var playing = false;
+    var DWELL = 5200;
+
+    var dots = STEPS.map(function (step, i) {
+      var d = document.createElement('button');
+      d.className = 'dg-dot';
+      d.type = 'button';
+      d.setAttribute('aria-label', 'Step ' + (i + 1) + ': ' + step.title);
+      d.addEventListener('click', function () { stop(); show(i); });
+      dotWrap.appendChild(d);
+      return d;
+    });
+
+    function show(i) {
+      current = (i + STEPS.length) % STEPS.length;
+      var step = STEPS[current];
+
+      stages.forEach(function (g) {
+        var n = parseInt(g.dataset.s, 10) - 1;
+        var samePhase = STEPS[n] && STEPS[n].phase === step.phase;
+        g.classList.toggle('is-active', n === current);
+        g.classList.toggle('is-seen', samePhase && n < current);
+      });
+
+      panels.forEach(function (pnl) {
+        pnl.classList.toggle('is-current', pnl.dataset.panel === step.phase);
+      });
+      phases.forEach(function (ph) {
+        ph.classList.toggle('is-current', ph.dataset.phase === step.phase);
+      });
+      dots.forEach(function (d, n) { d.classList.toggle('is-current', n === current); });
+
+      capTitle.textContent = step.title;
+      capBody.textContent = step.body;
+    }
+
+    function setPlayUI() {
+      var icon = playBtn.querySelector('i');
+      var label = playBtn.querySelector('span');
+      icon.className = playing ? 'fas fa-pause' : 'fas fa-play';
+      if (label) label.textContent = playing ? 'Pause' : 'Play';
+    }
+
+    function start() {
+      if (playing) return;
+      playing = true;
+      setPlayUI();
+      timer = setInterval(function () { show(current + 1); }, DWELL);
+    }
+
+    function stop() {
+      playing = false;
+      setPlayUI();
+      if (timer) { clearInterval(timer); timer = null; }
+    }
+
+    prevBtn.addEventListener('click', function () { stop(); show(current - 1); });
+    nextBtn.addEventListener('click', function () { stop(); show(current + 1); });
+    playBtn.addEventListener('click', function () { playing ? stop() : start(); });
+
+    show(0);
+    stop();
+
+    // Run only while on screen: no point animating a diagram nobody is looking
+    // at, and it should not be part-way through when the reader arrives.
+    if ('IntersectionObserver' in window) {
+      var seen = false;
+      var mo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (entry) {
+          if (entry.isIntersecting) {
+            if (!seen) { seen = true; show(0); }
+            start();
+          } else {
+            stop();
+          }
+        });
+      }, { threshold: 0.3 });
+      mo.observe(root);
+    } else {
+      start();
+    }
+  })();
+
+  /* ----------------------------------------------------------------------
      Sync groups outside the tabbed explorer (the composition grid) start
      when scrolled into view and pause when scrolled away, so a page full of
      video stays cheap. The explorer has its own trigger above.

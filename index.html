@@ -233,12 +233,6 @@
              data-slot="Teaser figure (paper Fig. 1)"
              data-slot-path="static/images/teaser_figure.png"
              data-slot-hint="Export Figures/MainFigureV3.png from the manuscript at 2000px or wider and save it here.">
-        <h2 class="subtitle has-text-centered">
-          One diffusion planner, four interpretable social style axes. The desired
-          conduct is named at deployment &mdash; how closely the robot passes, which
-          side it yields to, how much it defers to groups &mdash; and the planner
-          adapts its social style based on the social setting at runtime.
-        </h2>
       </div>
     </div>
   </section>
@@ -275,27 +269,196 @@
     </div>
   </section>
 
-  <!-- ====================== METHOD ====================== -->
-  <section class="section">
+  <!-- ====================== METHOD (animated walkthrough) ====================== -->
+  <section class="section" id="method">
     <div class="container is-max-widescreen">
       <h2 class="title is-3 has-text-centered">How It Works</h2>
-      <figure class="method-figure">
-        <img src="static/images/method_overview.png"
-             alt="Overview of SoGuDiff: token-based conditioning, a conditional U-Net denoiser, per-axis guidance at inference, and a feasibility projection layer."
-             data-slot="Method overview (paper Fig. 2)"
-             data-slot-path="static/images/method_overview.png"
-             data-slot-hint="Export Figures/SocialStyleUNetV3.png from the manuscript at 2400px or wider and save it here. It is a wide two-panel figure, so give it plenty of resolution.">
-        <figcaption>
-          <b>Training (a).</b> The scene &mdash; initial state, goal, pedestrian
-          states, and occupancy map &mdash; and the social style vector are embedded
-          as tokens under structured conditioning dropout, and a one-dimensional
-          conditional U-Net learns to denoise trajectories.
-          <b>Inference (b).</b> The network is queried under decomposed conditions
-          and combined by per-axis classifier-free guidance. Candidates are denoised
-          in parallel, the best is selected, and a feasibility projection layer
-          returns an executable trajectory or commands a controlled stop.
-        </figcaption>
-      </figure>
+      <p class="section-lead">
+        Ten steps, from the inputs the planner receives to the actions it commands.
+        Step through it, or let it run.
+      </p>
+
+      <div class="diagram" id="method-diagram">
+        <div class="diagram-stage">
+          <svg class="diagram-svg" viewBox="0 0 1200 490" role="img"
+               aria-label="Architecture of SoGuDiff: training on the left, inference on the right.">
+            <defs>
+              <marker id="dg-ar" viewBox="0 0 10 10" refX="9" refY="5"
+                      markerWidth="7" markerHeight="7" orient="auto-start-reverse">
+                <path d="M0 0 L10 5 L0 10 z"/>
+              </marker>
+            </defs>
+
+            <!-- ============ PANEL A: TRAINING ============ -->
+            <g class="dg-panel" data-panel="a">
+
+              <g class="dg-stage" data-s="1">
+                <rect class="bx yl" x="20" y="26" width="176" height="418" rx="4"/>
+                <text class="t" x="108" y="66"  text-anchor="middle">Initial State</text>
+                <text class="t" x="108" y="108" text-anchor="middle">Goal Pose</text>
+                <text class="t" x="108" y="150" text-anchor="middle">Pedestrian</text>
+                <text class="t" x="108" y="170" text-anchor="middle">States</text>
+                <text class="t" x="108" y="228" text-anchor="middle">Occupancy</text>
+                <text class="t" x="108" y="248" text-anchor="middle">Map</text>
+                <text class="t" x="108" y="326" text-anchor="middle">Social Style</text>
+                <text class="t" x="108" y="346" text-anchor="middle">Vector</text>
+                <text class="tb" x="108" y="430" text-anchor="middle">Conditions</text>
+              </g>
+
+              <g class="dg-stage" data-s="2">
+                <path class="fl" d="M196 239 H218" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M196 340 H218" marker-end="url(#dg-ar)"/>
+                <rect class="bx bl" x="222" y="216" width="158" height="46" rx="4"/>
+                <text class="tb" x="301" y="245" text-anchor="middle">Map Encoder</text>
+                <rect class="bx bl" x="222" y="300" width="158" height="94" rx="4"/>
+                <text class="tb" x="301" y="326" text-anchor="middle">Style Token</text>
+                <text class="tb" x="301" y="346" text-anchor="middle">Embedder</text>
+                <rect class="bx wh" x="253" y="356" width="96" height="30" rx="3"/>
+                <text class="ts" x="301" y="376" text-anchor="middle">CFG Dropout</text>
+              </g>
+
+              <g class="dg-stage" data-s="3">
+                <path class="fl" d="M196 60  H406" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M196 102 H406" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M196 158 H406" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M380 239 H406" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M380 347 H393 V250 H406" marker-end="url(#dg-ar)"/>
+                <rect class="bx bl" x="410" y="40" width="168" height="300" rx="4"/>
+                <text class="tb" x="494" y="140" text-anchor="middle">Scene</text>
+                <text class="tb" x="494" y="162" text-anchor="middle">Token</text>
+                <text class="tb" x="494" y="184" text-anchor="middle">Embedder</text>
+                <rect class="bx wh" x="446" y="212" width="96" height="30" rx="3"/>
+                <text class="ts" x="494" y="232" text-anchor="middle">CFG Dropout</text>
+              </g>
+
+              <g class="dg-stage" data-s="4">
+                <path class="fl" d="M578 190 H624" marker-end="url(#dg-ar)"/>
+                <rect class="bx gr" x="628" y="96" width="330" height="248" rx="4"/>
+                <g class="bx wh">
+                  <rect x="654" y="124" width="38" height="166" rx="3"/>
+                  <rect x="708" y="144" width="38" height="126" rx="3"/>
+                  <rect x="762" y="172" width="38" height="70"  rx="3"/>
+                  <rect x="816" y="144" width="38" height="126" rx="3"/>
+                  <rect x="870" y="124" width="38" height="166" rx="3"/>
+                </g>
+                <text class="tb" x="793" y="326" text-anchor="middle">1D Conditional U-Net</text>
+                <text class="t" x="416" y="382">Diffusion Timestep</text>
+                <text class="t" x="416" y="402">Embedding</text>
+                <text class="t" x="416" y="438">Clean Trajectory</text>
+                <text class="t" x="416" y="458">+ Sampled Noise</text>
+                <path class="fl" d="M566 392 H700 V348" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M576 448 H800 V348" marker-end="url(#dg-ar)"/>
+              </g>
+
+              <g class="dg-stage" data-s="5">
+                <path class="fl" d="M958 186 H1020" marker-end="url(#dg-ar)"/>
+                <text class="t" x="1075" y="176" text-anchor="middle">Predicted</text>
+                <text class="t" x="1075" y="196" text-anchor="middle">Noise</text>
+                <path class="fl" d="M1075 212 V256" marker-end="url(#dg-ar)"/>
+                <text class="t" x="1075" y="270" text-anchor="middle">MSE Loss</text>
+                <text class="t" x="1075" y="290" text-anchor="middle">Training</text>
+              </g>
+
+            </g>
+
+            <!-- ============ PANEL B: INFERENCE ============ -->
+            <g class="dg-panel" data-panel="b">
+
+              <g class="dg-stage" data-s="6">
+                <rect class="bx yl" x="20" y="30" width="176" height="340" rx="4"/>
+                <rect class="bx wh" x="32" y="40" width="152" height="50" rx="3"/>
+                <text class="tb" x="108" y="61" text-anchor="middle">Decomposed</text>
+                <text class="tb" x="108" y="81" text-anchor="middle">Conditions</text>
+                <text class="t" x="108" y="160" text-anchor="middle">uncond</text>
+                <text class="t" x="108" y="245" text-anchor="middle">scene only</text>
+                <text class="t" x="108" y="315" text-anchor="middle">scene</text>
+                <text class="t" x="108" y="337" text-anchor="middle">+style<tspan class="sub" dy="4">i</tspan></text>
+                <text class="t" x="108" y="404" text-anchor="middle">N Noisy</text>
+                <text class="t" x="108" y="424" text-anchor="middle">Trajectories</text>
+              </g>
+
+              <g class="dg-stage" data-s="7">
+                <path class="fl" d="M196 235 H236"/>
+                <path class="fl" d="M236 129 V341"/>
+                <path class="fl" d="M236 129 H272" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M236 235 H272" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M236 341 H272" marker-end="url(#dg-ar)"/>
+                <rect class="bx gr" x="276" y="84"  width="200" height="90" rx="4"/>
+                <g class="bx wh"><rect x="292" y="100" width="24" height="58" rx="2"/><rect x="326" y="108" width="24" height="42" rx="2"/><rect x="360" y="116" width="24" height="26" rx="2"/><rect x="394" y="108" width="24" height="42" rx="2"/><rect x="428" y="100" width="24" height="58" rx="2"/></g>
+                <rect class="bx gr" x="276" y="190" width="200" height="90" rx="4"/>
+                <g class="bx wh"><rect x="292" y="206" width="24" height="58" rx="2"/><rect x="326" y="214" width="24" height="42" rx="2"/><rect x="360" y="222" width="24" height="26" rx="2"/><rect x="394" y="214" width="24" height="42" rx="2"/><rect x="428" y="206" width="24" height="58" rx="2"/></g>
+                <rect class="bx gr" x="276" y="296" width="200" height="90" rx="4"/>
+                <g class="bx wh"><rect x="292" y="312" width="24" height="58" rx="2"/><rect x="326" y="320" width="24" height="42" rx="2"/><rect x="360" y="328" width="24" height="26" rx="2"/><rect x="394" y="320" width="24" height="42" rx="2"/><rect x="428" y="312" width="24" height="58" rx="2"/></g>
+                <text class="ts" x="376" y="406" text-anchor="middle">&#215; N<tspan class="sub" dy="3">style</tspan><tspan dy="-3" dx="5">axes</tspan></text>
+              </g>
+
+              <g class="dg-stage" data-s="8">
+                <path class="fl" d="M476 129 H636"/>
+                <path class="fl" d="M476 235 H636"/>
+                <path class="fl" d="M476 341 H636"/>
+                <path class="fl" d="M636 129 V341"/>
+                <path class="fl" d="M636 262 H662" marker-end="url(#dg-ar)"/>
+                <text class="eq" x="664" y="52">&#949; = &#949;<tspan class="sub" dy="4">uncond</tspan></text>
+                <text class="eq" x="664" y="90">+ w<tspan class="sub" dy="4">s</tspan><tspan dy="-4">(&#949;</tspan><tspan class="sub" dy="4">scene</tspan><tspan dy="-4"> &#8722; &#949;</tspan><tspan class="sub" dy="4">uncond</tspan><tspan dy="-4">)</tspan></text>
+                <text class="eq" x="664" y="128">+ &#8721;<tspan class="sub" dy="6">i</tspan><tspan dy="-6"> w</tspan><tspan class="sub" dy="4">i</tspan><tspan dy="-4">(&#949;</tspan><tspan class="sub" dy="4">scene+style</tspan><tspan class="sub" dy="2">i</tspan><tspan dy="-6">&#8722; &#949;</tspan><tspan class="sub" dy="4">scene</tspan><tspan dy="-4">)</tspan></text>
+                <circle class="bx wh" cx="700" cy="262" r="34"/>
+                <text class="eq dg-sum" x="700" y="273" text-anchor="middle">&#8721;</text>
+              </g>
+
+              <g class="dg-stage" data-s="9">
+                <path class="fl" d="M760 296 V452 H236 V346" marker-end="url(#dg-ar)"/>
+                <path class="fl" d="M108 434 V452 H236"/>
+                <text class="t" x="548" y="444" text-anchor="middle">Repeat for all denoising steps</text>
+              </g>
+
+              <g class="dg-stage" data-s="10">
+                <path class="fl" d="M734 262 H926" marker-end="url(#dg-ar)"/>
+                <text class="t" x="832" y="226" text-anchor="middle">N Denoised</text>
+                <text class="t" x="832" y="246" text-anchor="middle">Trajectory Samples</text>
+                <rect class="bx pu" x="930" y="232" width="212" height="64" rx="4"/>
+                <text class="tb" x="1036" y="258" text-anchor="middle">Best-of-N</text>
+                <text class="tb" x="1036" y="280" text-anchor="middle">Sample Selection</text>
+                <path class="fl" d="M1036 296 V336" marker-end="url(#dg-ar)"/>
+                <rect class="bx pk" x="930" y="340" width="212" height="64" rx="4"/>
+                <text class="tb" x="1036" y="366" text-anchor="middle">Feasibility</text>
+                <text class="tb" x="1036" y="388" text-anchor="middle">Projection Layer</text>
+                <path class="fl" d="M1036 404 V430" marker-end="url(#dg-ar)"/>
+                <text class="t" x="1036" y="448" text-anchor="middle">Control Actions</text>
+              </g>
+
+            </g>
+          </svg>
+        </div>
+
+        <div class="diagram-panel-label">
+          <span class="dg-phase" data-phase="a">Training</span>
+          <span class="dg-phase" data-phase="b">Deployment</span>
+        </div>
+
+        <div class="diagram-caption">
+          <h3 class="dg-cap-title"></h3>
+          <p class="dg-cap-body"></p>
+        </div>
+
+        <div class="diagram-controls">
+          <button class="dg-btn" data-dg="prev" aria-label="Previous step">
+            <i class="fas fa-chevron-left"></i>
+          </button>
+          <button class="dg-btn dg-play" data-dg="play" aria-label="Play or pause the walkthrough">
+            <i class="fas fa-pause"></i><span>Pause</span>
+          </button>
+          <button class="dg-btn" data-dg="next" aria-label="Next step">
+            <i class="fas fa-chevron-right"></i>
+          </button>
+          <div class="dg-dots" role="tablist" aria-label="Walkthrough step"></div>
+        </div>
+      </div>
+
+      <p class="diagram-foot">
+        <a href="static/images/method_overview.png" target="_blank" rel="noopener">
+          View the static figure as it appears in the paper
+        </a>
+      </p>
     </div>
   </section>
 
@@ -392,7 +555,7 @@
           <figure class="triptych-cell">
             <div class="triptych-head">
               <span class="style-chip is-neg">s_prox = &minus;1</span>
-              <span class="cell-name">Efficient</span>
+              <span class="cell-name">Assertive</span>
             </div>
             <video muted playsinline preload="metadata"
                    poster="static/videos/posters/prox_-1.jpg"
@@ -516,7 +679,7 @@
           <figure class="triptych-cell">
             <div class="triptych-head">
               <span class="style-chip is-neg">s_yield = &minus;1</span>
-              <span class="cell-name">Assertive</span>
+              <span class="cell-name">Non-Yielding</span>
             </div>
             <video muted playsinline preload="metadata"
                    poster="static/videos/posters/yield_-1.jpg"
@@ -548,7 +711,7 @@
           <figure class="triptych-cell">
             <div class="triptych-head">
               <span class="style-chip is-pos">s_yield = +1</span>
-              <span class="cell-name">Deferential</span>
+              <span class="cell-name">Yielding</span>
             </div>
             <video muted playsinline preload="metadata"
                    poster="static/videos/posters/yield_+1.jpg"
@@ -610,7 +773,7 @@
           <figure class="triptych-cell">
             <div class="triptych-head">
               <span class="style-chip is-pos">s_group = +1</span>
-              <span class="cell-name">Deferential</span>
+              <span class="cell-name">Group-preserving</span>
             </div>
             <video muted playsinline preload="metadata"
                    poster="static/videos/posters/group_+1.jpg"

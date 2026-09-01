@@ -114,7 +114,7 @@
 }
 
 /* --------------------------------------------------------------------------
-   Paper figures (teaser, method overview)
+   Teaser figure
    -------------------------------------------------------------------------- */
 
 .teaser-figure {
@@ -124,27 +124,9 @@
   border-radius: var(--border-radius);
 }
 
-.method-figure { margin: 1.75rem 0 0; }
 
-.method-figure img {
-  display: block;
-  width: 100%;
-  height: auto;
-  border: 1px solid var(--hairline);
-  border-radius: var(--border-radius);
-  background: #fff;
-}
 
-.method-figure figcaption {
-  max-width: 78ch;
-  margin: 1rem auto 0;
-  color: var(--text-secondary);
-  font-size: 0.9rem;
-  line-height: 1.65;
-  text-align: left;
-}
 
-.method-figure figcaption b { color: var(--text-primary); }
 
 /* --------------------------------------------------------------------------
    Style axis cards
@@ -524,4 +506,179 @@ body.is-draft .draft-note code {
 
 @media (prefers-reduced-motion: reduce) {
   .axis-card:hover { transform: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Animated method walkthrough
+   The diagram is drawn as inline SVG so each stage can be revealed, dimmed
+   and animated independently. Without JS every stage stays fully visible,
+   so the figure still reads as a complete static diagram.
+   -------------------------------------------------------------------------- */
+
+.diagram {
+  margin-top: 1.5rem;
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius-lg);
+  background: var(--surface);
+  box-shadow: var(--shadow-sm);
+  overflow: hidden;
+}
+
+.diagram-stage {
+  position: relative;
+  padding: 1.25rem 1.25rem 0;
+  background: #fff;
+}
+
+.diagram-svg { display: block; width: 100%; height: auto; }
+
+/* Diagram primitives, matching the palette of the figure in the paper. */
+.diagram-svg .bx { stroke: #3a414a; stroke-width: 2.2; }
+.diagram-svg .yl { fill: #fcfcca; }
+.diagram-svg .bl { fill: #edf5ff; }
+.diagram-svg .gr { fill: #e3fae3; }
+.diagram-svg .pu { fill: #f2f2ff; }
+.diagram-svg .pk { fill: #fff0f0; }
+.diagram-svg .wh { fill: #ffffff; }
+.diagram-svg text { font-family: Inter, system-ui, sans-serif; fill: #1e293b; }
+.diagram-svg .t  { font-size: 16px; }
+.diagram-svg .tb { font-size: 16px; font-weight: 700; }
+.diagram-svg .ts { font-size: 13px; }
+.diagram-svg .sub { font-size: 11px; }
+.diagram-svg .eq { font-size: 17px; font-family: Georgia, "Times New Roman", serif; }
+.diagram-svg .dg-sum { font-size: 30px; }
+.diagram-svg .fl { fill: none; stroke: #64748b; stroke-width: 2.2; }
+.diagram-svg marker path { fill: #64748b; }
+
+/* Only one phase is on screen at a time. */
+.diagram-svg .dg-panel { transition: opacity 0.4s ease; }
+.is-animated .dg-panel { opacity: 0; pointer-events: none; }
+.is-animated .dg-panel.is-current { opacity: 1; pointer-events: auto; }
+
+/* Stage reveal: unseen stages are ghosted, past stages settle back, the
+   active stage is at full strength with its flow lines marching. */
+.diagram-svg .dg-stage { transition: opacity 0.45s ease; }
+.is-animated .dg-stage { opacity: 0.1; }
+.is-animated .dg-stage.is-seen { opacity: 0.5; }
+.is-animated .dg-stage.is-active { opacity: 1; }
+
+.is-animated .dg-stage.is-active .fl {
+  stroke: var(--primary-color);
+  stroke-dasharray: 9 7;
+  animation: dg-flow 0.75s linear infinite;
+}
+
+.is-animated .dg-stage.is-active .bx { stroke: #1f2937; }
+
+@keyframes dg-flow { to { stroke-dashoffset: -16; } }
+
+@media (prefers-reduced-motion: reduce) {
+  .is-animated .dg-stage.is-active .fl { animation: none; }
+}
+
+/* Phase label */
+.diagram-panel-label {
+  display: flex;
+  justify-content: center;
+  gap: 0.5rem;
+  padding: 0.9rem 1rem 0;
+  background: #fff;
+}
+
+.dg-phase {
+  padding: 0.25rem 0.85rem;
+  border-radius: 999px;
+  background: var(--background-accent);
+  color: var(--text-light);
+  font-size: 0.78rem;
+  font-weight: 700;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  transition: var(--transition);
+}
+
+.dg-phase.is-current { background: var(--primary-color); color: #fff; }
+
+/* Caption */
+.diagram-caption {
+  min-height: 7.5rem;
+  padding: 1rem 1.5rem 0.25rem;
+  background: #fff;
+  text-align: center;
+}
+
+.dg-cap-title {
+  margin: 0 0 0.4rem;
+  font-size: 1.1rem;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.dg-cap-body {
+  max-width: 68ch;
+  margin: 0 auto;
+  color: var(--text-secondary);
+  font-size: 0.93rem;
+  line-height: 1.65;
+}
+
+/* Controls */
+.diagram-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 0.6rem;
+  padding: 1rem 1.25rem 1.25rem;
+  background: #fff;
+}
+
+.dg-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.45rem;
+  min-height: 2.3rem;
+  padding: 0.45rem 0.9rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-primary);
+  font-family: inherit;
+  font-size: 0.88rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dg-btn:hover { border-color: var(--primary-color); color: var(--primary-color); }
+.dg-btn:disabled { opacity: 0.35; cursor: default; }
+.dg-btn:disabled:hover { border-color: var(--hairline); color: var(--text-primary); }
+
+.dg-dots { display: flex; gap: 0.35rem; margin-left: 0.5rem; }
+
+.dg-dot {
+  width: 11px;
+  height: 11px;
+  padding: 0;
+  border: none;
+  border-radius: 50%;
+  background: #cbd5e1;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.dg-dot:hover { background: #94a3b8; }
+.dg-dot.is-current { background: var(--primary-color); transform: scale(1.25); }
+
+.diagram-foot {
+  margin-top: 0.9rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
+  text-align: center;
+}
+
+@media screen and (max-width: 700px) {
+  .diagram-stage { padding: 0.75rem 0.75rem 0; }
+  .diagram-caption { min-height: 10rem; padding: 0.9rem 1rem 0.25rem; }
+  .dg-dots { width: 100%; justify-content: center; margin: 0.4rem 0 0; }
 }

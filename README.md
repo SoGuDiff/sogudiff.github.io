@@ -37,7 +37,7 @@ is visible to a normal viewer.
 
 ## Adding the assets that are still missing
 
-Ten media slots are wired up but have no file yet. Each renders as a labelled
+Nine media slots are wired up but have no file yet. Each renders as a labelled
 dashed placeholder naming the exact path to drop in — so the page is never
 broken while you are still producing material. **Adding an asset is one step:
 put the file at the named path.** No HTML edit needed.
@@ -47,10 +47,12 @@ put the file at the named path.** No HTML edit needed.
 | Path | Source in the paper | Where it appears |
 | --- | --- | --- |
 | `static/images/teaser_figure.png` | `Figures/MainFigureV3.png` | Top of the page, under the title |
-| `static/images/method_overview.png` | `Figures/SocialStyleUNetV3.png` | "How It Works" section |
 
-Export both at generous width — 2000px for the teaser, 2400px for the
-two-panel method figure — since they are shown full-bleed.
+Export at 2000px or wider, since it is shown full-bleed.
+
+`static/images/method_overview.png` is already in place — it is the supplied
+`SocialStyleUNetV3.png`, kept only as the "static figure" link under the
+animated walkthrough.
 
 ### Videos (in `static/videos/`)
 
@@ -102,7 +104,7 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 1. **Hero** — title, anonymous author block, inert Paper/arXiv/Code/Video buttons
 2. **Teaser figure** — the paper's Fig. 1
 3. **Abstract** — verbatim from the paper
-4. **How It Works** — the paper's Fig. 2, with a condensed caption
+4. **How It Works** — an animated ten-step walkthrough of the architecture
 5. **The Style Vector** — four cards explaining the axes and what ±1 mean
 6. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
    clips play in step with shared play / restart / scrub controls
@@ -110,6 +112,33 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 8. **Real-World Deployment** — four slots
 9. **Beyond the Paper** — four slots for supplementary comparisons
 10. **BibTeX** and footer
+
+### The animated walkthrough
+
+"How It Works" is not the paper's figure as an image — it is redrawn as inline
+SVG in `index.html` so each stage can be revealed and animated separately. It
+steps through ten stages, five on training and five on deployment, cross-fading
+between the two phases; the active stage is brought to full strength with its
+flow lines marching, earlier stages settle back, and later ones stay ghosted.
+
+It autoplays when scrolled into view, pauses when scrolled away, and has
+prev / play / next controls plus clickable step dots.
+
+To edit it:
+
+- **Step text** lives in the `STEPS` array in `static/js/sogudiff.js`. Each
+  entry is `{ phase, title, body }`, where `phase` is `'a'` (training) or
+  `'b'` (deployment).
+- **Which shapes belong to a step** is set by `data-s="N"` on the
+  `<g class="dg-stage">` wrappers in `index.html`. The number matches the
+  step's position in `STEPS`. Moving a shape between steps means moving it
+  between those groups — nothing else to update.
+- **Colors** are `.yl/.bl/.gr/.pu/.pk` in `sogudiff.css`, sampled from the
+  paper figure.
+- **Pace** is the `DWELL` constant (milliseconds per step).
+
+With JavaScript disabled every stage stays fully visible, so the diagram still
+reads as one complete static figure.
 
 ### Synchronized playback
 
