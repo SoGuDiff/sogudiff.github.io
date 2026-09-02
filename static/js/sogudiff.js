@@ -269,60 +269,60 @@
     // wholly lit or wholly dim - it can never be clipped part way through.
     // Ranges are written [first, last]. Use tools/region-picker.html to edit.
     var STEPS = [
-      { phase: 'a', at: [9, [41, 42], [44, 45], [47, 48], [50, 51], [53, 55], [60, 62], [64, 65], 68, 71, 74],
+      { phase: 'a', at: [9, [41, 42], [44, 45], [47, 48], [50, 51], [53, 55], 60],
         title: 'Conditioning inputs',
         body: 'The robot state, goal pose, neighboring pedestrian states, and a local ' +
               'occupancy map together define the scene context. The four-dimensional ' +
               'social style vector is supplied through the same conditioning interface, ' +
               'so the desired conduct is specified at deployment rather than fixed ' +
               'during training.' },
-      { phase: 'a', at: [[10, 12], [19, 22], [56, 58], 63, 66, [155, 157], [181, 182]],
+      { phase: 'a', at: [[10, 12], [19, 22], [61, 66], [181, 182]],
         title: 'Dedicated encoders for map and style',
         body: 'A convolutional encoder compresses the occupancy map into tokens, and ' +
               'each style axis is embedded as a token of its own. Both paths are subject ' +
               'to structured conditioning dropout during training, so the model remains ' +
               'well defined when either group is replaced by its learned null embedding.' },
-      { phase: 'a', at: [[15, 18], 26, 67, [69, 70], [72, 73], 75, [158, 160]],
+      { phase: 'a', at: [[15, 18], 26, [56, 58], [67, 75], [155, 160]],
         title: 'Joint encoding of scene and style',
         body: 'Scene and style tokens are concatenated and processed by a self-attention ' +
               'encoder, allowing the two to interact before they condition the denoiser. ' +
               'The requested style is therefore interpreted in the context of the ' +
               'observed geometry rather than applied independently of it.' },
-      { phase: 'a', at: [[6, 7], [13, 14], 25, 27, [29, 36], [77, 79], 95, [149, 154]],
+      { phase: 'a', at: [[13, 14], 25, 27, [29, 36], [77, 79], [149, 154]],
         title: 'Conditional trajectory denoising',
         body: 'A one-dimensional conditional U-Net denoises a corrupted trajectory while ' +
               'cross-attending to the encoded tokens, with the diffusion timestep ' +
               'entering as an embedding that modulates the residual block features. The ' +
               'output is a full trajectory over the planning horizon.' },
-      { phase: 'a', at: [8, [38, 39], [88, 93]],
+      { phase: 'a', at: [[6, 8], [38, 39], [88, 93]],
         title: 'Training objective',
         body: 'The network is trained to predict the noise introduced by the forward ' +
               'process, under a mean squared error loss. Each demonstration carries a ' +
               'label on exactly one style axis, so composed styles are never observed ' +
               'during training.' },
-      { phase: 'b', at: [86, 100, 167, 169, 171, 173, 175, 177, 180],
+      { phase: 'b', at: [167, 169, 171, 173, 175, 180],
         title: 'Decomposed conditioning at inference',
         body: 'The trained network is queried under several conditioning subsets: ' +
               'unconditional, scene-only, and scene combined with a single style axis at ' +
               'a time. The structured dropout applied during training is what makes ' +
               'these partial queries well posed.' },
-      { phase: 'b', at: [4, [80, 81], [83, 85], [98, 99], 109, [120, 121], 126, [162, 164], 176, 178, [185, 188]],
+      { phase: 'b', at: [[80, 81], [83, 86], [98, 100], 121, [125, 127], [162, 164], [176, 178], [185, 188]],
         title: 'Parallel evaluation of the variants',
         body: 'All conditioning variants, across the N candidate trajectories, are ' +
               'evaluated in a single batched forward pass. Guidance therefore introduces ' +
               'no additional sequential denoising steps.' },
-      { phase: 'b', at: [[101, 106], [110, 112], [165, 166], 189],
+      { phase: 'b', at: [[101, 106], [110, 112], [114, 117], [122, 124], [165, 166], 189],
         title: 'Per-axis classifier-free guidance',
         body: 'Each style axis contributes a score difference taken relative to the ' +
               'scene-conditional estimate and scaled by its own guidance weight. Because ' +
               'the contributions are summed independently, the axes can be weighted ' +
               'separately and composed into styles never demonstrated jointly.' },
-      { phase: 'b', at: [[2, 3], [107, 108], [118, 119], 125, 127, 184],
+      { phase: 'b', at: [[2, 4], [107, 109], [114, 120], 125, 127, 184],
         title: 'Iterated denoising',
         body: 'The guided noise estimate drives one reverse diffusion step, and the ' +
               'procedure repeats across the sampling schedule, propagating all N ' +
               'candidate trajectories simultaneously.' },
-      { phase: 'b', at: [[114, 117], [122, 124], [128, 131], [133, 147]],
+      { phase: 'b', at: [[128, 131], [133, 147]],
         title: 'Selection and feasibility projection',
         body: 'A goal-directed cost selects the lowest-cost candidate. A ' +
               'soft-constrained optimal control problem then refines it into a ' +
