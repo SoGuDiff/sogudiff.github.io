@@ -913,51 +913,122 @@
 
   <!-- ====================== SUPPLEMENTARY ====================== -->
   <section class="section">
+    <div class="container is-max-widescreen">
+      <h2 class="title is-3 has-text-centered">Neutral Style and Baseline Comparisons</h2>
+      <p class="section-lead">
+        Five scenes from the same randomized evaluation set the paper's baseline
+        table reports, chosen because they separate the methods. SoGuDiff runs at
+        the neutral style, so this is the comparison with the style axes held at
+        their defaults. Every panel is the same scene at the same moment.
+      </p>
+
+      <div class="cmp" id="compare">
+        <div class="cmp-scenes" role="tablist" aria-label="Scene">
+          <button class="cmp-scene" role="tab" data-scene="1" aria-selected="true">Scene 1</button>
+          <button class="cmp-scene" role="tab" data-scene="2" aria-selected="false">Scene 2</button>
+          <button class="cmp-scene" role="tab" data-scene="3" aria-selected="false">Scene 3</button>
+          <button class="cmp-scene" role="tab" data-scene="4" aria-selected="false">Scene 4</button>
+          <button class="cmp-scene" role="tab" data-scene="5" aria-selected="false">Scene 5</button>
+        </div>
+
+        <div class="cmp-stage" data-sync-group="compare">
+          <figure class="cmp-panel is-large" data-method="sogudiff">
+            <video muted playsinline preload="metadata" data-method="sogudiff"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>SoGuDiff (neutral style)</figcaption>
+          </figure>
+
+          <div class="cmp-grid">
+          <figure class="cmp-panel is-small" data-method="orca">
+            <video muted playsinline preload="metadata" data-method="orca"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>ORCA</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="sfm">
+            <video muted playsinline preload="metadata" data-method="sfm"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>SFM</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="cadrl">
+            <video muted playsinline preload="metadata" data-method="cadrl"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>CADRL</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="lstm-rl">
+            <video muted playsinline preload="metadata" data-method="lstm-rl"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>LSTM-RL</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="sarl">
+            <video muted playsinline preload="metadata" data-method="sarl"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>SARL</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="rgl">
+            <video muted playsinline preload="metadata" data-method="rgl"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>RGL</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="dsrnn">
+            <video muted playsinline preload="metadata" data-method="dsrnn"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>DSRNN</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="navistar">
+            <video muted playsinline preload="metadata" data-method="navistar"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>NaviSTAR</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="height">
+            <video muted playsinline preload="metadata" data-method="height"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>HEIGHT</figcaption>
+          </figure>
+          <figure class="cmp-panel is-small" data-method="sicnav">
+            <video muted playsinline preload="metadata" data-method="sicnav"></video>
+            <span class="cmp-badge"></span>
+            <figcaption>SICNav</figcaption>
+          </figure>
+          </div>
+        </div>
+
+        <div class="sync-bar" data-sync-controls="compare">
+          <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+          <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+          <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+                 data-sync-scrub aria-label="Scrub every panel together">
+        </div>
+
+        <ul class="cmp-key">
+          <li><span class="cmp-k cmp-k-success"></span>reached the goal</li>
+          <li><span class="cmp-k cmp-k-collision"></span>collided</li>
+          <li><span class="cmp-k cmp-k-timeout"></span>timed out</li>
+          <li class="cmp-k-note">a panel is marked once its own episode ends, and holds its last frame while the others finish</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <!-- ====================== BEYOND THE PAPER ====================== -->
+  <section class="section hero is-light">
     <div class="container is-max-desktop">
       <h2 class="title is-3 has-text-centered">Beyond the Paper</h2>
       <p class="section-lead">
-        Material that did not fit in the page limit: qualitative comparisons against
-        baselines, and a look at where the training demonstrations come from.
+        Material that did not fit in the page limit.
       </p>
 
       <div class="media-grid">
 
         <figure class="media-item">
           <video controls muted loop playsinline preload="metadata"
-                 data-slot="Baseline comparison, same scenes"
-                 data-slot-path="static/videos/baseline_comparison.mp4"
-                 data-slot-hint="SoGuDiff at neutral style beside SFM / ORCA / DSRNN / SICNav on identical scenes. The paper only has the table; seeing the failure modes is far more convincing.">
-            <source src="static/videos/baseline_comparison.mp4" type="video/mp4">
+                 data-slot="Continuous axis sweep"
+                 data-slot-path="static/videos/continuous_sweep.mp4"
+                 data-slot-hint="One axis walked smoothly from -1 to +1 in fine increments on a single scene. Every sweep elsewhere on this page shows only -1 / 0 / +1, which reads as three discrete settings; the abstract claims the axes are continuous and nothing currently shows it.">
+            <source src="static/videos/continuous_sweep.mp4" type="video/mp4">
           </video>
           <figcaption>
-            <b>Against fixed-behavior planners.</b> Neutral-style SoGuDiff beside the
-            baselines on identical scenes.
-          </figcaption>
-        </figure>
-
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Demonstration generation"
-                 data-slot-path="static/videos/demonstration_generation.mp4"
-                 data-slot-hint="The offline sampling planner at work: the candidate trajectory fan colored by social cost, and how the retained low-cost set shifts as the style label changes. Explains where single-axis labels come from.">
-            <source src="static/videos/demonstration_generation.mp4" type="video/mp4">
-          </video>
-          <figcaption>
-            <b>Where the labels come from.</b> The offline sampler's candidate fan,
-            colored by social cost, as the style label varies.
-          </figcaption>
-        </figure>
-
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Guidance weight sweep"
-                 data-slot-path="static/videos/guidance_weight_sweep.mp4"
-                 data-slot-hint="Same scene and style, sweeping total guidance weight over 1 / 3 / 10. Shows style value and guidance strength are genuinely independent controls - a point that is hard to make in text.">
-            <source src="static/videos/guidance_weight_sweep.mp4" type="video/mp4">
-          </video>
-          <figcaption>
-            <b>Style versus strength.</b> One style, varying guidance weight &mdash; the
-            two controls act independently.
+            <b>The axes really are continuous.</b> One axis swept smoothly end to
+            end, rather than sampled at three points.
           </figcaption>
         </figure>
 
@@ -965,12 +1036,25 @@
           <video controls muted loop playsinline preload="metadata"
                  data-slot="Feasibility projection ablation"
                  data-slot-path="static/videos/projection_ablation.mp4"
-                 data-slot-hint="With and without the acados projection layer on the same scene. The table reports 70% success without it; the stalling failure mode is much clearer as video.">
+                 data-slot-hint="With and without the acados projection layer on the same scene. The table reports 70% success and mean clearance rising to 4.08 m without it; that clearance is freezing, not caution, which only reads as video.">
             <source src="static/videos/projection_ablation.mp4" type="video/mp4">
           </video>
           <figcaption>
-            <b>Without the projection layer.</b> The stalling failure mode behind the
-            drop to 70% success.
+            <b>Without the projection layer.</b> The stalling behind the drop to
+            70% success, and why the clearance figure rises rather than falls.
+          </figcaption>
+        </figure>
+
+        <figure class="media-item">
+          <video controls muted loop playsinline preload="metadata"
+                 data-slot="Guidance weight sweep"
+                 data-slot-path="static/videos/guidance_weight_sweep.mp4"
+                 data-slot-hint="Same scene and style, total guidance weight over 1 / 3 / 10. Shows the requested style and the strength it is imposed with are independent controls, which is hard to make land in prose.">
+            <source src="static/videos/guidance_weight_sweep.mp4" type="video/mp4">
+          </video>
+          <figcaption>
+            <b>Style versus strength.</b> One style, varying guidance weight — the
+            two act as independent controls.
           </figcaption>
         </figure>
 

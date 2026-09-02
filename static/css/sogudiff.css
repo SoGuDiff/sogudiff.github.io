@@ -830,3 +830,139 @@ body.is-draft .draft-note code {
 @media (prefers-reduced-motion: reduce) {
   .teaser-layer { transition: none; }
 }
+
+/* --------------------------------------------------------------------------
+   Baseline comparison
+   Ours large, the ten baselines in a grid beneath. All eleven are one sync
+   group, so they play as a single clock and hold their last frame; the badge
+   says why a panel stopped, which the frozen frame alone cannot.
+   -------------------------------------------------------------------------- */
+
+.cmp { margin-top: 1.5rem; }
+
+.cmp-scenes {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-bottom: 1.1rem;
+}
+
+.cmp-scene {
+  padding: 0.5rem 1.1rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 0.9rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.cmp-scene:hover { border-color: var(--primary-color); color: var(--text-primary); }
+
+.cmp-scene[aria-selected="true"] {
+  background: var(--primary-color);
+  border-color: var(--primary-color);
+  color: #fff;
+}
+
+.cmp-stage {
+  display: grid;
+  grid-template-columns: minmax(0, 1.15fr) minmax(0, 2fr);
+  gap: 1rem;
+  align-items: start;
+}
+
+.cmp-grid {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: 0.6rem;
+}
+
+.cmp-panel {
+  position: relative;
+  margin: 0;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: #fff;
+  overflow: hidden;
+}
+
+.cmp-panel video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  background: #fff;
+}
+
+.cmp-panel figcaption {
+  padding: 0.4rem 0.5rem;
+  border-top: 1px solid var(--hairline);
+  color: var(--text-secondary);
+  font-size: 0.76rem;
+  font-weight: 600;
+  text-align: center;
+}
+
+.cmp-panel.is-large figcaption { font-size: 0.95rem; padding: 0.6rem; }
+
+/* Outcome badge: hidden until that panel's own episode ends. */
+.cmp-badge {
+  position: absolute;
+  top: 0.4rem;
+  left: 0.4rem;
+  padding: 0.12rem 0.45rem;
+  border-radius: 999px;
+  color: #fff;
+  font-size: 0.68rem;
+  font-weight: 700;
+  letter-spacing: 0.01em;
+  opacity: 0;
+  transition: opacity 0.25s ease;
+  pointer-events: none;
+}
+
+.cmp-badge.is-on { opacity: 1; }
+.cmp-badge.is-success { background: #1e7a3c; }
+.cmp-badge.is-collision { background: #c62828; }
+.cmp-badge.is-timeout { background: #b26a00; }
+
+.cmp-panel.is-large .cmp-badge { font-size: 0.82rem; padding: 0.2rem 0.65rem; }
+
+.cmp-key {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.4rem 1.15rem;
+  margin: 1rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
+}
+
+.cmp-key li { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+.cmp-k {
+  width: 11px;
+  height: 11px;
+  border-radius: 3px;
+  display: inline-block;
+}
+
+.cmp-k-success { background: #1e7a3c; }
+.cmp-k-collision { background: #c62828; }
+.cmp-k-timeout { background: #b26a00; }
+.cmp-k-note { color: var(--text-light); font-style: italic; }
+
+@media screen and (max-width: 900px) {
+  .cmp-stage { grid-template-columns: 1fr; }
+  .cmp-grid { grid-template-columns: repeat(3, 1fr); }
+}
+
+@media screen and (max-width: 560px) {
+  .cmp-grid { grid-template-columns: repeat(2, 1fr); }
+}

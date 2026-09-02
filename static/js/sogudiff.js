@@ -566,6 +566,164 @@
   })();
 
   /* ----------------------------------------------------------------------
+     Baseline comparison
+     Eleven panels of one scene. Switching scene repoints every <video> at
+     that scene's file, so the eleven stay together rather than drifting apart
+     across scenes. Each panel is marked with its own outcome the moment its
+     episode ends, which matters because the methods finish at very different
+     times — in scene 1 five of them collide inside 1.5 s while others run past
+     12 s, and without a marker a frozen panel just looks like a stalled video.
+     ---------------------------------------------------------------------- */
+  (function () {
+    var root = document.getElementById('compare');
+    if (!root) return;
+
+    var OUTCOMES = {
+          "sogudiff": {
+                "1": "success",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "orca": {
+                "1": "collision",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "sfm": {
+                "1": "collision",
+                "2": "collision",
+                "3": "collision",
+                "4": "collision",
+                "5": "success"
+          },
+          "cadrl": {
+                "1": "collision",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "lstm-rl": {
+                "1": "collision",
+                "2": "collision",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "sarl": {
+                "1": "collision",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "rgl": {
+                "1": "collision",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "dsrnn": {
+                "1": "success",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "collision"
+          },
+          "navistar": {
+                "1": "success",
+                "2": "success",
+                "3": "collision",
+                "4": "collision",
+                "5": "success"
+          },
+          "height": {
+                "1": "success",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          },
+          "sicnav": {
+                "1": "collision",
+                "2": "success",
+                "3": "success",
+                "4": "success",
+                "5": "success"
+          }
+    };
+    var LABEL = { success: 'Reached goal', collision: 'Collision', timeout: 'Timed out' };
+
+    var panels = Array.prototype.slice.call(root.querySelectorAll('.cmp-panel'));
+    var tabs = Array.prototype.slice.call(root.querySelectorAll('.cmp-scene'));
+    var group = root.querySelector('[data-sync-group]');
+    var scene = '1';
+
+    function mark(panel, method) {
+      var o = (OUTCOMES[method] || {})[scene];
+      if (!o) return;
+      var b = panel.querySelector('.cmp-badge');
+      b.textContent = LABEL[o] || o;
+      b.className = 'cmp-badge is-' + o + ' is-on';
+    }
+
+    panels.forEach(function (panel) {
+      var v = panel.querySelector('video');
+      var m = panel.dataset.method;
+      // The clip ends exactly when the episode does, so 'ended' is the moment
+      // the outcome is known — no separate timing data needed.
+      v.addEventListener('ended', function () { mark(panel, m); });
+    });
+
+    function load(n) {
+      scene = String(n);
+      panels.forEach(function (panel) {
+        var v = panel.querySelector('video');
+        var m = panel.dataset.method;
+        var b = panel.querySelector('.cmp-badge');
+        b.className = 'cmp-badge';
+        b.textContent = '';
+        v.src = 'static/videos/compare/' + m + '_scene' + scene + '.mp4';
+        v.load();
+      });
+      tabs.forEach(function (t) {
+        t.setAttribute('aria-selected', t.dataset.scene === scene ? 'true' : 'false');
+      });
+    }
+
+    tabs.forEach(function (t) {
+      t.addEventListener('click', function () {
+        load(t.dataset.scene);
+        if (group && group._syncPlay) {
+          group._syncPlay();
+          if (group._syncReset) group._syncReset(true);
+        }
+      });
+    });
+
+    load(1);
+
+    if ('IntersectionObserver' in window && group) {
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            if (group._syncPlay) { group._syncPlay(); if (group._syncReset) group._syncReset(true); }
+          } else if (group._syncPause) {
+            group._syncPause();
+            if (group._syncReset) group._syncReset(false);
+          }
+        });
+      }, { threshold: 0.2 });
+      io.observe(root);
+    }
+  })();
+
+  /* ----------------------------------------------------------------------
      Sync groups outside the tabbed explorer (the composition grid) start
      when scrolled into view and pause when scrolled away, so a page full of
      video stays cheap. The explorer has its own trigger above.

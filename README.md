@@ -89,10 +89,9 @@ they are stacked directly. Replacing them needs no code changes.
 | `real_onboard_detections.mp4` | Camera feed with YOLO boxes/tracks beside the planner's own view | High |
 | `real_group_encounter.mp4` | A real co-moving pair at `s_group = -1` vs `+1` | High |
 | `real_style_switch.mp4` | Style vector changed *during* one continuous run | Bonus, high impact |
-| `baseline_comparison.mp4` | Neutral SoGuDiff beside SFM / ORCA / DSRNN / SICNav, identical scenes | Medium |
-| `demonstration_generation.mp4` | The offline sampler's candidate fan colored by social cost | Medium |
-| `guidance_weight_sweep.mp4` | One style, guidance weight over 1 / 3 / 10 | Medium |
+| `continuous_sweep.mp4` | One axis walked smoothly from −1 to +1; nothing else on the page shows the axes are continuous | Medium |
 | `projection_ablation.mp4` | With vs without the acados projection layer | Medium |
+| `guidance_weight_sweep.mp4` | One style, guidance weight over 1 / 3 / 10 | Medium |
 
 Full rationale for each is in the `data-slot-hint` attribute on the
 corresponding element in `index.html`.
@@ -205,6 +204,24 @@ re-check the steps in the picker — the **Select nothing-assigned shapes**
 button makes gaps obvious. If the SVG cannot be fetched at all (opening the
 page over `file://`, for instance) the figure stays a plain `<img>` and reads
 as a normal static diagram.
+
+### The baseline comparison
+
+`static/videos/compare/<method>_scene<N>.mp4` — 11 methods × 5 scenes, already
+in place. These are scenes **215, 231, 235, 252, 262** of the randomized
+evaluation set behind the paper's baseline table (the renderer labels episodes
+1-indexed, so those display as 216/232/236/253/263).
+
+They were produced by new, self-contained infrastructure in
+`CrowdNav_DiffusionEnv/crowd_nav/`: `test_evaluateWEB5.py` plus
+`test_evalWEB5_{BASELINES,SOGUDIFF,SICNAV}.slurm`. **`crowd_sim.py` is not
+modified** — the caption, the legend and the attention overlay are overridden
+from inside that script and only when `--cases` is passed, so every other job
+in that repo behaves exactly as before.
+
+Outcomes are baked into the `OUTCOMES` table in the comparison block of
+`static/js/sogudiff.js`. Re-running the clips means updating that table; the
+job logs print a `Test N: ... | <outcome> |` line per episode.
 
 ### Synchronized playback
 
