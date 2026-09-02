@@ -37,7 +37,7 @@ is visible to a normal viewer.
 
 ## Adding the assets that are still missing
 
-Eight media slots are wired up but have no file yet. Each renders as a labelled
+Four media slots are wired up but have no file yet. Each renders as a labelled
 dashed placeholder naming the exact path to drop in — so the page is never
 broken while you are still producing material. **Adding an asset is one step:
 put the file at the named path.** No HTML edit needed.
@@ -89,9 +89,6 @@ they are stacked directly. Replacing them needs no code changes.
 | `real_onboard_detections.mp4` | Camera feed with YOLO boxes/tracks beside the planner's own view | High |
 | `real_group_encounter.mp4` | A real co-moving pair at `s_group = -1` vs `+1` | High |
 | `real_style_switch.mp4` | Style vector changed *during* one continuous run | Bonus, high impact |
-| `continuous_sweep.mp4` | One axis walked smoothly from −1 to +1; nothing else on the page shows the axes are continuous | Medium |
-| `projection_ablation.mp4` | With vs without the acados projection layer | Medium |
-| `guidance_weight_sweep.mp4` | One style, guidance weight over 1 / 3 / 10 | Medium |
 
 Full rationale for each is in the `data-slot-hint` attribute on the
 corresponding element in `index.html`.
@@ -128,15 +125,18 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 ## Layout of the page
 
 1. **Hero** — title, anonymous author block, inert Paper/arXiv/Code/Video buttons
-2. **Teaser figure** — the paper's Fig. 1
+2. **Teaser** — the layered interactive Fig. 1
 3. **Abstract** — verbatim from the paper
 4. **How It Works** — an animated ten-step walkthrough of the architecture
 5. **The Style Vector** — four cards explaining the axes and what ±1 mean
-6. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
+6. **Neutral Style and Baseline Comparisons** — 11 methods × 5 scenes, synced,
+   with per-panel outcomes. Sits here because it shows the planner with every
+   axis at its default, which is the reference the styled behaviour below is
+   measured against.
+7. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
    clips play in step with shared play / restart / scrub controls
-7. **Composing Axes at Inference** — the four composed-style runs, also synced
-8. **Real-World Deployment** — four slots
-9. **Beyond the Paper** — four slots for supplementary comparisons
+8. **Composing Axes at Inference** — the four composed-style runs, also synced
+9. **Real-World Deployment** — four slots
 10. **BibTeX** and footer
 
 ### The animated walkthrough
