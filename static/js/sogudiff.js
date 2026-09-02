@@ -306,7 +306,7 @@
               'unconditional, scene-only, and scene combined with a single style axis at ' +
               'a time. The structured dropout applied during training is what makes ' +
               'these partial queries well posed.' },
-      { phase: 'b', at: [[80, 81], [83, 86], [98, 100], 121, [125, 127], [162, 164], [176, 178], [185, 188]],
+      { phase: 'b', at: [2, 4, [80, 81], [83, 86], [98, 100], 107, 118, [120, 121], [125, 127], [162, 164], [176, 178], [185, 188]],
         title: 'Parallel evaluation of the variants',
         body: 'All conditioning variants, across the N candidate trajectories, are ' +
               'evaluated in a single batched forward pass. Guidance therefore introduces ' +
@@ -317,7 +317,7 @@
               'scene-conditional estimate and scaled by its own guidance weight. Because ' +
               'the contributions are summed independently, the axes can be weighted ' +
               'separately and composed into styles never demonstrated jointly.' },
-      { phase: 'b', at: [[2, 4], [107, 109], [114, 120], 125, 127, 184],
+      { phase: 'b', at: [[2, 4], [107, 109], [114, 120], 184],
         title: 'Iterated denoising',
         body: 'The guided noise estimate drives one reverse diffusion step, and the ' +
               'procedure repeats across the sampling schedule, propagating all N ' +
