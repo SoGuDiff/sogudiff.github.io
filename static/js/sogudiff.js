@@ -268,6 +268,8 @@
     // rectangular areas means a box, an arrow or a label is always either
     // wholly lit or wholly dim - it can never be clipped part way through.
     // Ranges are written [first, last]. Use tools/region-picker.html to edit.
+    // Element 191 is #dg-input-riser, added to the figure for this walkthrough:
+    // see the note in method_overview.svg.
     var STEPS = [
       { phase: 'a', at: [9, [41, 42], [44, 45], [47, 48], [50, 51], [53, 55], 60],
         title: 'Conditioning inputs',
@@ -306,7 +308,7 @@
               'unconditional, scene-only, and scene combined with a single style axis at ' +
               'a time. The structured dropout applied during training is what makes ' +
               'these partial queries well posed.' },
-      { phase: 'b', at: [2, 4, [80, 81], [83, 86], [98, 100], 107, 118, [120, 121], [125, 127], [162, 164], [176, 178], [185, 188]],
+      { phase: 'b', at: [4, [80, 81], [83, 86], [98, 100], [120, 121], [125, 127], [162, 164], [176, 178], [185, 188], 191],
         title: 'Parallel evaluation of the variants',
         body: 'All conditioning variants, across the N candidate trajectories, are ' +
               'evaluated in a single batched forward pass. Guidance therefore introduces ' +

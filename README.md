@@ -161,6 +161,17 @@ the box it is given and will draw at raw size and overflow, so the page
 synthesizes a `viewBox` from those dimensions before dropping them. This is
 handled automatically; it is noted only because it is invisible until it bites.
 
+#### The one edit made to the figure
+
+`method_overview.svg` carries a single added element, `#dg-input-riser`, at the
+very end. The figure draws each of the three return paths as one element that
+runs along the loop's bottom horizontal *and* then up into its net, so the
+vertical could not be lit without dragging the horizontal along with it. The
+added element is that vertical on its own. It lies exactly under the existing
+paths, so it is invisible in the figure as drawn, and it exists only so step 7
+can light the input rising into the nets while step 9 keeps the loop.
+**Re-add it after re-exporting the figure**, or drop it from step 7.
+
 If the figure is re-exported from Lucidchart, the element order can change, so
 re-check the steps in the picker — the **Select nothing-assigned shapes**
 button makes gaps obvious. If the SVG cannot be fetched at all (opening the
@@ -279,6 +290,12 @@ Between them they gate everything that must change before the page is public:
 
 Also consider re-adding the upstream template's "More Works" lab dropdown,
 which was removed here because it would identify the authors.
+
+`tools/` is a development directory. Nothing on the site links to it, but once
+Pages is enabled it would be reachable at `/tools/region-picker.html`. It gives
+nothing away — it only shows the figure the page already publishes — so it can
+stay. Delete the directory before publishing if you would rather it were not
+served.
 
 ### Publishing with GitHub Pages
 
