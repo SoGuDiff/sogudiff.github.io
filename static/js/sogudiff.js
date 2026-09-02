@@ -377,7 +377,7 @@
         body: 'A convolutional encoder compresses the occupancy map into tokens, and ' +
               'each style axis is embedded as a token of its own. Both paths are subject ' +
               'to structured conditioning dropout during training, so the model remains ' +
-              'well defined when either group is replaced by its learned null embedding.' },
+              'well-defined when either group is replaced by its learned null embedding.' },
       { phase: 'a', at: [[15, 18], 26, [56, 58], [67, 75], [155, 160]],
         title: 'Joint encoding of scene and style',
         body: 'Scene and style tokens are concatenated and processed by a self-attention ' +
@@ -401,7 +401,7 @@
         body: 'The trained network is queried under several conditioning subsets: ' +
               'unconditional, scene-only, and scene combined with a single style axis at ' +
               'a time. The structured dropout applied during training is what makes ' +
-              'these partial queries well posed.' },
+              'these partial queries well-posed.' },
       { phase: 'b', at: [4, [80, 81], [83, 86], [98, 100], [120, 121], [125, 127], [162, 164], [175, 178], [185, 188], 191],
         title: 'Parallel evaluation of the variants',
         body: 'All conditioning variants, across the N candidate trajectories, are ' +
