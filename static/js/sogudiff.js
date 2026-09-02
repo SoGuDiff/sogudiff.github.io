@@ -245,6 +245,103 @@
   }
 
   /* ----------------------------------------------------------------------
+     Layered teaser
+     Ships as the paper's static figure. If the layered renders exist, the
+     scene becomes a still base with one transparent overlay per style, which
+     fade on in turn. Everything here is skipped if teaser_base.png is absent,
+     so the static figure simply stays.
+     ---------------------------------------------------------------------- */
+  (function () {
+    var stage = document.getElementById('teaser-stage');
+    var legend = document.getElementById('teaser-legend');
+    if (!stage || !legend) return;
+
+    var ORDER = ['neutral', 'cautious', 'assertive', 'nonyield', 'all'];
+    var DWELL = 2600;
+    var base = 'static/images/teaser_base.png';
+    var layerSrc = function (n) { return 'static/images/teaser_' + n + '.png'; };
+
+    // Probe the base render. Only if it loads do we build the layered version.
+    var probe = new Image();
+    probe.onload = build;
+    probe.onerror = function () { /* keep the static figure */ };
+    probe.src = base;
+
+    function build() {
+      var still = document.createElement('img');
+      still.className = 'teaser-figure';
+      still.src = base;
+      still.alt = stage.querySelector('img') ? stage.querySelector('img').alt : '';
+
+      var layers = {};
+      var frag = document.createDocumentFragment();
+      frag.appendChild(still);
+      ORDER.forEach(function (name) {
+        if (name === 'all') return;
+        var el = document.createElement('img');
+        el.className = 'teaser-layer';
+        el.src = layerSrc(name);
+        el.alt = '';
+        el.setAttribute('aria-hidden', 'true');
+        layers[name] = el;
+        frag.appendChild(el);
+      });
+      stage.innerHTML = '';
+      stage.appendChild(frag);
+      legend.hidden = false;
+
+      var buttons = Array.prototype.slice.call(legend.querySelectorAll('.tl-btn'));
+      var idx = 0, timer = null, held = false;
+
+      function apply(name) {
+        Object.keys(layers).forEach(function (n) {
+          layers[n].classList.toggle('is-on', name === 'all' || n === name);
+        });
+        buttons.forEach(function (b) {
+          b.classList.toggle('is-on', b.dataset.style === name);
+        });
+      }
+
+      function step() {
+        idx = (idx + 1) % ORDER.length;
+        apply(ORDER[idx]);
+      }
+
+      function play() {
+        if (timer || held) return;
+        timer = setInterval(step, DWELL);
+      }
+      function pause() {
+        if (timer) { clearInterval(timer); timer = null; }
+      }
+
+      buttons.forEach(function (b) {
+        b.addEventListener('click', function () {
+          held = true;                 // a deliberate choice stops the cycle
+          pause();
+          idx = ORDER.indexOf(b.dataset.style);
+          apply(b.dataset.style);
+        });
+      });
+
+      // Hovering holds the current style so it can be read without it moving on.
+      stage.addEventListener('mouseenter', pause);
+      stage.addEventListener('mouseleave', function () { if (!held) play(); });
+
+      apply(ORDER[0]);
+
+      if ('IntersectionObserver' in window) {
+        var io = new IntersectionObserver(function (entries) {
+          entries.forEach(function (e) { e.isIntersecting ? play() : pause(); });
+        }, { threshold: 0.25 });
+        io.observe(stage);
+      } else {
+        play();
+      }
+    }
+  })();
+
+  /* ----------------------------------------------------------------------
      Animated method walkthrough
      The figure itself is the manuscript's vector export, untouched. This
      drives an overlay: a scrim with holes cut over the region each step is

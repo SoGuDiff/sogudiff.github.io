@@ -42,13 +42,35 @@ dashed placeholder naming the exact path to drop in — so the page is never
 broken while you are still producing material. **Adding an asset is one step:
 put the file at the named path.** No HTML edit needed.
 
-### Figures, exported from the manuscript
+### The teaser
 
-| Path | Source in the paper | Where it appears |
-| --- | --- | --- |
-| `static/images/teaser_figure.png` | `Figures/MainFigureV3.png` | Top of the page, under the title |
+`static/images/teaser_figure.png` is the paper's Fig. 1 and is already in place.
 
-Export at 2000px or wider, since it is shown full-bleed.
+The teaser can also become **interactive**, which is worth doing: the scene sits
+still and each style's trajectories fade on over it, cycling on their own and
+selectable from a legend beneath. The page already contains everything for
+this — it activates the moment the layered renders appear, and falls back to
+the static figure until then.
+
+Re-render from the same camera, same resolution (2000px wide or more), same
+lighting, and save into `static/images/`:
+
+| File | Contents |
+| --- | --- |
+| `teaser_base.png` | The scene **without any trajectories and without the legend box**: room, floor, the three pedestrians, their motion arrows, the goal flag, and the robot. |
+| `teaser_neutral.png` | Only the Neutral style's three curves — dashed samples, selected, projected — on a **transparent** background. |
+| `teaser_cautious.png` | Same, for Cautious & Yielding. |
+| `teaser_assertive.png` | Same, for Assertive & Group-Agnostic. |
+| `teaser_nonyield.png` | Same, for Non-Yielding & Right-Side Passing. |
+
+Every file must share one camera and one pixel size, since they are stacked
+directly on top of each other. The legend is HTML rather than pixels, so it
+stays sharp and is clickable; its colors and style vectors live in the teaser
+markup in `index.html`, and the cycle speed is `DWELL` in the teaser block of
+`static/js/sogudiff.js`.
+
+Dropping in `teaser_base.png` alone is what switches the page over, so add all
+five together.
 
 `static/images/method_overview.svg` is already in place — it is the supplied
 Lucidchart export, shown as-is in the "How It Works" section.

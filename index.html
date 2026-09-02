@@ -228,14 +228,55 @@
   </section>
 
   <!-- ====================== TEASER ====================== -->
+  <!-- Ships as the paper's static Fig. 1. If the layered renders are present
+       (static/images/teaser_base.png plus one per style), sogudiff.js swaps in
+       an interactive version: the scene sits still and each style's
+       trajectories fade on over it, cycling by default and selectable from the
+       legend below. See the README for what to export. -->
   <section class="hero teaser">
-    <div class="container is-max-desktop">
+    <div class="container is-max-widescreen">
       <div class="hero-body">
-        <img class="teaser-figure" src="static/images/teaser_figure.png"
-             alt="SoGuDiff steers one diffusion planner along composable social style axes at deployment."
-             data-slot="Teaser figure (paper Fig. 1)"
-             data-slot-path="static/images/teaser_figure.png"
-             data-slot-hint="The paper's Fig. 1, exported at 2000px wide.">
+
+        <div class="teaser-stage" id="teaser-stage">
+          <img class="teaser-figure" src="static/images/teaser_figure.png"
+               alt="SoGuDiff steering one diffusion planner along four social style axes: from the same robot state, four differently styled trajectory sets fan out past three pedestrians toward the goal.">
+        </div>
+
+        <!-- Revealed only when the layered renders are available. -->
+        <div class="teaser-legend" id="teaser-legend" hidden>
+          <button class="tl-btn" type="button" data-style="neutral" style="--tl: #2a78d6;">
+            <span class="tl-dot"></span>
+            <span class="tl-text">
+              <span class="tl-name">Neutral</span>
+              <span class="tl-vec">[0, 0, 0, 0]</span>
+            </span>
+          </button>
+          <button class="tl-btn" type="button" data-style="cautious" style="--tl: #eda100;">
+            <span class="tl-dot"></span>
+            <span class="tl-text">
+              <span class="tl-name">Cautious &amp; Yielding</span>
+              <span class="tl-vec">[+1, 0, +1, 0]</span>
+            </span>
+          </button>
+          <button class="tl-btn" type="button" data-style="assertive" style="--tl: #4a3aa7;">
+            <span class="tl-dot"></span>
+            <span class="tl-text">
+              <span class="tl-name">Assertive &amp; Group-Agnostic</span>
+              <span class="tl-vec">[&minus;1, 0, &minus;1, &minus;1]</span>
+            </span>
+          </button>
+          <button class="tl-btn" type="button" data-style="nonyield" style="--tl: #e87ba4;">
+            <span class="tl-dot"></span>
+            <span class="tl-text">
+              <span class="tl-name">Non-Yielding &amp; Right-Side Passing</span>
+              <span class="tl-vec">[0, +1, &minus;1, 0]</span>
+            </span>
+          </button>
+          <button class="tl-btn tl-all" type="button" data-style="all">
+            <span class="tl-text"><span class="tl-name">All four</span></span>
+          </button>
+        </div>
+
       </div>
     </div>
   </section>
