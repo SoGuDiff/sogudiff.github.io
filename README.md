@@ -49,12 +49,12 @@ top of each other in `static/images/`:
 
 | File | Contents |
 | --- | --- |
-| `teaser_base.png` | The scene: room, floor, the three pedestrians, their motion arrows, the goal flag, the robot. No trajectories, no legend. |
-| `teaser_neutral.png` | Neutral's three curves — dashed samples, selected, projected — transparent background. |
-| `teaser_cautious.png` | Cautious & Yielding. |
-| `teaser_assertive.png` | Assertive & Group-Agnostic. |
-| `teaser_nonyield.png` | Non-Yielding & Right-Side Passing. |
-| `teaser_robot.png` | The robot alone, transparent background, so it sits **above** the trajectories and the paths appear to leave from behind it. Currently derived from `teaser_base.png` by keying out the floor colour; replace it with a proper render if you re-export. |
+| `teaser_base.webp` | The scene: room, floor, the three pedestrians, their motion arrows, the goal flag, the robot. No trajectories, no legend. |
+| `teaser_neutral.webp` | Neutral's three curves — dashed samples, selected, projected — transparent background. |
+| `teaser_cautious.webp` | Cautious & Yielding. |
+| `teaser_assertive.webp` | Assertive & Group-Agnostic. |
+| `teaser_nonyield.webp` | Non-Yielding & Right-Side Passing. |
+| `teaser_robot.webp` | The robot alone, transparent background, so it sits **above** the trajectories and the paths appear to leave from behind it. Currently derived from `teaser_base.webp` by keying out the floor colour; replace it with a proper render if you re-export. |
 
 The four style layers are **visible by default**, so with JavaScript disabled
 the teaser is the figure exactly as printed in the paper. Script adds
@@ -78,8 +78,20 @@ it otherwise pushes the abstract a long way down the page. The renders are
 live in the teaser markup in `index.html`; `DWELL` is in the teaser block of
 `static/js/sogudiff.js`.
 
-To re-render: keep one camera and one pixel size across all five files, since
+To re-render: keep one camera and one pixel size across all six files, since
 they are stacked directly. Replacing them needs no code changes.
+
+They are **WebP**, not PNG. These are photographic 3D renders, which PNG stores
+badly: the set was 711 KB as PNG and is 128 KB as WebP at quality 88, with the
+alpha channel kept lossless so the trajectory layers still composite cleanly.
+Convert with:
+
+```bash
+cwebp -q 88 -alpha_q 100 teaser_base.png -o static/images/teaser_base.webp
+```
+
+`social_preview.png` deliberately stays PNG — social-card crawlers do not all
+read WebP.
 
 ### Videos (in `static/videos/`)
 
@@ -168,25 +180,25 @@ To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
   never dimmed.
 - `DWELL` sets the milliseconds per step.
 
-#### Editing the steps the easy way
+#### Editing the steps
 
-Open **`tools/region-picker.html`** through the local server. It loads the same
-figure and lets you:
+Change the `at` list for a step. Numbers are positions among the figure's
+top-level elements, so to find the one you want, render the figure with each
+element labelled:
 
-- **click a shape** to add or remove it from the selected step
-- **drag a lasso** to take everything it touches; <kbd>Alt</kbd>+drag removes
-- toggle **Dim unselected** to see the step exactly as it will publish
-- **Select nothing-assigned shapes** to find anything no step covers yet
-- **Copy** output shaped to paste straight over the `at:` lines in `STEPS`
+```python
+# from the repo root, with the SVG open in any text editor:
+#   the Nth top-level child of the single <g> is element N (0 is the backing)
+```
 
-It round-trips: paste the current `at:` lines back in and press **Re-load from
-text** to start from what the site uses today.
+A drag-and-drop picker for this lived at `tools/region-picker.html` and was
+removed when the repo was tidied for publication — it is in the git history if
+the steps ever need reworking wholesale:
 
-Lucidchart exports carry `width`/`height` but no `viewBox`. That is fine for an
-`<img>`, but an inline SVG without one has no mapping from its user units to
-the box it is given and will draw at raw size and overflow, so the page
-synthesizes a `viewBox` from those dimensions before dropping them. This is
-handled automatically; it is noted only because it is invisible until it bites.
+```bash
+git log --diff-filter=D --name-only -- tools/region-picker.html
+git checkout <commit>^ -- tools/region-picker.html
+```
 
 #### The one edit made to the figure
 
@@ -255,9 +267,7 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
-tools/region-picker.html      click/lasso editor for the walkthrough steps
-static/css/index.css          template base styles (one copy-button fix)
-static/css/fontawesome.all.min.css  UNUSED - see "Icons" below
+static/css/index.css          template base styles (trimmed, see below)
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
 static/js/index.js            BibTeX copy + scroll-to-top
@@ -278,39 +288,29 @@ convert -background none favicon.svg -define icon:auto-resize=64,48,32,16 favico
 convert -background "#1b2a4a" favicon.svg -flatten -resize 180x180 apple-touch-icon.png
 ```
 
-`bulma-carousel` and `bulma-slider` are still vendored but unused — the page
-uses CSS grid instead. Safe to delete if you never add a carousel.
+`bulma-carousel`, `bulma-slider` and their stylesheets have been deleted: the
+page uses CSS grid, and nothing loaded them. `index.css` has also had the
+template's rules for the removed "More Works" dropdown and carousel stripped.
 
 ### Icons
 
-Icons come from `static/js/fontawesome.all.min.js`, which renders them as
-inline `<svg>`. The matching **stylesheet is deliberately not loaded**: the
-template shipped `fontawesome.all.min.css` without the `static/webfonts/`
-directory it references, so every glyph 404s. Academicons was dropped for the
-same class of reason — it came from a CDN that ad blockers commonly refuse, and
-the arXiv button now uses a Font Awesome document glyph.
+Every icon is inline SVG; **no icon library is loaded**. Font Awesome was
+removed: it cost 1.3 MB of JavaScript for seven glyphs, the template shipped
+its stylesheet without the `static/webfonts/` directory it references, and its
+build rewrites `<i>` elements into `<svg>` at runtime — which silently broke
+two scripts here before it was tracked down. Academicons went the same way,
+since it came from a CDN ad blockers commonly refuse.
 
-One consequence worth knowing: the JS build **replaces `<i>` elements with
-`<svg>`**, so any script that sets a class on an `<i>` after page load finds
-nothing there. Buttons whose icon toggles (play/pause) therefore carry both
-icons inline and swap them with a CSS class instead.
-
-Two things to watch when adding an icon:
-
-- The vendored build is **Font Awesome Free 5.15.1**, so use FA5 names. Several
-  were renamed in FA6 and an FA6 name renders as a "missing icon" glyph rather
-  than failing loudly — `fa-file-alt` not `fa-file-lines`, `fa-undo` not
-  `fa-rotate-left`. Check a name is present with
-  `grep -o "\"NAME\"" static/js/fontawesome.all.min.js`.
-- The JS build **replaces `<i>` with `<svg>`**, so any script that sets a class
-  on an `<i>` after page load finds nothing there. Buttons whose icon toggles
-  carry both icons inline and swap them with a CSS class instead.
+To add an icon, paste an SVG path. The GitHub and YouTube marks are Simple
+Icons (CC0); the arXiv mark is Academicons (SIL OFL 1.1), inlined at its use
+site with its viewBox cropped to the artwork so `height: 1em` matches the
+others.
 
 ---
 
 ## Before going public
 
-`index.html` contains **14 `RELEASE:` markers**, plus 5 occurrences of
+`index.html` contains **15 `RELEASE:` markers**, plus 6 occurrences of
 `REPLACE_WITH_PROJECT_URL`. Grep for both:
 
 ```bash
@@ -322,8 +322,8 @@ Between them they gate everything that must change before the page is public:
 1. `robots` meta — `noindex, nofollow` → `index, follow`
 2. `author` meta — real names
 3. `og:site_name` — institution or lab
-4. `og:url` / canonical — the live URL (also in `og:image`, `twitter:image`,
-   and the JSON-LD `image`; search for `REPLACE_WITH_PROJECT_URL`)
+4. `og:url` and `<link rel="canonical">` — the live URL (also in `og:image`,
+   `twitter:image` and the JSON-LD `image`; search `REPLACE_WITH_PROJECT_URL`)
 5. Google Scholar `citation_*` tags — currently commented out. Uncomment and
    complete them; Scholar will skip a page with a partial author list, so fill
    every field or leave them commented.

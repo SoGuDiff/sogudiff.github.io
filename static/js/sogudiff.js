@@ -32,9 +32,17 @@
     var wrap = document.createElement('div');
     wrap.className = 'asset-slot' + (el.dataset.slotShape === 'square' ? ' is-square' : '');
 
-    var icon = document.createElement('i');
-    icon.className = 'slot-icon fas ' + (el.tagName === 'IMG' ? 'fa-image' : 'fa-film');
+    // Inline SVG rather than a font glyph: no icon library is loaded.
+    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
+    icon.setAttribute('class', 'slot-icon');
+    icon.setAttribute('viewBox', '0 0 24 24');
     icon.setAttribute('aria-hidden', 'true');
+    icon.innerHTML = el.tagName === 'IMG'
+      ? '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>' +
+        '<circle cx="8.5" cy="10" r="1.5" fill="currentColor"/>' +
+        '<path d="M5 17l4.5-4.5L13 16l2.5-2.5L19 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
+      : '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>' +
+        '<path d="M7 5v14M17 5v14M3 12h18" fill="none" stroke="currentColor" stroke-width="2"/>';
 
     var label = document.createElement('div');
     label.className = 'slot-label';
