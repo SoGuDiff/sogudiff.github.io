@@ -371,6 +371,17 @@
           var doc = new DOMParser().parseFromString(text, 'image/svg+xml');
           var svg = doc.documentElement;
           if (!svg || svg.nodeName.toLowerCase() !== 'svg') { done(false); return; }
+          // Lucidchart exports carry width/height but no viewBox. As an <img>
+          // that is fine, but inline it leaves the SVG with no mapping from
+          // user units to the box it is given, so it draws at raw size and
+          // overflows. Synthesize the viewBox before dropping the dimensions.
+          if (!svg.getAttribute('viewBox')) {
+            var w = parseFloat(svg.getAttribute('width'));
+            var h = parseFloat(svg.getAttribute('height'));
+            if (!isFinite(w) || !isFinite(h) || w <= 0 || h <= 0) { done(false); return; }
+            svg.setAttribute('viewBox', '0 0 ' + w + ' ' + h);
+          }
+          svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
           svg.setAttribute('class', 'dg-base');
           svg.removeAttribute('width');
           svg.removeAttribute('height');

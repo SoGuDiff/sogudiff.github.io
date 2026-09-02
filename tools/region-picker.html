@@ -133,6 +133,15 @@
     .then(function (text) {
       var doc = new DOMParser().parseFromString(text, 'image/svg+xml');
       var svg = doc.documentElement;
+      // Lucid exports have width/height but no viewBox; inline that means no
+      // mapping to the box it is given, so give it one before stripping them.
+      if (!svg.getAttribute('viewBox')) {
+        var vw = parseFloat(svg.getAttribute('width')), vh = parseFloat(svg.getAttribute('height'));
+        if (isFinite(vw) && isFinite(vh) && vw > 0 && vh > 0) {
+          svg.setAttribute('viewBox', '0 0 ' + vw + ' ' + vh);
+        }
+      }
+      svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
       svg.removeAttribute('width'); svg.removeAttribute('height');
       stage.appendChild(document.importNode(svg, true));
       var root = stage.querySelector('svg > g');

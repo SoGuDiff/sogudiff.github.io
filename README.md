@@ -155,6 +155,12 @@ figure and lets you:
 It round-trips: paste the current `at:` lines back in and press **Re-load from
 text** to start from what the site uses today.
 
+Lucidchart exports carry `width`/`height` but no `viewBox`. That is fine for an
+`<img>`, but an inline SVG without one has no mapping from its user units to
+the box it is given and will draw at raw size and overflow, so the page
+synthesizes a `viewBox` from those dimensions before dropping them. This is
+handled automatically; it is noted only because it is invisible until it bites.
+
 If the figure is re-exported from Lucidchart, the element order can change, so
 re-check the steps in the picker — the **Select nothing-assigned shapes**
 button makes gaps obvious. If the SVG cannot be fetched at all (opening the
