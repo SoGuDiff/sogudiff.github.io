@@ -228,11 +228,11 @@
   </section>
 
   <!-- ====================== TEASER ====================== -->
-  <!-- The scene and each style's trajectories are separate renders stacked on
-       top of each other, all sharing one camera and one pixel size. With
-       JavaScript the styles cycle one at a time and can be picked from the
-       legend; without it every layer stays visible, which is exactly the
-       figure as printed in the paper. -->
+  <!-- The scene, each style's trajectories, and the robot are separate renders
+       stacked in that order, so the robot occludes the paths leaving it. All
+       share one camera and one pixel size. With JavaScript the styles cycle
+       one at a time and can be picked from the legend; without it every layer
+       stays visible, which is the figure as printed in the paper. -->
   <section class="hero teaser">
     <div class="container is-max-widescreen">
       <div class="hero-body">
@@ -244,41 +244,83 @@
           <img class="teaser-layer" data-style="cautious"  src="static/images/teaser_cautious.png" alt="" aria-hidden="true">
           <img class="teaser-layer" data-style="assertive" src="static/images/teaser_assertive.png" alt="" aria-hidden="true">
           <img class="teaser-layer" data-style="nonyield"  src="static/images/teaser_nonyield.png" alt="" aria-hidden="true">
+          <img class="teaser-robot" src="static/images/teaser_robot.png" alt="" aria-hidden="true">
         </div>
 
-        <!-- Revealed by script; without it the legend would not do anything. -->
+        <!-- Revealed by script; without it the buttons would do nothing. -->
         <div class="teaser-legend" id="teaser-legend" hidden>
+          <div class="tl-rows">
           <button class="tl-btn" type="button" data-style="neutral" style="--tl: #2a78d6;">
-            <span class="tl-dot"></span>
+            <span class="tl-key">
+              <svg viewBox="0 0 46 22" aria-hidden="true"><g stroke="currentColor" fill="none" stroke-linecap="round">
+                <path d="M3 5h5M12 5h5M21 5h5" stroke-width="2" opacity=".85"/>
+                <path d="M3 11h23" stroke-width="3"/>
+                <path d="M3 18h23" stroke-width="5"/>
+              </g></svg>
+            </span>
             <span class="tl-text">
               <span class="tl-name">Neutral</span>
-              <span class="tl-vec">[0, 0, 0, 0]</span>
+              <span class="tl-vec"><span class="tl-ax"><b>prox</b>&#8202;0</span><span class="tl-ax"><b>pass</b>&#8202;0</span><span class="tl-ax"><b>yield</b>&#8202;0</span><span class="tl-ax"><b>group</b>&#8202;0</span></span>
             </span>
           </button>
           <button class="tl-btn" type="button" data-style="cautious" style="--tl: #eda100;">
-            <span class="tl-dot"></span>
+            <span class="tl-key">
+              <svg viewBox="0 0 46 22" aria-hidden="true"><g stroke="currentColor" fill="none" stroke-linecap="round">
+                <path d="M3 5h5M12 5h5M21 5h5" stroke-width="2" opacity=".85"/>
+                <path d="M3 11h23" stroke-width="3"/>
+                <path d="M3 18h23" stroke-width="5"/>
+              </g></svg>
+            </span>
             <span class="tl-text">
               <span class="tl-name">Cautious &amp; Yielding</span>
-              <span class="tl-vec">[+1, 0, +1, 0]</span>
+              <span class="tl-vec"><span class="tl-ax"><b>prox</b>+1</span><span class="tl-ax"><b>pass</b>&#8202;0</span><span class="tl-ax"><b>yield</b>+1</span><span class="tl-ax"><b>group</b>&#8202;0</span></span>
             </span>
           </button>
           <button class="tl-btn" type="button" data-style="assertive" style="--tl: #4a3aa7;">
-            <span class="tl-dot"></span>
+            <span class="tl-key">
+              <svg viewBox="0 0 46 22" aria-hidden="true"><g stroke="currentColor" fill="none" stroke-linecap="round">
+                <path d="M3 5h5M12 5h5M21 5h5" stroke-width="2" opacity=".85"/>
+                <path d="M3 11h23" stroke-width="3"/>
+                <path d="M3 18h23" stroke-width="5"/>
+              </g></svg>
+            </span>
             <span class="tl-text">
               <span class="tl-name">Assertive &amp; Group-Agnostic</span>
-              <span class="tl-vec">[&minus;1, 0, &minus;1, &minus;1]</span>
+              <span class="tl-vec"><span class="tl-ax"><b>prox</b>&minus;1</span><span class="tl-ax"><b>pass</b>&#8202;0</span><span class="tl-ax"><b>yield</b>&minus;1</span><span class="tl-ax"><b>group</b>&minus;1</span></span>
             </span>
           </button>
           <button class="tl-btn" type="button" data-style="nonyield" style="--tl: #e87ba4;">
-            <span class="tl-dot"></span>
+            <span class="tl-key">
+              <svg viewBox="0 0 46 22" aria-hidden="true"><g stroke="currentColor" fill="none" stroke-linecap="round">
+                <path d="M3 5h5M12 5h5M21 5h5" stroke-width="2" opacity=".85"/>
+                <path d="M3 11h23" stroke-width="3"/>
+                <path d="M3 18h23" stroke-width="5"/>
+              </g></svg>
+            </span>
             <span class="tl-text">
               <span class="tl-name">Non-Yielding &amp; Right-Side Passing</span>
-              <span class="tl-vec">[0, +1, &minus;1, 0]</span>
+              <span class="tl-vec"><span class="tl-ax"><b>prox</b>&#8202;0</span><span class="tl-ax"><b>pass</b>+1</span><span class="tl-ax"><b>yield</b>&minus;1</span><span class="tl-ax"><b>group</b>&#8202;0</span></span>
             </span>
           </button>
-          <button class="tl-btn tl-all" type="button" data-style="all">
-            <span class="tl-text"><span class="tl-name">All four</span></span>
-          </button>
+          </div>
+
+          <div class="tl-bar">
+            <button class="tl-btn tl-plain" type="button" data-style="all">All four at once</button>
+            <button class="tl-btn tl-plain tl-cycle" type="button" data-cycle>
+              <svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg>
+              <svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg>
+              <span>Cycle</span>
+            </button>
+          </div>
+
+          <p class="tl-note">
+            For each style the planner samples candidate trajectories
+            (<span class="tl-swatch tl-s-samples"></span> thin, dashed), selects one
+            (<span class="tl-swatch tl-s-selected"></span> solid), and projects it onto the
+            robot's kinematic and clearance limits to give the path actually driven
+            (<span class="tl-swatch tl-s-projected"></span> thick). The red flag marks the goal;
+            the coloured arrows are the pedestrians' current motion.
+          </p>
         </div>
 
       </div>

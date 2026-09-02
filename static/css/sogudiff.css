@@ -682,6 +682,165 @@ body.is-draft .draft-note code {
 
 /* --------------------------------------------------------------------------
    Layered teaser
+   Scene, trajectory layers and robot are stacked in that order, so the robot
+   occludes the paths leaving it. The trajectory layers are visible by default:
+   with no script the teaser is the figure as printed. Script adds
+   .is-interactive, which hands control to .is-on.
+   -------------------------------------------------------------------------- */
+
+.teaser-stage { position: relative; line-height: 0; }
+
+.teaser-stage .teaser-figure { position: relative; z-index: 0; }
+
+.teaser-layer,
+.teaser-robot {
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: auto;
+  pointer-events: none;
+}
+
+.teaser-layer { transition: opacity 0.55s ease; }
+.teaser-robot { z-index: 2; }          /* above every trajectory layer */
+
+.is-interactive .teaser-layer { opacity: 0; }
+.is-interactive .teaser-layer.is-on { opacity: 1; }
+
+.teaser-legend { margin-top: 1.1rem; }
+
+.tl-rows {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  gap: 0.5rem;
+}
+
+.tl-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6rem;
+  padding: 0.5rem 0.85rem;
+  border: 1px solid var(--hairline);
+  border-radius: 10px;
+  background: var(--surface);
+  font: inherit;
+  cursor: pointer;
+  text-align: left;
+  transition: var(--transition);
+}
+
+.tl-btn:hover { border-color: var(--tl, var(--primary-color)); }
+
+.tl-btn.is-on {
+  border-color: var(--tl, var(--primary-color));
+  box-shadow: inset 0 0 0 1px var(--tl, var(--primary-color));
+  background: color-mix(in srgb, var(--tl, #2563eb) 6%, #fff);
+}
+
+/* The three line weights, in that style's own colour: the same key the
+   printed figure carries in its legend columns. */
+.tl-key { flex: none; color: var(--tl, var(--primary-color)); }
+.tl-key svg { width: 34px; height: 17px; display: block; }
+
+.tl-text { display: flex; flex-direction: column; gap: 0.15rem; min-width: 0; }
+
+.tl-name {
+  font-size: 0.86rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  line-height: 1.2;
+}
+
+.tl-vec { display: flex; flex-wrap: wrap; gap: 0.45rem; }
+
+.tl-ax {
+  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+  font-size: 0.7rem;
+  color: var(--text-secondary);
+  white-space: nowrap;
+}
+
+.tl-ax b { font-weight: 600; color: var(--text-light); margin-right: 0.15rem; }
+
+.tl-bar {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.5rem;
+  margin-top: 0.6rem;
+}
+
+.tl-plain {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--text-secondary);
+  border-radius: 999px;
+}
+
+.tl-plain.is-on { color: var(--text-primary); }
+
+.tl-cycle { gap: 0.4rem; }
+
+.tl-note {
+  max-width: 78ch;
+  margin: 0.9rem auto 0;
+  color: var(--text-secondary);
+  font-size: 0.85rem;
+  line-height: 1.65;
+  text-align: center;
+}
+
+/* Little inline line-style samples used inside that sentence. */
+.tl-swatch {
+  display: inline-block;
+  width: 22px;
+  vertical-align: middle;
+  margin-right: 0.15rem;
+  border-radius: 2px;
+  background: currentColor;
+  color: var(--text-light);
+}
+
+.tl-s-samples  { height: 0; border-top: 2px dashed var(--text-light); background: none; }
+.tl-s-selected { height: 3px; }
+.tl-s-projected{ height: 5px; }
+
+@media screen and (max-width: 600px) {
+  .tl-rows { grid-template-columns: 1fr; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .teaser-layer { transition: none; }
+}
+
+/* --------------------------------------------------------------------------
+   Inline button icons
+   Font Awesome's JS build rewrites <i> into <svg>, which breaks any script
+   that later looks the <i> up. Buttons whose icon changes therefore carry
+   both states inline and swap them with a class.
+   -------------------------------------------------------------------------- */
+
+.ic {
+  width: 1em;
+  height: 1em;
+  flex: none;
+  vertical-align: -0.125em;
+}
+
+.ic-pause { display: none; }
+.is-playing .ic-play { display: none; }
+.is-playing .ic-pause { display: inline-block; }
+
+/* The arXiv mark is taller than it is wide, so let width follow the aspect
+   ratio instead of being forced square like the other button icons. */
+.ic-arxiv {
+  width: auto;
+  height: 1em;
+}
+
+/* --------------------------------------------------------------------------
+   Layered teaser
    The static figure is the baseline. When the layered renders are present the
    scene becomes a still base with one absolutely-positioned overlay per style.
    -------------------------------------------------------------------------- */

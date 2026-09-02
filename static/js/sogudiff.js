@@ -246,9 +246,9 @@
 
   /* ----------------------------------------------------------------------
      Layered teaser
-     The layers are in the markup and visible by default, so with no script
-     the teaser is the paper's figure exactly as printed. Taking control means
-     dimming them and bringing one back at a time.
+     The trajectory layers are in the markup and visible by default, so with
+     no script the teaser is the paper's figure exactly as printed. Taking
+     control means dimming them and bringing one back at a time.
      ---------------------------------------------------------------------- */
   (function () {
     var stage = document.getElementById('teaser-stage');
@@ -256,12 +256,13 @@
     if (!stage || !legend) return;
 
     var layers = Array.prototype.slice.call(stage.querySelectorAll('.teaser-layer'));
-    var buttons = Array.prototype.slice.call(legend.querySelectorAll('.tl-btn'));
+    var buttons = Array.prototype.slice.call(legend.querySelectorAll('.tl-btn[data-style]'));
+    var cycleBtn = legend.querySelector('[data-cycle]');
     if (!layers.length || !buttons.length) return;
 
     var ORDER = ['neutral', 'cautious', 'assertive', 'nonyield', 'all'];
     var DWELL = 2600;
-    var idx = 0, timer = null, held = false;
+    var idx = 0, timer = null;
 
     function apply(name) {
       layers.forEach(function (el) {
@@ -272,32 +273,56 @@
       });
     }
 
-    function play() { if (!timer && !held) timer = setInterval(function () {
-      idx = (idx + 1) % ORDER.length; apply(ORDER[idx]);
-    }, DWELL); }
+    function setCycleUI() {
+      if (!cycleBtn) return;
+      cycleBtn.classList.toggle('is-playing', !!timer);
+      var label = cycleBtn.querySelector('span');
+      if (label) label.textContent = timer ? 'Pause' : 'Cycle';
+    }
 
-    function pause() { if (timer) { clearInterval(timer); timer = null; } }
+    function play() {
+      if (timer) return;
+      timer = setInterval(function () {
+        idx = (idx + 1) % ORDER.length;
+        apply(ORDER[idx]);
+      }, DWELL);
+      setCycleUI();
+    }
 
+    function pause() {
+      if (!timer) return;
+      clearInterval(timer);
+      timer = null;
+      setCycleUI();
+    }
+
+    // Picking a style stops the cycle; the Cycle button starts it again.
     buttons.forEach(function (b) {
       b.addEventListener('click', function () {
-        held = true;                 // a deliberate choice stops the cycle
         pause();
         idx = ORDER.indexOf(b.dataset.style);
         apply(b.dataset.style);
       });
     });
 
-    // Hovering holds the current style so it can be read without moving on.
-    stage.addEventListener('mouseenter', pause);
-    stage.addEventListener('mouseleave', function () { if (!held) play(); });
+    if (cycleBtn) {
+      cycleBtn.addEventListener('click', function () { timer ? pause() : play(); });
+    }
 
     stage.classList.add('is-interactive');   // hands the layers over to CSS
     legend.hidden = false;
     apply(ORDER[0]);
+    setCycleUI();
 
+    // Run only while on screen. Whether it was cycling is remembered, so
+    // scrolling away and back does not restart a cycle the reader stopped.
     if ('IntersectionObserver' in window) {
+      var wasPlaying = true;
       var io = new IntersectionObserver(function (entries) {
-        entries.forEach(function (e) { e.isIntersecting ? play() : pause(); });
+        entries.forEach(function (e) {
+          if (e.isIntersecting) { if (wasPlaying) play(); }
+          else { wasPlaying = !!timer; pause(); }
+        });
       }, { threshold: 0.25 });
       io.observe(stage);
     } else {

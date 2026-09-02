@@ -54,6 +54,7 @@ top of each other in `static/images/`:
 | `teaser_cautious.png` | Cautious & Yielding. |
 | `teaser_assertive.png` | Assertive & Group-Agnostic. |
 | `teaser_nonyield.png` | Non-Yielding & Right-Side Passing. |
+| `teaser_robot.png` | The robot alone, transparent background, so it sits **above** the trajectories and the paths appear to leave from behind it. Currently derived from `teaser_base.png` by keying out the floor colour; replace it with a proper render if you re-export. |
 
 The four style layers are **visible by default**, so with JavaScript disabled
 the teaser is the figure exactly as printed in the paper. Script adds
@@ -61,8 +62,15 @@ the teaser is the figure exactly as printed in the paper. Script adds
 cycling every `DWELL` milliseconds and ending on "All four". Hovering holds the
 current style; clicking one in the legend stops the cycle for good.
 
-The legend is HTML, not pixels, so it stays sharp and is clickable. Its colors
-and style vectors are in the teaser markup in `index.html`; `DWELL` is in the
+Layer order is base, then the four trajectory layers, then the robot.
+
+The legend is HTML, not pixels, so it stays sharp and is clickable. Each row
+carries that style's own line key — dashed samples, solid selected, thick
+projected — plus its four axis values written out (`prox +1`, `pass 0`, and so
+on) rather than as a bare vector, since the teaser is the first thing a reader
+meets and the notation has not been introduced yet. A sentence underneath says
+what the three line weights, the goal flag and the pedestrian arrows are.
+Colors and values live in the teaser markup in `index.html`; `DWELL` is in the
 teaser block of `static/js/sogudiff.js`.
 
 To re-render: keep one camera and one pixel size across all five files, since
