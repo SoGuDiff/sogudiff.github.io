@@ -688,7 +688,14 @@ body.is-draft .draft-note code {
    .is-interactive, which hands control to .is-on.
    -------------------------------------------------------------------------- */
 
-.teaser-stage { position: relative; line-height: 0; }
+/* Capped well below the container width: at 1.6:1 this figure otherwise
+   pushes the abstract a long way down the page. */
+.teaser-stage {
+  position: relative;
+  line-height: 0;
+  max-width: 780px;
+  margin: 0 auto;
+}
 
 .teaser-stage .teaser-figure { position: relative; z-index: 0; }
 
@@ -708,11 +715,16 @@ body.is-draft .draft-note code {
 .is-interactive .teaser-layer { opacity: 0; }
 .is-interactive .teaser-layer.is-on { opacity: 1; }
 
-.teaser-legend { margin-top: 1.1rem; }
+.teaser-legend {
+  max-width: 820px;
+  margin: 1.1rem auto 0;
+}
 
+/* Fixed 2x2 rather than auto-fit, which stacked to a single column and made
+   the block twice as tall as it needed to be. */
 .tl-rows {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(310px, 1fr));
+  grid-template-columns: repeat(2, 1fr);
   gap: 0.5rem;
 }
 
@@ -782,140 +794,37 @@ body.is-draft .draft-note code {
 
 .tl-cycle { gap: 0.4rem; }
 
-.tl-note {
-  max-width: 78ch;
-  margin: 0.9rem auto 0;
-  color: var(--text-secondary);
-  font-size: 0.85rem;
-  line-height: 1.65;
-  text-align: center;
-}
-
-/* Little inline line-style samples used inside that sentence. */
-.tl-swatch {
-  display: inline-block;
-  width: 22px;
-  vertical-align: middle;
-  margin-right: 0.15rem;
-  border-radius: 2px;
-  background: currentColor;
-  color: var(--text-light);
-}
-
-.tl-s-samples  { height: 0; border-top: 2px dashed var(--text-light); background: none; }
-.tl-s-selected { height: 3px; }
-.tl-s-projected{ height: 5px; }
-
-@media screen and (max-width: 600px) {
-  .tl-rows { grid-template-columns: 1fr; }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .teaser-layer { transition: none; }
-}
-
-/* --------------------------------------------------------------------------
-   Inline button icons
-   Font Awesome's JS build rewrites <i> into <svg>, which breaks any script
-   that later looks the <i> up. Buttons whose icon changes therefore carry
-   both states inline and swap them with a class.
-   -------------------------------------------------------------------------- */
-
-.ic {
-  width: 1em;
-  height: 1em;
-  flex: none;
-  vertical-align: -0.125em;
-}
-
-.ic-pause { display: none; }
-.is-playing .ic-play { display: none; }
-.is-playing .ic-pause { display: inline-block; }
-
-/* The arXiv mark is taller than it is wide, so let width follow the aspect
-   ratio instead of being forced square like the other button icons. */
-.ic-arxiv {
-  width: auto;
-  height: 1em;
-}
-
-/* --------------------------------------------------------------------------
-   Layered teaser
-   The static figure is the baseline. When the layered renders are present the
-   scene becomes a still base with one absolutely-positioned overlay per style.
-   -------------------------------------------------------------------------- */
-
-.teaser-stage { position: relative; line-height: 0; }
-
-.teaser-stage .teaser-figure { position: relative; z-index: 0; }
-
-/* Visible by default: with no script the four layers stack into the figure as
-   printed. Script adds .is-interactive, which hands control to .is-on. */
-.teaser-layer {
-  position: absolute;
-  top: 0;
-  left: 0;
-  width: 100%;
-  height: auto;
-  transition: opacity 0.55s ease;
-  pointer-events: none;
-}
-
-.is-interactive .teaser-layer { opacity: 0; }
-.is-interactive .teaser-layer.is-on { opacity: 1; }
-
-.teaser-legend {
+/* Compact key for the three line weights and the two scene markers, in place
+   of a sentence describing them. */
+.tl-key-row {
   display: flex;
   flex-wrap: wrap;
   justify-content: center;
-  gap: 0.5rem;
-  margin-top: 1.1rem;
+  gap: 0.4rem 1.15rem;
+  margin: 0.85rem 0 0;
+  padding: 0;
+  list-style: none;
+  color: var(--text-secondary);
+  font-size: 0.8rem;
 }
 
-.tl-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.55rem;
-  padding: 0.45rem 0.9rem;
-  border: 1px solid var(--hairline);
-  border-radius: 999px;
-  background: var(--surface);
-  font: inherit;
-  cursor: pointer;
-  text-align: left;
-  transition: var(--transition);
+.tl-key-row li { display: inline-flex; align-items: center; gap: 0.4rem; }
+
+.tlk {
+  display: inline-block;
+  width: 24px;
+  border-radius: 2px;
+  background: #64748b;
 }
 
-.tl-btn:hover { border-color: var(--tl, var(--primary-color)); }
+.tlk-samples   { height: 0; border-top: 2px dashed #64748b; background: none; }
+.tlk-selected  { height: 3px; }
+.tlk-projected { height: 5px; }
 
-.tl-btn.is-on {
-  border-color: var(--tl, var(--primary-color));
-  box-shadow: inset 0 0 0 1px var(--tl, var(--primary-color));
-}
-
-.tl-dot {
-  width: 12px;
-  height: 12px;
-  flex: none;
-  border-radius: 3px;
-  background: var(--tl, var(--primary-color));
-}
-
-.tl-text { display: flex; flex-direction: column; line-height: 1.25; }
-
-.tl-name { font-size: 0.86rem; font-weight: 700; color: var(--text-primary); }
-
-.tl-vec {
-  font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-  font-size: 0.72rem;
-  color: var(--text-light);
-}
-
-.tl-all .tl-name { color: var(--text-secondary); }
+.tlk-ico { height: 14px; width: auto; display: block; }
 
 @media screen and (max-width: 600px) {
-  .tl-btn { padding: 0.4rem 0.7rem; }
-  .tl-name { font-size: 0.8rem; }
+  .tl-rows { grid-template-columns: 1fr; }
 }
 
 @media (prefers-reduced-motion: reduce) {

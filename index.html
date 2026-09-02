@@ -313,14 +313,24 @@
             </button>
           </div>
 
-          <p class="tl-note">
-            For each style the planner samples candidate trajectories
-            (<span class="tl-swatch tl-s-samples"></span> thin, dashed), selects one
-            (<span class="tl-swatch tl-s-selected"></span> solid), and projects it onto the
-            robot's kinematic and clearance limits to give the path actually driven
-            (<span class="tl-swatch tl-s-projected"></span> thick). The red flag marks the goal;
-            the coloured arrows are the pedestrians' current motion.
-          </p>
+          <ul class="tl-key-row">
+            <li><span class="tlk tlk-samples"></span>samples</li>
+            <li><span class="tlk tlk-selected"></span>selected</li>
+            <li><span class="tlk tlk-projected"></span>projected</li>
+            <li>
+              <svg class="tlk-ico" viewBox="0 0 14 16" aria-hidden="true">
+                <path d="M3 15V1" stroke="#333" stroke-width="1.6" stroke-linecap="round"/>
+                <path d="M3.8 1.6h8.2L9 5.2l3 3.6H3.8z" fill="#d32f2f"/>
+              </svg>goal
+            </li>
+            <li>
+              <svg class="tlk-ico" viewBox="0 0 20 12" aria-hidden="true">
+                <path d="M1 6h11" stroke="#7a8a9a" stroke-width="2.6" stroke-linecap="round"/>
+                <path d="M11 1.5L18.5 6 11 10.5z" fill="#7a8a9a"/>
+              </svg>pedestrian motion
+            </li>
+          </ul>
+
         </div>
 
       </div>

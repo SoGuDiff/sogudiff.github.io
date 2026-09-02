@@ -64,14 +64,19 @@ current style; clicking one in the legend stops the cycle for good.
 
 Layer order is base, then the four trajectory layers, then the robot.
 
-The legend is HTML, not pixels, so it stays sharp and is clickable. Each row
-carries that style's own line key — dashed samples, solid selected, thick
-projected — plus its four axis values written out (`prox +1`, `pass 0`, and so
-on) rather than as a bare vector, since the teaser is the first thing a reader
-meets and the notation has not been introduced yet. A sentence underneath says
-what the three line weights, the goal flag and the pedestrian arrows are.
-Colors and values live in the teaser markup in `index.html`; `DWELL` is in the
-teaser block of `static/js/sogudiff.js`.
+The legend is HTML, not pixels, so it stays sharp and is clickable. The four
+styles sit in a 2x2 grid; each row carries that style's own line key — dashed
+samples, solid selected, thick projected — and its four axis values written
+out (`prox +1`, `pass 0`, and so on) rather than as a bare vector, since the
+teaser is the first thing a reader meets and the notation has not been
+introduced yet. A key row underneath names the three line weights, the goal
+flag and the pedestrian motion arrows.
+
+The figure is capped at 780px wide rather than filling the container: at 1.6:1
+it otherwise pushes the abstract a long way down the page. The renders are
+1600px wide, so that is still a little over 2x for sharpness. Colors and values
+live in the teaser markup in `index.html`; `DWELL` is in the teaser block of
+`static/js/sogudiff.js`.
 
 To re-render: keep one camera and one pixel size across all five files, since
 they are stacked directly. Replacing them needs no code changes.
