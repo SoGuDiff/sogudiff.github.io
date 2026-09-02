@@ -37,7 +37,7 @@ is visible to a normal viewer.
 
 ## Adding the assets that are still missing
 
-Nine media slots are wired up but have no file yet. Each renders as a labelled
+Eight media slots are wired up but have no file yet. Each renders as a labelled
 dashed placeholder naming the exact path to drop in — so the page is never
 broken while you are still producing material. **Adding an asset is one step:
 put the file at the named path.** No HTML edit needed.
