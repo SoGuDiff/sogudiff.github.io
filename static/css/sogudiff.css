@@ -690,18 +690,20 @@ body.is-draft .draft-note code {
 
 .teaser-stage .teaser-figure { position: relative; z-index: 0; }
 
+/* Visible by default: with no script the four layers stack into the figure as
+   printed. Script adds .is-interactive, which hands control to .is-on. */
 .teaser-layer {
   position: absolute;
   top: 0;
   left: 0;
   width: 100%;
   height: auto;
-  opacity: 0;
   transition: opacity 0.55s ease;
   pointer-events: none;
 }
 
-.teaser-layer.is-on { opacity: 1; }
+.is-interactive .teaser-layer { opacity: 0; }
+.is-interactive .teaser-layer.is-on { opacity: 1; }
 
 .teaser-legend {
   display: flex;

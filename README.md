@@ -44,36 +44,29 @@ put the file at the named path.** No HTML edit needed.
 
 ### The teaser
 
-`static/images/teaser_figure.png` is the paper's Fig. 1 and is already in place.
-
-The teaser can also become **interactive**, which is worth doing: the scene sits
-still and each style's trajectories fade on over it, cycling on their own and
-selectable from a legend beneath. The page already contains everything for
-this — it activates the moment the layered renders appear, and falls back to
-the static figure until then.
-
-Re-render from the same camera, same resolution (2000px wide or more), same
-lighting, and save into `static/images/`:
+The teaser is five renders sharing one camera and one pixel size, stacked on
+top of each other in `static/images/`:
 
 | File | Contents |
 | --- | --- |
-| `teaser_base.png` | The scene **without any trajectories and without the legend box**: room, floor, the three pedestrians, their motion arrows, the goal flag, and the robot. |
-| `teaser_neutral.png` | Only the Neutral style's three curves — dashed samples, selected, projected — on a **transparent** background. |
-| `teaser_cautious.png` | Same, for Cautious & Yielding. |
-| `teaser_assertive.png` | Same, for Assertive & Group-Agnostic. |
-| `teaser_nonyield.png` | Same, for Non-Yielding & Right-Side Passing. |
+| `teaser_base.png` | The scene: room, floor, the three pedestrians, their motion arrows, the goal flag, the robot. No trajectories, no legend. |
+| `teaser_neutral.png` | Neutral's three curves — dashed samples, selected, projected — transparent background. |
+| `teaser_cautious.png` | Cautious & Yielding. |
+| `teaser_assertive.png` | Assertive & Group-Agnostic. |
+| `teaser_nonyield.png` | Non-Yielding & Right-Side Passing. |
 
-Every file must share one camera and one pixel size, since they are stacked
-directly on top of each other. The legend is HTML rather than pixels, so it
-stays sharp and is clickable; its colors and style vectors live in the teaser
-markup in `index.html`, and the cycle speed is `DWELL` in the teaser block of
-`static/js/sogudiff.js`.
+The four style layers are **visible by default**, so with JavaScript disabled
+the teaser is the figure exactly as printed in the paper. Script adds
+`.is-interactive` to the stage, which dims them and brings one back at a time,
+cycling every `DWELL` milliseconds and ending on "All four". Hovering holds the
+current style; clicking one in the legend stops the cycle for good.
 
-Dropping in `teaser_base.png` alone is what switches the page over, so add all
-five together.
+The legend is HTML, not pixels, so it stays sharp and is clickable. Its colors
+and style vectors are in the teaser markup in `index.html`; `DWELL` is in the
+teaser block of `static/js/sogudiff.js`.
 
-`static/images/method_overview.svg` is already in place — it is the supplied
-Lucidchart export, shown as-is in the "How It Works" section.
+To re-render: keep one camera and one pixel size across all five files, since
+they are stacked directly. Replacing them needs no code changes.
 
 ### Videos (in `static/videos/`)
 

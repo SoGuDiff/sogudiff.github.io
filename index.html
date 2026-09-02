@@ -228,21 +228,25 @@
   </section>
 
   <!-- ====================== TEASER ====================== -->
-  <!-- Ships as the paper's static Fig. 1. If the layered renders are present
-       (static/images/teaser_base.png plus one per style), sogudiff.js swaps in
-       an interactive version: the scene sits still and each style's
-       trajectories fade on over it, cycling by default and selectable from the
-       legend below. See the README for what to export. -->
+  <!-- The scene and each style's trajectories are separate renders stacked on
+       top of each other, all sharing one camera and one pixel size. With
+       JavaScript the styles cycle one at a time and can be picked from the
+       legend; without it every layer stays visible, which is exactly the
+       figure as printed in the paper. -->
   <section class="hero teaser">
     <div class="container is-max-widescreen">
       <div class="hero-body">
 
         <div class="teaser-stage" id="teaser-stage">
-          <img class="teaser-figure" src="static/images/teaser_figure.png"
-               alt="SoGuDiff steering one diffusion planner along four social style axes: from the same robot state, four differently styled trajectory sets fan out past three pedestrians toward the goal.">
+          <img class="teaser-figure" src="static/images/teaser_base.png"
+               alt="A robot approaches its goal past three pedestrians in an indoor scene, with four differently styled sets of candidate, selected and projected trajectories fanning out from it.">
+          <img class="teaser-layer" data-style="neutral"   src="static/images/teaser_neutral.png" alt="" aria-hidden="true">
+          <img class="teaser-layer" data-style="cautious"  src="static/images/teaser_cautious.png" alt="" aria-hidden="true">
+          <img class="teaser-layer" data-style="assertive" src="static/images/teaser_assertive.png" alt="" aria-hidden="true">
+          <img class="teaser-layer" data-style="nonyield"  src="static/images/teaser_nonyield.png" alt="" aria-hidden="true">
         </div>
 
-        <!-- Revealed only when the layered renders are available. -->
+        <!-- Revealed by script; without it the legend would not do anything. -->
         <div class="teaser-legend" id="teaser-legend" hidden>
           <button class="tl-btn" type="button" data-style="neutral" style="--tl: #2a78d6;">
             <span class="tl-dot"></span>
