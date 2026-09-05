@@ -949,16 +949,14 @@
     <div class="container is-max-widescreen">
       <h2 class="title is-3 has-text-centered">Real-World Deployment</h2>
       <p class="section-lead">
-        SoGuDiff runs at 10&nbsp;Hz on a Clearpath Jackal with YOLO11n pedestrian
-        detection and tracking, on a tethered laptop with a Ryzen 7 7745HX and an
-        RTX&nbsp;4070. Each clip shows the third-person view alongside the robot's
-        own camera and its occupancy map, with the executed path drawn on it.
+        SoGuDiff is deployed on a Clearpath Jackal for real-world demonstrations.
+        Each clip shows the recorded demonstration, human detection via the onboard
+        camera, and logged real-time detection and prediction data.
       </p>
 
-      <h3 class="rw-head">Unstructured navigation at the neutral style</h3>
+      <h3 class="rw-head">Unstructured navigation using the neutral style</h3>
       <p class="rw-sub">
-        Three pedestrians moving freely, no scripted encounter, every axis at its
-        default.
+        The robot navigates socially in an environment with three pedestrians.
       </p>
       <div class="rw-duo">
         <figure class="rw-cell">
@@ -973,10 +971,10 @@
         </figure>
       </div>
 
-      <h3 class="rw-head">One axis at a time</h3>
+      <h3 class="rw-head">Style differences across a single axis</h3>
       <p class="rw-sub">
-        The same encounter run at each end of an axis. These are the hardware
-        counterparts of the simulated sweeps above.
+        For each axis, the same encounter is repeated using
+        <span class="vec">&minus;1</span> and <span class="vec">+1</span> values.
       </p>
       <div class="rw-tabs" role="tablist" aria-label="Social style axis on hardware">
         <button class="rw-tab" role="tab" data-axis="prox" aria-selected="true"
@@ -1035,7 +1033,7 @@
               <video muted playsinline preload="none" poster="static/videos/real/posters/pass_pos.webp">
                 <source src="static/videos/real/pass_pos.mp4" type="video/mp4">
               </video>
-              <figcaption class="triptych-caption">Resolves the same encounter to the right, the mirror of the &minus;1 run.</figcaption>
+              <figcaption class="triptych-caption">Resolves the same encounter to the right, the mirror of the left-hand run.</figcaption>
             </figure>
           </div>
           <div class="sync-bar" data-sync-controls="rw-pass">
@@ -1082,7 +1080,7 @@
               <video muted playsinline preload="none" poster="static/videos/real/posters/group_neg.webp">
                 <source src="static/videos/real/group_neg.mp4" type="video/mp4">
               </video>
-              <figcaption class="triptych-caption">Treats the pair as two obstacles and takes the gap between them.</figcaption>
+              <figcaption class="triptych-caption">Takes the shortest path, between the social group.</figcaption>
             </figure>
             <figure class="rw-cell">
               <div class="triptych-head">
@@ -1091,7 +1089,7 @@
               <video muted playsinline preload="none" poster="static/videos/real/posters/group_pos.webp">
                 <source src="static/videos/real/group_pos.mp4" type="video/mp4">
               </video>
-              <figcaption class="triptych-caption">Recognises the pair as a group and routes around the formation.</figcaption>
+              <figcaption class="triptych-caption">Preserves the social group by routing around the formation.</figcaption>
             </figure>
           </div>
           <div class="sync-bar" data-sync-controls="rw-group">
@@ -1104,8 +1102,8 @@
 
       <h3 class="rw-head">Two axes composed</h3>
       <p class="rw-sub">
-        Proxemic conservatism against passing side, all four corners. The axes were
-        never demonstrated together; the combinations are produced at inference.
+        Proxemic conservatism and passing side, four distinct compositions. On the
+        same encounter, differences in behavior are perceptible across each style.
       </p>
       <div class="rw-matrix" data-sync-group="rw-comp">
           <figure class="rw-cell">
@@ -1152,11 +1150,10 @@
                data-sync-scrub aria-label="Scrub all four composed clips together">
       </div>
 
-      <h3 class="rw-head">Changing style during a run</h3>
+      <h3 class="rw-head">Adapting social style during runtime</h3>
       <p class="rw-sub">
-        The style vector is rewritten mid-episode, with no reload and no retraining.
-        The behaviour changes from that moment on, which is what "set at deployment"
-        means in practice.
+        The style is flipped from left-side passing to right-side passing during the
+        run, changing behavior in real-time.
       </p>
       <div class="rw-single">
         <figure class="rw-cell">
