@@ -33,11 +33,17 @@ editorial notes marking everything still unfilled, plus a banner. Without the
 flag the page renders exactly as a visitor would see it. Nothing in draft mode
 is visible to a normal viewer.
 
+Draft mode is itself pre-publication scaffolding: one of the `RELEASE:` markers
+says to delete it, along with the `.draft-note` / `.draft-banner` rules and the
+draft block at the top of `sogudiff.js`.
+
 ---
 
 ## Assets
 
-Everything the page references is in place. Nothing is a placeholder.
+Everything the page references is in place. Nothing is a placeholder — the
+build-time scaffolding that used to draw a dashed box in place of a missing
+video has been removed now that every asset exists.
 
 ### The teaser
 
@@ -286,7 +292,7 @@ static/css/index.css          template base styles (trimmed, see below)
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
 static/js/index.js            BibTeX copy + scroll-to-top
-static/js/sogudiff.js         asset slots, axis tabs, synchronized playback
+static/js/sogudiff.js         axis tabs, synchronized playback, walkthrough, teaser
 static/images/favicon.svg     source for the favicon
 static/images/favicon.ico     generated: rsvg-convert + ImageMagick
 static/images/social_preview.svg  source for the link-preview card

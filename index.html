@@ -10,8 +10,9 @@
          * no author names, affiliations, or personal links
          * no lab "More Works" list (it would deanonymize instantly)
          * robots = noindex, nofollow  (search engines told to stay away)
-       BEFORE PUBLIC RELEASE, search this file for "RELEASE:" and act on
-       each one. There are 15, plus 6 occurrences of REPLACE_WITH_PROJECT_URL.
+       BEFORE PUBLIC RELEASE, search this file for "RELEASE:" and act on each
+       one, then for REPLACE_WITH_PROJECT_URL and substitute the live URL.
+       Appending ?draft to the URL renders the same list on the page itself.
        ====================================================================== -->
 
   <!-- RELEASE: change to "index, follow" once the paper is public. Until then
@@ -75,6 +76,10 @@
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 
+  <!-- The teaser is the largest element painted above the fold, so it is
+       fetched alongside the stylesheets rather than after them. -->
+  <link rel="preload" as="image" href="static/images/teaser_base.webp" fetchpriority="high">
+
   <title>SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation</title>
 
   <!-- Favicon and App Icons -->
@@ -126,6 +131,8 @@
   </script>
 </head>
 <body>
+
+  <a class="skip-link" href="#main-content">Skip to content</a>
 
   <!-- Scroll to Top Button -->
   <button class="scroll-to-top" onclick="scrollToTop()" title="Scroll to top" aria-label="Scroll to top">
@@ -215,12 +222,17 @@
                 Links become active on publication.
               </p>
 
+              <!-- RELEASE: delete this note, the .draft-note / .draft-banner
+                   rules in sogudiff.css, and the draft-mode block at the top of
+                   sogudiff.js. It is hidden unless ?draft is in the URL, so it
+                   is invisible to visitors, but it has no purpose once the page
+                   is public. -->
               <div class="draft-note">
-                <b>Draft note.</b> 15 <code>RELEASE:</code> markers in
+                <b>Draft note.</b> The <code>RELEASE:</code> markers in
                 <code>index.html</code> gate everything that must change before this
                 page goes public: robots meta, author block, four link buttons,
-                Scholar citation tags, JSON-LD, canonical URL, and the BibTeX entry.
-                Run <code>grep -n "RELEASE:" index.html</code> to list them.
+                Scholar citation tags, JSON-LD, canonical URL, the BibTeX entry, and
+                this note. Run <code>grep -n "RELEASE:" index.html</code> to list them.
               </div>
             </div>
 
@@ -620,8 +632,7 @@
               <span class="cell-name">Assertive</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/prox_-1.jpg"
-                   data-slot="prox = -1" data-slot-path="static/videos/prox_-1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/prox_-1.jpg">
               <source src="static/videos/prox_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -636,8 +647,7 @@
               <span class="cell-name">Neutral</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/prox_+0.jpg"
-                   data-slot="prox = 0" data-slot-path="static/videos/prox_+0.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/prox_+0.jpg">
               <source src="static/videos/prox_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -651,8 +661,7 @@
               <span class="cell-name">Conservative</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/prox_+1.jpg"
-                   data-slot="prox = +1" data-slot-path="static/videos/prox_+1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/prox_+1.jpg">
               <source src="static/videos/prox_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -681,8 +690,7 @@
               <span class="cell-name">Left-hand</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/pass_-1.jpg"
-                   data-slot="pass = -1" data-slot-path="static/videos/pass_-1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/pass_-1.jpg">
               <source src="static/videos/pass_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -697,8 +705,7 @@
               <span class="cell-name">No preference</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/pass_+0.jpg"
-                   data-slot="pass = 0" data-slot-path="static/videos/pass_+0.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/pass_+0.jpg">
               <source src="static/videos/pass_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -713,8 +720,7 @@
               <span class="cell-name">Right-hand</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/pass_+1.jpg"
-                   data-slot="pass = +1" data-slot-path="static/videos/pass_+1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/pass_+1.jpg">
               <source src="static/videos/pass_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -744,8 +750,7 @@
               <span class="cell-name">Non-Yielding</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/yield_-1.jpg"
-                   data-slot="yield = -1" data-slot-path="static/videos/yield_-1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/yield_-1.jpg">
               <source src="static/videos/yield_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -760,8 +765,7 @@
               <span class="cell-name">Neutral</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/yield_+0.jpg"
-                   data-slot="yield = 0" data-slot-path="static/videos/yield_+0.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/yield_+0.jpg">
               <source src="static/videos/yield_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -776,8 +780,7 @@
               <span class="cell-name">Yielding</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/yield_+1.jpg"
-                   data-slot="yield = +1" data-slot-path="static/videos/yield_+1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/yield_+1.jpg">
               <source src="static/videos/yield_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -807,8 +810,7 @@
               <span class="cell-name">Group-agnostic</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/group_-1.jpg"
-                   data-slot="group = -1" data-slot-path="static/videos/group_-1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/group_-1.jpg">
               <source src="static/videos/group_-1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -823,8 +825,7 @@
               <span class="cell-name">Neutral</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/group_+0.jpg"
-                   data-slot="group = 0" data-slot-path="static/videos/group_+0.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/group_+0.jpg">
               <source src="static/videos/group_+0.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -838,8 +839,7 @@
               <span class="cell-name">Group-preserving</span>
             </div>
             <video muted playsinline preload="metadata"
-                   poster="static/videos/posters/group_+1.jpg"
-                   data-slot="group = +1" data-slot-path="static/videos/group_+1.mp4" data-slot-shape="square">
+                   poster="static/videos/posters/group_+1.jpg">
               <source src="static/videos/group_+1.mp4" type="video/mp4">
             </video>
             <figcaption class="triptych-caption">
@@ -874,12 +874,11 @@
 
         <figure class="compose-card">
           <video muted playsinline preload="metadata"
-                 poster="static/videos/posters/Neutral.jpg"
-                 data-slot="Neutral composition" data-slot-path="static/videos/Neutral.mp4" data-slot-shape="square">
+                 poster="static/videos/posters/Neutral.jpg">
             <source src="static/videos/Neutral.mp4" type="video/mp4">
           </video>
           <figcaption class="compose-body">
-            <h4>Neutral</h4>
+            <h3 class="compose-title">Neutral</h3>
             <span class="vec">[0, 0, 0, 0]</span>
             <p>The reference behavior with every axis at its default convention.</p>
           </figcaption>
@@ -887,12 +886,11 @@
 
         <figure class="compose-card">
           <video muted playsinline preload="metadata"
-                 poster="static/videos/posters/Assertive___Left_Side_Passing.jpg"
-                 data-slot="Assertive composition" data-slot-path="static/videos/Assertive___Left_Side_Passing.mp4" data-slot-shape="square">
+                 poster="static/videos/posters/Assertive___Left_Side_Passing.jpg">
             <source src="static/videos/Assertive___Left_Side_Passing.mp4" type="video/mp4">
           </video>
           <figcaption class="compose-body">
-            <h4>Assertive &amp; Left-Side Passing</h4>
+            <h3 class="compose-title">Assertive &amp; Left-Side Passing</h3>
             <span class="vec">[&minus;1, &minus;1, &minus;1, &minus;1]</span>
             <p>Produces the most assertive path and passes all pedestrians on the
             left.</p>
@@ -901,12 +899,11 @@
 
         <figure class="compose-card">
           <video muted playsinline preload="metadata"
-                 poster="static/videos/posters/Cautious___Right_Side_Passing.jpg"
-                 data-slot="Cautious composition" data-slot-path="static/videos/Cautious___Right_Side_Passing.mp4" data-slot-shape="square">
+                 poster="static/videos/posters/Cautious___Right_Side_Passing.jpg">
             <source src="static/videos/Cautious___Right_Side_Passing.mp4" type="video/mp4">
           </video>
           <figcaption class="compose-body">
-            <h4>Cautious &amp; Right-Side Passing</h4>
+            <h3 class="compose-title">Cautious &amp; Right-Side Passing</h3>
             <span class="vec">[+1, +1, +1, +1]</span>
             <p>Makes the widest arc around all pedestrians, passing on the right
             side.</p>
@@ -915,12 +912,11 @@
 
         <figure class="compose-card">
           <video muted playsinline preload="metadata"
-                 poster="static/videos/posters/Yielding___Group_Agnostic.jpg"
-                 data-slot="Mixed composition" data-slot-path="static/videos/Yielding___Group_Agnostic.mp4" data-slot-shape="square">
+                 poster="static/videos/posters/Yielding___Group_Agnostic.jpg">
             <source src="static/videos/Yielding___Group_Agnostic.mp4" type="video/mp4">
           </video>
           <figcaption class="compose-body">
-            <h4>Yielding &amp; Group-Agnostic</h4>
+            <h3 class="compose-title">Yielding &amp; Group-Agnostic</h3>
             <span class="vec">[0, 0, +1, &minus;1]</span>
             <p>Yields to the first pedestrian before cutting through the oncoming
             social group.</p>

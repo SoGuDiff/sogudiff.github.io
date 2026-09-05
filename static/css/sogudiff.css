@@ -57,60 +57,30 @@
   pointer-events: none;
 }
 
+/* Keyboard users land here first: hidden until focused, then it sits over
+   the hero and jumps past the nav to the content. */
+.skip-link {
+  position: absolute;
+  left: 50%;
+  top: -3rem;
+  transform: translateX(-50%);
+  z-index: 200;
+  padding: 0.55rem 1.1rem;
+  border-radius: 0 0 8px 8px;
+  background: var(--primary-color);
+  color: #fff;
+  font-weight: 600;
+  font-size: 0.9rem;
+  text-decoration: none;
+  transition: top 0.15s ease;
+}
+
+.skip-link:focus { top: 0; }
+
 .link-note {
   margin-top: 1rem;
   color: var(--text-light);
   font-size: 0.85rem;
-}
-
-/* --------------------------------------------------------------------------
-   Asset slots — a placeholder that renders wherever a file has not been
-   dropped in yet. Any <video>/<img> whose source fails to load is swapped
-   for one of these by sogudiff.js, so the page is never broken mid-build.
-   -------------------------------------------------------------------------- */
-
-.asset-slot {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  gap: 0.5rem;
-  width: 100%;
-  aspect-ratio: 16 / 9;
-  padding: 1.5rem;
-  border: 2px dashed #cbd5e1;
-  border-radius: var(--border-radius);
-  background:
-    repeating-linear-gradient(45deg, #f8fafc, #f8fafc 12px, #f1f5f9 12px, #f1f5f9 24px);
-  color: var(--text-secondary);
-  text-align: center;
-}
-
-.asset-slot.is-square { aspect-ratio: 1 / 1; }
-
-.asset-slot .slot-icon { width: 26px; height: 26px; color: var(--text-light); }
-
-.asset-slot .slot-label {
-  font-weight: 700;
-  font-size: 0.95rem;
-  color: var(--text-primary);
-}
-
-.asset-slot .slot-path {
-  font-family: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, monospace;
-  font-size: 0.78rem;
-  color: var(--primary-color);
-  word-break: break-all;
-  background: rgba(37, 99, 235, 0.07);
-  padding: 0.2rem 0.5rem;
-  border-radius: 6px;
-}
-
-.asset-slot .slot-hint {
-  font-size: 0.8rem;
-  color: var(--text-light);
-  max-width: 42ch;
-  line-height: 1.4;
 }
 
 /* --------------------------------------------------------------------------
@@ -123,10 +93,6 @@
   height: auto;
   border-radius: var(--border-radius);
 }
-
-
-
-
 
 /* --------------------------------------------------------------------------
    Style axis cards
@@ -234,8 +200,7 @@
   box-shadow: var(--shadow-sm);
 }
 
-.triptych-cell video,
-.triptych-cell .asset-slot {
+.triptych-cell video {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -308,19 +273,6 @@
   color: var(--text-secondary);
 }
 
-.panel-note {
-  margin-top: 1.25rem;
-  padding: 0.9rem 1.1rem;
-  border-left: 3px solid var(--tab-color, var(--primary-color));
-  border-radius: 0 8px 8px 0;
-  background: var(--background-secondary);
-  font-size: 0.88rem;
-  line-height: 1.6;
-  color: var(--text-secondary);
-}
-
-.panel-note strong { color: var(--text-primary); }
-
 /* Shared playback controls for a synchronized group */
 .sync-bar {
   display: flex;
@@ -377,8 +329,7 @@
 
 .compose-card:hover { box-shadow: var(--shadow-md); }
 
-.compose-card video,
-.compose-card .asset-slot {
+.compose-card video {
   display: block;
   width: 100%;
   aspect-ratio: 1 / 1;
@@ -389,7 +340,7 @@
 
 .compose-body { padding: 0.85rem 1rem 1rem; }
 
-.compose-body h4 {
+.compose-body .compose-title {
   margin: 0 0 0.4rem;
   font-size: 0.98rem;
   font-weight: 700;
@@ -413,44 +364,6 @@
   padding: 0.15rem 0.5rem;
   border-radius: 6px;
 }
-
-/* --------------------------------------------------------------------------
-   Generic media grid for the "to be filled" sections
-   -------------------------------------------------------------------------- */
-
-.media-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
-  gap: 1.25rem;
-  margin-top: 1.5rem;
-}
-
-.media-item {
-  border: 1px solid var(--hairline);
-  border-radius: var(--border-radius);
-  background: var(--surface);
-  overflow: hidden;
-  box-shadow: var(--shadow-sm);
-}
-
-.media-item video,
-.media-item img,
-.media-item .asset-slot {
-  display: block;
-  width: 100%;
-  background: #0f172a;
-  border: none;
-  border-radius: 0;
-}
-
-.media-item figcaption {
-  padding: 0.75rem 1rem 0.9rem;
-  font-size: 0.85rem;
-  line-height: 1.5;
-  color: var(--text-secondary);
-}
-
-.media-item figcaption b { color: var(--text-primary); }
 
 .section-lead {
   /* Wide enough that these leads do not strand a single word on the last
@@ -512,8 +425,7 @@ body.is-draft .draft-note code {
 
 @media screen and (max-width: 900px) {
   .triptych { grid-template-columns: 1fr; gap: 1rem; }
-  .triptych-cell video,
-  .triptych-cell .asset-slot { max-height: 62vh; }
+  .triptych-cell video { max-height: 62vh; }
 }
 
 @media screen and (max-width: 600px) {
@@ -559,7 +471,6 @@ body.is-draft .draft-note code {
 @media (prefers-reduced-motion: reduce) {
   .dg-el { transition: none; }
 }
-
 
 .diagram-panel-label {
   display: flex;
@@ -656,13 +567,6 @@ body.is-draft .draft-note code {
 
 .dg-dot:hover { background: #94a3b8; }
 .dg-dot.is-current { background: var(--primary-color); transform: scale(1.25); }
-
-.diagram-foot {
-  margin-top: 0.9rem;
-  color: var(--text-light);
-  font-size: 0.85rem;
-  text-align: center;
-}
 
 @media screen and (max-width: 700px) {
   .diagram-stage { padding: 0.75rem 0.75rem 0; }
@@ -971,7 +875,6 @@ body.is-draft .draft-note code {
 .cmp-k-success { background: #1e7a3c; }
 .cmp-k-collision { background: #c62828; }
 .cmp-k-timeout { background: #b26a00; }
-.cmp-k-note { color: var(--text-light); font-style: italic; }
 
 @media screen and (max-width: 900px) {
   .cmp-stage { grid-template-columns: 1fr; }
@@ -981,7 +884,6 @@ body.is-draft .draft-note code {
 @media screen and (max-width: 560px) {
   .cmp-grid { grid-template-columns: repeat(2, 1fr); }
 }
-
 
 /* --------------------------------------------------------------------------
    Real-world deployment

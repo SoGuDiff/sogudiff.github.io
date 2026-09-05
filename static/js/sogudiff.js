@@ -1,9 +1,9 @@
 /* ==========================================================================
    SoGuDiff project page behaviour.
-   Three independent pieces, each safe to delete on its own:
-     1. asset slots   — graceful placeholders for files not added yet
-     2. axis explorer — tab switching with synchronized triptych playback
-     3. sync groups   — shared play/pause/scrub over a set of clips
+   Independent pieces, each safe to delete on its own:
+     - synchronized playback groups (shared play/pause/scrub over a set of clips)
+     - the axis explorers, simulated and real-world
+     - the method walkthrough, the teaser, and the baseline comparison
    ========================================================================== */
 (function () {
   'use strict';
@@ -23,65 +23,7 @@
   }
 
   /* ----------------------------------------------------------------------
-     1. Asset slots
-     A <video data-slot="..."> or <img data-slot="..."> whose file is missing
-     is replaced by a dashed placeholder naming the path to drop in. This
-     keeps the page coherent while assets are still being produced.
-     ---------------------------------------------------------------------- */
-  function buildSlot(el) {
-    var wrap = document.createElement('div');
-    wrap.className = 'asset-slot' + (el.dataset.slotShape === 'square' ? ' is-square' : '');
-
-    // Inline SVG rather than a font glyph: no icon library is loaded.
-    var icon = document.createElementNS('http://www.w3.org/2000/svg', 'svg');
-    icon.setAttribute('class', 'slot-icon');
-    icon.setAttribute('viewBox', '0 0 24 24');
-    icon.setAttribute('aria-hidden', 'true');
-    icon.innerHTML = el.tagName === 'IMG'
-      ? '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>' +
-        '<circle cx="8.5" cy="10" r="1.5" fill="currentColor"/>' +
-        '<path d="M5 17l4.5-4.5L13 16l2.5-2.5L19 17" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/>'
-      : '<rect x="3" y="5" width="18" height="14" rx="2" fill="none" stroke="currentColor" stroke-width="2"/>' +
-        '<path d="M7 5v14M17 5v14M3 12h18" fill="none" stroke="currentColor" stroke-width="2"/>';
-
-    var label = document.createElement('div');
-    label.className = 'slot-label';
-    label.textContent = el.dataset.slot || 'Asset pending';
-
-    var path = document.createElement('code');
-    path.className = 'slot-path';
-    path.textContent = el.dataset.slotPath || (el.currentSrc || el.src || '');
-
-    wrap.appendChild(icon);
-    wrap.appendChild(label);
-    if (path.textContent) wrap.appendChild(path);
-
-    if (el.dataset.slotHint) {
-      var hint = document.createElement('div');
-      hint.className = 'slot-hint';
-      hint.textContent = el.dataset.slotHint;
-      wrap.appendChild(hint);
-    }
-
-    if (el.parentNode) el.parentNode.replaceChild(wrap, el);
-  }
-
-  document.querySelectorAll('[data-slot]').forEach(function (el) {
-    if (el.tagName === 'IMG') {
-      el.addEventListener('error', function () { buildSlot(el); });
-      // Already failed before this script ran.
-      if (el.complete && el.naturalWidth === 0) buildSlot(el);
-      return;
-    }
-    // <video>: the error fires on the <source>, and readyState stays 0.
-    var sources = el.querySelectorAll('source');
-    if (!sources.length) { buildSlot(el); return; }
-    sources[sources.length - 1].addEventListener('error', function () { buildSlot(el); });
-    el.addEventListener('error', function () { buildSlot(el); });
-  });
-
-  /* ----------------------------------------------------------------------
-     2 & 3. Synchronized playback groups
+     Synchronized playback groups
      Every [data-sync-group] contains videos that should play as one. The
      group's controls live in [data-sync-controls] with a matching name.
      ---------------------------------------------------------------------- */

@@ -38,7 +38,6 @@ body {
   -moz-osx-font-smoothing: grayscale;
 }
 
-
 /* Modern Button Styles */
 .button {
   border-radius: var(--border-radius) !important;
@@ -67,25 +66,9 @@ body {
   box-shadow: var(--shadow-md);
 }
 
-.footer .icon-link {
-    font-size: 25px;
-    color: var(--text-secondary);
-    transition: var(--transition);
-}
-
-.footer .icon-link:hover {
-    color: var(--primary-color);
-    transform: translateY(-2px);
-}
-
 .link-block a {
     margin: 8px 4px;
 }
-
-.dnerf {
-  font-variant: small-caps;
-}
-
 
 /* Hero Section Modernization */
 .hero {
@@ -112,7 +95,6 @@ body {
   font-family: 'Inter', sans-serif;
 }
 
-
 /* Publication Content Styling */
 .publication-title {
     font-family: 'Inter', sans-serif !important;
@@ -122,55 +104,10 @@ body {
     line-height: 1.1 !important;
 }
 
-.publication-banner {
-  max-height: 70vh;
-  border-radius: var(--border-radius-lg);
-  overflow: hidden;
-  box-shadow: var(--shadow-xl);
-  margin: 2rem 0;
-}
-
-.publication-banner video {
-  position: relative;
-  left: auto;
-  top: auto;
-  transform: none;
-  object-fit: cover;
-  width: 100%;
-  height: 100%;
-  border-radius: var(--border-radius-lg);
-}
-
-.publication-header .hero-body {
-  padding: 6rem 1.5rem 4rem;
-}
-
 .publication-authors {
     font-family: 'Inter', sans-serif !important;
     font-weight: 500;
     margin-bottom: 1.5rem;
-}
-
-.publication-venue {
-    color: var(--text-secondary);
-    width: fit-content;
-    font-weight: 600;
-    background: var(--background-accent);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    margin-top: 1rem;
-    display: inline-block;
-}
-
-.publication-awards {
-    color: #ef4444;
-    width: fit-content;
-    font-weight: 700;
-    background: linear-gradient(135deg, #fef2f2, #fee2e2);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-    border-left: 4px solid #ef4444;
-    margin-top: 1rem;
 }
 
 .publication-authors a {
@@ -203,64 +140,6 @@ body {
 .author-block {
   display: inline-block;
   margin-right: 0.5rem;
-}
-
-.publication-banner img {
-  border-radius: var(--border-radius-lg);
-  box-shadow: var(--shadow-lg);
-  transition: var(--transition);
-}
-
-.publication-banner img:hover {
-  transform: scale(1.02);
-  box-shadow: var(--shadow-xl);
-}
-
-/* Modern Video and Carousel Styling */
-.publication-video {
-    position: relative;
-    width: 100%;
-    height: 0;
-    padding-bottom: 56.25%;
-    overflow: hidden;
-    border-radius: var(--border-radius-lg) !important;
-    box-shadow: var(--shadow-xl);
-    transition: var(--transition);
-}
-
-.publication-video:hover {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-xl);
-}
-
-.publication-video iframe {
-    position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    border-radius: var(--border-radius-lg);
-}
-
-.publication-body img {
-  border-radius: var(--border-radius);
-  box-shadow: var(--shadow-md);
-  transition: var(--transition);
-}
-
-.publication-body img:hover {
-  transform: translateY(-2px);
-  box-shadow: var(--shadow-lg);
-}
-
-
-/* Pagination and Misc Improvements */
-
-
-.eql-cntrb { 
-  font-size: 0.875rem;
-  color: var(--text-light);
-  font-style: italic;
 }
 
 /* Section Titles */
@@ -407,9 +286,7 @@ code {
   visibility: visible;
 }
 
-
 /* More Works Dropdown */
-
 
 /* Mobile Responsive Improvements */
 @media screen and (max-width: 768px) {
@@ -417,9 +294,6 @@ code {
     padding: 2rem 1rem;
   }
   
-  .publication-header .hero-body {
-    padding: 3rem 1rem 2rem;
-  }
   
   .publication-title {
     font-size: 2.5rem !important;
@@ -479,9 +353,6 @@ code {
     padding: 3rem 2rem;
   }
   
-  .publication-header .hero-body {
-    padding: 4rem 2rem 3rem;
-  }
 }
 
 /* Animation for page load */
@@ -502,12 +373,10 @@ code {
 
 /* Improved focus states for accessibility */
 .button:focus,
-.related-works-btn:focus,
 a:focus {
   outline: 2px solid var(--primary-color);
   outline-offset: 2px;
 }
-
 
 /* Print styles */
 @media print {
@@ -522,5 +391,4 @@ a:focus {
     box-shadow: none !important;
   }
 }
-
 
