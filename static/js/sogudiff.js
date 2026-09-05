@@ -574,6 +574,91 @@
   })();
 
   /* ----------------------------------------------------------------------
+     Real-world axis tabs
+     Deliberately separate from the simulated explorer above: that one queries
+     .axis-tab / .axis-panel across the whole document, so reusing those class
+     names here would make one set of tabs drive both blocks.
+
+     The clips are preload="none" — fifteen 720p files is far too much to fetch
+     on load — so a panel's videos are told to load the first time it is shown.
+     ---------------------------------------------------------------------- */
+  (function () {
+    var tabs = Array.prototype.slice.call(document.querySelectorAll('.rw-tab'));
+    var panels = Array.prototype.slice.call(document.querySelectorAll('.rw-panel'));
+    if (!tabs.length || !panels.length) return;
+
+    function show(axis, focus) {
+      tabs.forEach(function (t) {
+        var on = t.dataset.axis === axis;
+        t.setAttribute('aria-selected', on ? 'true' : 'false');
+        t.tabIndex = on ? 0 : -1;
+        if (on && focus) t.focus();
+      });
+      panels.forEach(function (p) {
+        var on = p.dataset.axis === axis;
+        p.hidden = !on;
+        var group = p.querySelector('[data-sync-group]');
+        if (!group) return;
+        if (on) {
+          group.querySelectorAll('video').forEach(function (v) {
+            if (v.preload === 'none') { v.preload = 'metadata'; v.load(); }
+          });
+          if (group._syncPlay) { group._syncPlay(); if (group._syncReset) group._syncReset(true); }
+        } else if (group._syncPause) {
+          group._syncPause();
+          if (group._syncReset) group._syncReset(false);
+        }
+      });
+    }
+
+    tabs.forEach(function (tab) {
+      tab.addEventListener('click', function () { show(tab.dataset.axis, false); });
+      tab.addEventListener('keydown', function (e) {
+        if (e.key !== 'ArrowRight' && e.key !== 'ArrowLeft') return;
+        e.preventDefault();
+        var i = tabs.indexOf(tab);
+        var next = (i + (e.key === 'ArrowRight' ? 1 : tabs.length - 1)) % tabs.length;
+        show(tabs[next].dataset.axis, true);
+      });
+    });
+
+    // Nothing loads or plays until the block is actually on screen.
+    var section = document.getElementById('real-world');
+    if (section && 'IntersectionObserver' in window) {
+      var started = false;
+      var io = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (!e.isIntersecting || started) return;
+          started = true;
+          var active = document.querySelector('.rw-tab[aria-selected="true"]');
+          if (active) show(active.dataset.axis, false);
+          io.disconnect();
+        });
+      }, { threshold: 0.15 });
+      io.observe(section);
+    }
+
+    // The composed matrix is not tabbed, so it gets its own trigger.
+    var matrix = document.querySelector('[data-sync-group="rw-comp"]');
+    if (matrix && 'IntersectionObserver' in window) {
+      var mo = new IntersectionObserver(function (entries) {
+        entries.forEach(function (e) {
+          if (e.isIntersecting) {
+            matrix.querySelectorAll('video').forEach(function (v) {
+              if (v.preload === 'none') { v.preload = 'metadata'; v.load(); }
+            });
+            if (matrix._syncPlay) { matrix._syncPlay(); if (matrix._syncReset) matrix._syncReset(true); }
+          } else if (matrix._syncPause) {
+            matrix._syncPause();
+            if (matrix._syncReset) matrix._syncReset(false);
+          }
+        });
+      }, { threshold: 0.25 });
+      mo.observe(matrix);
+    }
+  })();
+
+  /* ----------------------------------------------------------------------
      Baseline comparison
      Eleven panels of one scene. Switching scene repoints every <video> at
      that scene's file, so the eleven stay together rather than drifting apart

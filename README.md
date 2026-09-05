@@ -35,12 +35,9 @@ is visible to a normal viewer.
 
 ---
 
-## Adding the assets that are still missing
+## Assets
 
-Four media slots are wired up but have no file yet. Each renders as a labelled
-dashed placeholder naming the exact path to drop in — so the page is never
-broken while you are still producing material. **Adding an asset is one step:
-put the file at the named path.** No HTML edit needed.
+Everything the page references is in place. Nothing is a placeholder.
 
 ### The teaser
 
@@ -93,17 +90,34 @@ cwebp -q 88 -alpha_q 100 teaser_base.png -o static/images/teaser_base.webp
 `social_preview.png` deliberately stays PNG — social-card crawlers do not all
 read WebP.
 
-### Videos (in `static/videos/`)
+### Real-world clips (in `static/videos/real/`)
 
-| Path | What it is | Priority |
-| --- | --- | --- |
-| `real_style_comparison.mp4` | One repeated hardware scene under two or three styles, ideally side by side | **Highest** — the core real-world claim |
-| `real_onboard_detections.mp4` | Camera feed with YOLO boxes/tracks beside the planner's own view | High |
-| `real_group_encounter.mp4` | A real co-moving pair at `s_group = -1` vs `+1` | High |
-| `real_style_switch.mp4` | Style vector changed *during* one continuous run | Bonus, high impact |
+Fifteen clips from the Jackal deployment, all 1280x720:
 
-Full rationale for each is in the `data-slot-hint` attribute on the
-corresponding element in `index.html`.
+| Files | Shown as |
+| --- | --- |
+| `neutral1`, `neutral2` | Two unstructured runs, three pedestrians, neutral style |
+| `prox_pos/neg`, `pass_pos/neg`, `yield_pos/neg`, `group_pos/neg` | Tabbed per axis, the two ends side by side and synced |
+| `comp_pp`, `comp_pm`, `comp_mp`, `comp_mm` | A 2x2 matrix of proxemic against passing side, all four synced |
+| `liveswitch` | The style vector rewritten mid-episode |
+
+The originals were 1080p30 at roughly 2 MB/s with AAC audio — **534 MB for the
+set**. Re-encoded to 720p at CRF 25 with audio stripped they come to about
+20 MB, with the occupancy-map inset and the trajectory overlay still crisp
+(checked against the originals frame by frame before settling on the setting).
+Every clip on the page is muted, so the audio was pure weight. The 1080p
+originals are kept outside the repo, in `../real_world_source_1080p/`, so
+clips can be re-encoded without re-recording.
+
+They are `preload="none"` and only fetched when their tab or block is first
+scrolled to; loading fifteen 720p files up front would dwarf the rest of the
+page. Posters in `static/videos/real/posters/` are WebP stills taken a third of
+the way in, so a panel shows the interaction rather than an empty room before
+it plays.
+
+The real-world tabs use `.rw-tab` / `.rw-panel` rather than the simulated
+explorer's `.axis-tab` / `.axis-panel`, because that explorer queries its
+classes across the whole document and would otherwise drive both blocks at once.
 
 ### Video encoding
 
@@ -148,7 +162,8 @@ Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
 7. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
    clips play in step with shared play / restart / scrub controls
 8. **Composing Axes at Inference** — the four composed-style runs, also synced
-9. **Real-World Deployment** — four slots
+9. **Real-World Deployment** — unstructured neutral runs, the four axes tabbed
+   with both ends synced, a 2x2 composed matrix, and a live style switch
 10. **BibTeX** and footer
 
 ### The animated walkthrough

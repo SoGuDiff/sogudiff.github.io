@@ -945,69 +945,225 @@
   </section>
 
   <!-- ====================== REAL-WORLD ====================== -->
-  <section class="section hero is-light">
-    <div class="container is-max-desktop">
+  <section class="section hero is-light" id="real-world">
+    <div class="container is-max-widescreen">
       <h2 class="title is-3 has-text-centered">Real-World Deployment</h2>
       <p class="section-lead">
         SoGuDiff runs at 10&nbsp;Hz on a Clearpath Jackal with YOLO11n pedestrian
-        detection and tracking, on a tethered laptop with a Ryzen 7 7745HX and an RTX
-        4070.
+        detection and tracking, on a tethered laptop with a Ryzen 7 7745HX and an
+        RTX&nbsp;4070. Each clip shows the third-person view alongside the robot's
+        own camera and its occupancy map, with the executed path drawn on it.
       </p>
 
-      <div class="media-grid">
-
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Real-world: contrasting styles, same scene"
-                 data-slot-path="static/videos/real_style_comparison.mp4"
-                 data-slot-hint="The key real-world result: one repeated scene, run under two or three styles, ideally side by side in a single encode so the difference is unmissable.">
-            <source src="static/videos/real_style_comparison.mp4" type="video/mp4">
+      <h3 class="rw-head">Unstructured navigation at the neutral style</h3>
+      <p class="rw-sub">
+        Three pedestrians moving freely, no scripted encounter, every axis at its
+        default.
+      </p>
+      <div class="rw-duo">
+        <figure class="rw-cell">
+          <video controls muted loop playsinline preload="none" poster="static/videos/real/posters/neutral1.webp">
+            <source src="static/videos/real/neutral1.mp4" type="video/mp4">
           </video>
-          <figcaption>
-            <b>Style difference on hardware.</b> The same encounter, repeated under
-            contrasting style vectors.
-          </figcaption>
         </figure>
-
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Real-world: onboard view with detections"
-                 data-slot-path="static/videos/real_onboard_detections.mp4"
-                 data-slot-hint="Camera feed with YOLO boxes and tracks, next to the planner's own view - candidates, selected, projected. Shows the full pipeline is genuinely running live.">
-            <source src="static/videos/real_onboard_detections.mp4" type="video/mp4">
+        <figure class="rw-cell">
+          <video controls muted loop playsinline preload="none" poster="static/videos/real/posters/neutral2.webp">
+            <source src="static/videos/real/neutral2.mp4" type="video/mp4">
           </video>
-          <figcaption>
-            <b>Perception and planning, live.</b> Detections and tracks alongside the
-            planner's candidate, selected, and projected trajectories.
-          </figcaption>
         </figure>
+      </div>
 
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Real-world: group encounter"
-                 data-slot-path="static/videos/real_group_encounter.mp4"
-                 data-slot-hint="A co-moving pair or small group on hardware, at s_group = -1 and +1. Group deference is the axis reviewers are most likely to doubt transfers.">
-            <source src="static/videos/real_group_encounter.mp4" type="video/mp4">
+      <h3 class="rw-head">One axis at a time</h3>
+      <p class="rw-sub">
+        The same encounter run at each end of an axis. These are the hardware
+        counterparts of the simulated sweeps above.
+      </p>
+      <div class="rw-tabs" role="tablist" aria-label="Social style axis on hardware">
+        <button class="rw-tab" role="tab" data-axis="prox" aria-selected="true"
+                aria-controls="rw-panel-prox" style="--tab-color: var(--ax-prox);">Proxemic</button>
+        <button class="rw-tab" role="tab" data-axis="pass" aria-selected="false" tabindex="-1"
+                aria-controls="rw-panel-pass" style="--tab-color: var(--ax-pass);">Passing side</button>
+        <button class="rw-tab" role="tab" data-axis="yield" aria-selected="false" tabindex="-1"
+                aria-controls="rw-panel-yield" style="--tab-color: var(--ax-yield);">Yielding</button>
+        <button class="rw-tab" role="tab" data-axis="group" aria-selected="false" tabindex="-1"
+                aria-controls="rw-panel-group" style="--tab-color: var(--ax-group);">Group deference</button>
+      </div>
+
+        <div class="rw-panel" data-axis="prox">
+          <div class="rw-pair" data-sync-group="rw-prox">
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-neg">s_prox = &minus;1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/prox_neg.webp">
+                <source src="static/videos/real/prox_neg.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Cuts close past the pedestrian, taking the shorter line.</figcaption>
+            </figure>
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-pos">s_prox = +1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/prox_pos.webp">
+                <source src="static/videos/real/prox_pos.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Swings wide and early, holding a generous berth all the way past.</figcaption>
+            </figure>
+          </div>
+          <div class="sync-bar" data-sync-controls="rw-prox">
+            <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+            <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+            <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+                   data-sync-scrub aria-label="Scrub both Proxemic clips together">
+          </div>
+        </div>
+        <div class="rw-panel" data-axis="pass" hidden>
+          <div class="rw-pair" data-sync-group="rw-pass">
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-neg">s_pass = &minus;1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/pass_neg.webp">
+                <source src="static/videos/real/pass_neg.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Resolves the encounter to the left, the left-hand traffic convention.</figcaption>
+            </figure>
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-pos">s_pass = +1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/pass_pos.webp">
+                <source src="static/videos/real/pass_pos.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Resolves the same encounter to the right, the mirror of the &minus;1 run.</figcaption>
+            </figure>
+          </div>
+          <div class="sync-bar" data-sync-controls="rw-pass">
+            <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+            <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+            <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+                   data-sync-scrub aria-label="Scrub both Passing side clips together">
+          </div>
+        </div>
+        <div class="rw-panel" data-axis="yield" hidden>
+          <div class="rw-pair" data-sync-group="rw-yield">
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-neg">s_yield = &minus;1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/yield_neg.webp">
+                <source src="static/videos/real/yield_neg.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Holds its line and crosses ahead of the pedestrian.</figcaption>
+            </figure>
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-pos">s_yield = +1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/yield_pos.webp">
+                <source src="static/videos/real/yield_pos.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Anticipates the conflict, slows, and lets the pedestrian through first.</figcaption>
+            </figure>
+          </div>
+          <div class="sync-bar" data-sync-controls="rw-yield">
+            <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+            <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+            <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+                   data-sync-scrub aria-label="Scrub both Yielding clips together">
+          </div>
+        </div>
+        <div class="rw-panel" data-axis="group" hidden>
+          <div class="rw-pair" data-sync-group="rw-group">
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-neg">s_group = &minus;1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/group_neg.webp">
+                <source src="static/videos/real/group_neg.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Treats the pair as two obstacles and takes the gap between them.</figcaption>
+            </figure>
+            <figure class="rw-cell">
+              <div class="triptych-head">
+                <span class="style-chip is-pos">s_group = +1</span>
+              </div>
+              <video muted playsinline preload="none" poster="static/videos/real/posters/group_pos.webp">
+                <source src="static/videos/real/group_pos.mp4" type="video/mp4">
+              </video>
+              <figcaption class="triptych-caption">Recognises the pair as a group and routes around the formation.</figcaption>
+            </figure>
+          </div>
+          <div class="sync-bar" data-sync-controls="rw-group">
+            <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+            <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+            <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+                   data-sync-scrub aria-label="Scrub both Group deference clips together">
+          </div>
+        </div>
+
+      <h3 class="rw-head">Two axes composed</h3>
+      <p class="rw-sub">
+        Proxemic conservatism against passing side, all four corners. The axes were
+        never demonstrated together; the combinations are produced at inference.
+      </p>
+      <div class="rw-matrix" data-sync-group="rw-comp">
+          <figure class="rw-cell">
+            <div class="triptych-head">
+              <span data-axis="prox" class="style-chip is-pos">prox +1</span>
+              <span data-axis="pass" class="style-chip is-neg">pass &minus;1</span>
+            </div>
+            <video muted playsinline preload="none" poster="static/videos/real/posters/comp_pm.webp">
+              <source src="static/videos/real/comp_pm.mp4" type="video/mp4">
+            </video>
+          </figure>
+          <figure class="rw-cell">
+            <div class="triptych-head">
+              <span data-axis="prox" class="style-chip is-pos">prox +1</span>
+              <span data-axis="pass" class="style-chip is-pos">pass +1</span>
+            </div>
+            <video muted playsinline preload="none" poster="static/videos/real/posters/comp_pp.webp">
+              <source src="static/videos/real/comp_pp.mp4" type="video/mp4">
+            </video>
+          </figure>
+          <figure class="rw-cell">
+            <div class="triptych-head">
+              <span data-axis="prox" class="style-chip is-neg">prox &minus;1</span>
+              <span data-axis="pass" class="style-chip is-neg">pass &minus;1</span>
+            </div>
+            <video muted playsinline preload="none" poster="static/videos/real/posters/comp_mm.webp">
+              <source src="static/videos/real/comp_mm.mp4" type="video/mp4">
+            </video>
+          </figure>
+          <figure class="rw-cell">
+            <div class="triptych-head">
+              <span data-axis="prox" class="style-chip is-neg">prox &minus;1</span>
+              <span data-axis="pass" class="style-chip is-pos">pass +1</span>
+            </div>
+            <video muted playsinline preload="none" poster="static/videos/real/posters/comp_mp.webp">
+              <source src="static/videos/real/comp_mp.mp4" type="video/mp4">
+            </video>
+          </figure>
+      </div>
+      <div class="sync-bar" data-sync-controls="rw-comp">
+        <button class="sync-btn" type="button" data-sync-play><svg class="ic ic-play" viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5l11 7-11 7z" fill="currentColor"/></svg><svg class="ic ic-pause" viewBox="0 0 24 24" aria-hidden="true"><path d="M7 5h3.5v14H7zM13.5 5H17v14h-3.5z" fill="currentColor"/></svg><span>Play all</span></button>
+        <button class="sync-btn" type="button" data-sync-restart><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 12a8 8 0 1 0 2.5-5.8M4 4v4h4" fill="none" stroke="currentColor" stroke-width="2.2" stroke-linecap="round" stroke-linejoin="round"/></svg><span>Restart</span></button>
+        <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
+               data-sync-scrub aria-label="Scrub all four composed clips together">
+      </div>
+
+      <h3 class="rw-head">Changing style during a run</h3>
+      <p class="rw-sub">
+        The style vector is rewritten mid-episode, with no reload and no retraining.
+        The behaviour changes from that moment on, which is what "set at deployment"
+        means in practice.
+      </p>
+      <div class="rw-single">
+        <figure class="rw-cell">
+          <video controls muted loop playsinline preload="none" poster="static/videos/real/posters/liveswitch.webp">
+            <source src="static/videos/real/liveswitch.mp4" type="video/mp4">
           </video>
-          <figcaption>
-            <b>Groups in the wild.</b> Deference to a real co-moving pair, which the
-            model must infer from motion alone.
-          </figcaption>
         </figure>
-
-        <figure class="media-item">
-          <video controls muted loop playsinline preload="metadata"
-                 data-slot="Real-world: style changed mid-run"
-                 data-slot-path="static/videos/real_style_switch.mp4"
-                 data-slot-hint="Optional but high-impact: change the style vector partway through a single continuous run and show the behavior change live. Your Conclusion names adaptive style selection as future work - this is the teaser for it.">
-            <source src="static/videos/real_style_switch.mp4" type="video/mp4">
-          </video>
-          <figcaption>
-            <b>Retuned mid-run.</b> The style vector is changed during a single
-            continuous deployment, with no reload and no retraining.
-          </figcaption>
-        </figure>
-
       </div>
     </div>
   </section>

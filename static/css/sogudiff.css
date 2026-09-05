@@ -265,21 +265,33 @@
 /* Each chip carries the robot colour that clip actually uses, so the label
    and the moving robot in the frame below it match. Dark shades take white
    text, light shades take a dark tint of the same hue. */
-.axis-panel[data-axis="prox"]  .style-chip.is-neg  { background: var(--prox-neg);  color: #fff; }
-.axis-panel[data-axis="prox"]  .style-chip.is-zero { background: var(--prox-mid);  color: #fff; }
-.axis-panel[data-axis="prox"]  .style-chip.is-pos  { background: var(--prox-pos);  color: #34155e; }
+[data-axis="prox"] .style-chip.is-neg,
+.style-chip[data-axis="prox"].is-neg  { background: var(--prox-neg);  color: #fff; }
+[data-axis="prox"] .style-chip.is-zero,
+.style-chip[data-axis="prox"].is-zero { background: var(--prox-mid);  color: #fff; }
+[data-axis="prox"] .style-chip.is-pos,
+.style-chip[data-axis="prox"].is-pos  { background: var(--prox-pos);  color: #34155e; }
 
-.axis-panel[data-axis="pass"]  .style-chip.is-neg  { background: var(--pass-neg);  color: #fff; }
-.axis-panel[data-axis="pass"]  .style-chip.is-zero { background: var(--pass-mid);  color: #fff; }
-.axis-panel[data-axis="pass"]  .style-chip.is-pos  { background: var(--pass-pos);  color: #0b3a5c; }
+[data-axis="pass"] .style-chip.is-neg,
+.style-chip[data-axis="pass"].is-neg  { background: var(--pass-neg);  color: #fff; }
+[data-axis="pass"] .style-chip.is-zero,
+.style-chip[data-axis="pass"].is-zero { background: var(--pass-mid);  color: #fff; }
+[data-axis="pass"] .style-chip.is-pos,
+.style-chip[data-axis="pass"].is-pos  { background: var(--pass-pos);  color: #0b3a5c; }
 
-.axis-panel[data-axis="yield"] .style-chip.is-neg  { background: var(--yield-neg); color: #fff; }
-.axis-panel[data-axis="yield"] .style-chip.is-zero { background: var(--yield-mid); color: #fff; }
-.axis-panel[data-axis="yield"] .style-chip.is-pos  { background: var(--yield-pos); color: #14401f; }
+[data-axis="yield"] .style-chip.is-neg,
+.style-chip[data-axis="yield"].is-neg  { background: var(--yield-neg); color: #fff; }
+[data-axis="yield"] .style-chip.is-zero,
+.style-chip[data-axis="yield"].is-zero { background: var(--yield-mid); color: #fff; }
+[data-axis="yield"] .style-chip.is-pos,
+.style-chip[data-axis="yield"].is-pos  { background: var(--yield-pos); color: #14401f; }
 
-.axis-panel[data-axis="group"] .style-chip.is-neg  { background: var(--group-neg); color: #fff; }
-.axis-panel[data-axis="group"] .style-chip.is-zero { background: var(--group-mid); color: #fff; }
-.axis-panel[data-axis="group"] .style-chip.is-pos  { background: var(--group-pos); color: #5a2a06; }
+[data-axis="group"] .style-chip.is-neg,
+.style-chip[data-axis="group"].is-neg  { background: var(--group-neg); color: #fff; }
+[data-axis="group"] .style-chip.is-zero,
+.style-chip[data-axis="group"].is-zero { background: var(--group-mid); color: #fff; }
+[data-axis="group"] .style-chip.is-pos,
+.style-chip[data-axis="group"].is-pos  { background: var(--group-pos); color: #5a2a06; }
 
 .triptych-head .cell-name {
   font-size: 0.85rem;
@@ -968,4 +980,102 @@ body.is-draft .draft-note code {
 
 @media screen and (max-width: 560px) {
   .cmp-grid { grid-template-columns: repeat(2, 1fr); }
+}
+
+
+/* --------------------------------------------------------------------------
+   Real-world deployment
+   Its own tab classes (.rw-tab / .rw-panel) rather than the explorer's, because
+   the explorer binds .axis-tab / .axis-panel document-wide and would otherwise
+   drive both blocks as one.
+   -------------------------------------------------------------------------- */
+
+.rw-head {
+  margin: 2.5rem 0 0.3rem;
+  font-size: 1.15rem;
+  font-weight: 700;
+  color: var(--text-primary);
+  text-align: center;
+}
+
+.rw-sub {
+  max-width: 68ch;
+  margin: 0 auto 1.1rem;
+  color: var(--text-secondary);
+  font-size: 0.92rem;
+  line-height: 1.65;
+  text-align: center;
+  text-wrap: pretty;
+}
+
+.rw-cell {
+  margin: 0;
+  border: 1px solid var(--hairline);
+  border-radius: var(--border-radius);
+  background: var(--surface);
+  overflow: hidden;
+  box-shadow: var(--shadow-sm);
+}
+
+/* 16:9 footage, unlike the square simulator renders. */
+.rw-cell video {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  background: #0f172a;
+}
+
+.rw-duo,
+.rw-pair {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.rw-matrix {
+  display: grid;
+  grid-template-columns: repeat(2, 1fr);
+  gap: 1rem;
+}
+
+.rw-single { max-width: 900px; margin: 0 auto; }
+
+.rw-tabs {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.6rem;
+  margin-bottom: 1.25rem;
+}
+
+.rw-tab {
+  padding: 0.55rem 1.3rem;
+  border: 1px solid var(--hairline);
+  border-radius: 999px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-family: inherit;
+  font-size: 0.92rem;
+  font-weight: 600;
+  cursor: pointer;
+  transition: var(--transition);
+}
+
+.rw-tab:hover { border-color: var(--tab-color, var(--primary-color)); color: var(--text-primary); }
+
+.rw-tab[aria-selected="true"] {
+  background: var(--tab-color, var(--primary-color));
+  border-color: var(--tab-color, var(--primary-color));
+  color: #fff;
+  box-shadow: var(--shadow-sm);
+}
+
+.rw-panel[hidden] { display: none; }
+
+.rw-cell .triptych-head { justify-content: center; gap: 0.4rem; }
+
+@media screen and (max-width: 780px) {
+  .rw-duo,
+  .rw-pair,
+  .rw-matrix { grid-template-columns: 1fr; }
 }
