@@ -51,12 +51,6 @@
 
 .publication-affiliations sup { margin-right: 0.15rem; font-weight: 700; }
 
-.footer .funding {
-  margin-top: 0.75rem;
-  font-size: 0.82rem;
-  color: var(--text-light);
-}
-
 .venue-badge {
   display: inline-block;
   margin-top: 0.6rem;

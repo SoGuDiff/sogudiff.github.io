@@ -236,22 +236,56 @@ Because the site is at a domain root, `robots.txt` is read by crawlers and
 
 ---
 
-## When the preprint is posted
+## Updating the page as the paper progresses
 
-Four things are deliberately left undone until there is an arXiv entry, because
-each would otherwise point at something that does not exist:
+The page is built to pass through three states without restructuring: pending,
+preprint, and published. The hero carries **two** paper buttons for exactly
+this reason — **Paper** is the venue's official version, **arXiv** is the
+preprint — so once both exist they coexist rather than one replacing the other.
 
-1. The **Paper** and **arXiv** buttons in the hero — remove `is-pending` and
-   `aria-disabled`, give them real `href`s, and delete the "The paper links go
-   live when the preprint is posted" note beneath them
-2. `<meta name="citation_pdf_url">` in the head — Google Scholar requires it to
-   resolve to a real PDF, so it is absent rather than pointing at a 404
-3. `datePublished` and `publisher` in the JSON-LD block
-4. The BibTeX entry — add `eprint`, `archivePrefix` and `primaryClass`
+Everything below is in `index.html` unless noted. Find the current state with:
 
 ```bash
-grep -n "is-pending" index.html
+grep -n "is-pending\|venue-badge\|citation_\|datePublished" index.html
 ```
+
+### Now: no arXiv entry yet
+
+Four things are deliberately left undone, because each would otherwise point at
+something that does not exist:
+
+- The **Paper** and **arXiv** buttons carry `is-pending` and `aria-disabled`,
+  with a note beneath them
+- `<meta name="citation_pdf_url">` is absent — Google Scholar requires it to
+  resolve to a real PDF, and a 404 there is worse than omitting it
+- `datePublished` and `publisher` are absent from the JSON-LD
+- BibTeX is a plain `@misc` pointing at this site
+
+### Stage 1 — the preprint goes up
+
+1. **arXiv button** — real `href`, drop `is-pending`, `aria-disabled` and
+   `tabindex="-1"`, add `target="_blank" rel="noopener"`
+2. Delete the "The paper links go live when the preprint is posted" note. Leave
+   the Paper button pending; it is the venue version, which does not exist yet
+3. Add `<meta name="citation_pdf_url" content="https://arxiv.org/pdf/XXXXX">`
+4. JSON-LD: add `"datePublished"` (the arXiv submission date) and
+   `"publisher": { "@type": "Organization", "name": "arXiv" }`
+5. BibTeX: keep `@misc`, add `eprint`, `archivePrefix = {arXiv}` and
+   `primaryClass = {cs.RO}`
+6. Venue badge stays **Preprint · 2026**
+
+### Stage 2 — accepted at a venue
+
+1. **Paper button** — point at the official version and drop `is-pending`
+2. Venue badge → the venue and year, e.g. `IROS 2026`
+3. Add `<meta name="citation_conference_title">` (or `citation_journal_title`
+   for a journal), and point `citation_pdf_url` at whichever version should be
+   indexed — usually the venue's
+4. JSON-LD: `publisher` becomes the venue, `datePublished` the publication date
+5. BibTeX: `@misc` → `@inproceedings` (or `@article`) with `booktitle`,
+   `pages` and `publisher`; keep the `eprint` field so the preprint stays
+   findable
+6. `sitemap.xml`: bump `<lastmod>`
 
 ---
 
