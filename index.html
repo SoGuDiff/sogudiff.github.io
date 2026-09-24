@@ -4,33 +4,19 @@
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
 
-  <!-- ======================================================================
-       ANONYMITY / RELEASE SWITCHES
-       This page is currently configured for double-blind review:
-         * no author names, affiliations, or personal links
-         * no lab "More Works" list (it would deanonymize instantly)
-         * robots = noindex, nofollow  (search engines told to stay away)
-       BEFORE PUBLIC RELEASE, search this file for "RELEASE:" and act on each
-       one. Appending ?draft to the URL renders the same list on the page itself.
-       The live URL is already set throughout: https://sogudiff.github.io/
-       ====================================================================== -->
 
-  <!-- RELEASE: change to "index, follow" once the paper is public. Until then
-       this is what keeps an unpublished paper out of Google's index. -->
-  <meta name="robots" content="noindex, nofollow">
+  <meta name="robots" content="index, follow">
 
   <!-- Primary Meta Tags -->
   <meta name="title" content="SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation">
   <meta name="description" content="A diffusion navigation planner whose social behavior is set at deployment along four continuous style axes - proxemic, passing side, yielding, and group deference - composed at inference without retraining.">
   <meta name="keywords" content="social robot navigation, diffusion planning, classifier-free guidance, compositional generation, crowd navigation, proxemics, imitation learning, trajectory optimization, robotics, steerable policies">
-  <!-- RELEASE: add author names here. -->
-  <meta name="author" content="Anonymous Authors">
+  <meta name="author" content="Christian Schaible, Haoran Ji, Yash Vardhan Pant, Stephen L. Smith">
   <meta name="language" content="English">
 
   <!-- Open Graph / Facebook -->
   <meta property="og:type" content="article">
-  <!-- RELEASE: replace with your institution or lab name. -->
-  <meta property="og:site_name" content="SoGuDiff">
+  <meta property="og:site_name" content="University of Waterloo">
   <meta property="og:title" content="SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation">
   <meta property="og:description" content="A diffusion navigation planner whose social behavior is set at deployment along four continuous style axes, composed at inference without retraining.">
   <meta property="og:url" content="https://sogudiff.github.io/">
@@ -44,24 +30,20 @@
 
   <!-- Twitter -->
   <meta name="twitter:card" content="summary_large_image">
-  <!-- RELEASE: add lab / author handles, or delete these two lines. -->
   <meta name="twitter:title" content="SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation">
   <meta name="twitter:description" content="A diffusion navigation planner whose social behavior is set at deployment along four continuous style axes, composed at inference without retraining.">
   <meta name="twitter:image" content="https://sogudiff.github.io/static/images/social_preview.png">
   <meta name="twitter:image:alt" content="SoGuDiff - four social style axes steering a diffusion navigation planner">
 
-  <!-- Google Scholar indexing.
-       RELEASE: uncomment and complete once the paper is public. Scholar
-       treats an incomplete citation_author list as a reason to skip the
-       page, so leave these commented rather than filled with placeholders. -->
+  <!-- Google Scholar indexing. citation_pdf_url is deliberately absent: it
+       must resolve to a real PDF, and pointing it at one that 404s is worse
+       than omitting it. Add it with the arXiv PDF once the preprint is up. -->
   <meta name="citation_title" content="SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation">
-  <!--
-  <meta name="citation_author" content="LAST, FIRST">
-  <meta name="citation_author" content="LAST, FIRST">
+  <meta name="citation_author" content="Schaible, Christian">
+  <meta name="citation_author" content="Ji, Haoran">
+  <meta name="citation_author" content="Pant, Yash Vardhan">
+  <meta name="citation_author" content="Smith, Stephen L.">
   <meta name="citation_publication_date" content="2026">
-  <meta name="citation_conference_title" content="CONFERENCE_NAME">
-  <meta name="citation_pdf_url" content="https://sogudiff.github.io/static/pdfs/sogudiff.pdf">
-  -->
 
   <meta name="theme-color" content="#1b2a4a">
   <meta name="msapplication-TileColor" content="#1b2a4a">
@@ -102,14 +84,26 @@
   <script defer src="static/js/index.js"></script>
   <script defer src="static/js/sogudiff.js"></script>
 
-  <!-- Structured data.
-       RELEASE: fill in author, datePublished, publisher, and url. Kept
-       minimal for now so nothing false is asserted while under review. -->
+  <!-- Structured data. datePublished and publisher are deliberately absent
+       until the preprint is posted; nothing here should assert a publication
+       that has not happened. -->
   <script type="application/ld+json">
   {
     "@context": "https://schema.org",
     "@type": "ScholarlyArticle",
     "headline": "SoGuDiff: Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation",
+    "url": "https://sogudiff.github.io/",
+    "author": [
+      { "@type": "Person", "name": "Christian Schaible",
+        "affiliation": { "@type": "Organization", "name": "University of Waterloo" } },
+      { "@type": "Person", "name": "Haoran Ji",
+        "affiliation": { "@type": "Organization", "name": "McMaster University" } },
+      { "@type": "Person", "name": "Yash Vardhan Pant",
+        "affiliation": { "@type": "Organization", "name": "University of Waterloo" } },
+      { "@type": "Person", "name": "Stephen L. Smith",
+        "affiliation": { "@type": "Organization", "name": "University of Waterloo" } }
+    ],
+    "codeRepository": "https://github.com/schaiblc/SoGuDiff",
     "description": "A diffusion navigation planner whose social behavior is set at deployment along four continuous style axes - proxemic conservatism, passing side, yielding disposition, and group deference - steered independently and composed at inference through per-axis classifier-free guidance.",
     "image": "https://sogudiff.github.io/static/images/social_preview.png",
     "keywords": [
@@ -137,10 +131,6 @@
     <svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path d="M6 15l6-6 6 6" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>
   </button>
 
-  <!-- NOTE: the template's "More Works" lab dropdown has been removed. It
-       links to a lab's other papers and would break double-blind review.
-       RELEASE: re-add it from the upstream template if you want it. -->
-
   <main id="main-content">
 
   <!-- ====================== HERO ====================== -->
@@ -156,23 +146,24 @@
               Steerable, Norm-Grounded Robot Navigation
             </h1>
 
-            <!-- RELEASE: replace the anonymous block with author names,
-                 affiliations, and personal links; replace "Paper under review"
-                 and the venue badge below it with the real venue and year. -->
             <div class="is-size-5 publication-authors">
-              <span class="author-block">Anonymous Authors</span>
+              <span class="author-block">Christian Schaible<sup>1</sup>,</span>
+              <span class="author-block">Haoran Ji<sup>2</sup>,</span>
+              <span class="author-block">Yash Vardhan Pant<sup>1</sup>,</span>
+              <span class="author-block">Stephen L. Smith<sup>1</sup></span>
             </div>
 
-            <div class="is-size-5 publication-authors">
-              <span class="author-block">Paper under review</span>
+            <div class="is-size-6 publication-affiliations">
+              <span class="affiliation"><sup>1</sup>Department of Electrical and Computer Engineering, University of Waterloo</span>
+              <span class="affiliation"><sup>2</sup>Department of Computing and Software, McMaster University</span>
             </div>
 
-            <span class="venue-badge">Under double-blind review &middot; 2026</span>
+            <span class="venue-badge">Preprint &middot; 2026</span>
 
             <div class="column has-text-centered">
               <div class="publication-links">
 
-                <!-- RELEASE: point at the real PDF and drop is-pending. -->
+                <!-- Paper and arXiv go live when the preprint is posted. -->
                 <span class="link-block">
                   <a href="#" class="external-link button is-normal is-rounded is-dark is-pending"
                      aria-disabled="true" tabindex="-1">
@@ -181,7 +172,6 @@
                   </a>
                 </span>
 
-                <!-- RELEASE: point at the arXiv abstract and drop is-pending. -->
                 <span class="link-block">
                   <a href="#" class="external-link button is-normal is-rounded is-dark is-pending"
                      aria-disabled="true" tabindex="-1">
@@ -196,20 +186,17 @@
                   </a>
                 </span>
 
-                <!-- RELEASE: point at the code repo and drop is-pending. -->
                 <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark is-pending"
-                     aria-disabled="true" tabindex="-1">
+                  <a href="https://github.com/schaiblc/SoGuDiff" target="_blank" rel="noopener"
+                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M12 .297c-6.63 0-12 5.373-12 12 0 5.303 3.438 9.8 8.205 11.385.6.113.82-.258.82-.577 0-.285-.01-1.04-.015-2.04-3.338.724-4.042-1.61-4.042-1.61C4.422 18.07 3.633 17.7 3.633 17.7c-1.087-.744.084-.729.084-.729 1.205.084 1.838 1.236 1.838 1.236 1.07 1.835 2.809 1.305 3.495.998.108-.776.417-1.305.76-1.605-2.665-.3-5.466-1.332-5.466-5.93 0-1.31.465-2.38 1.235-3.22-.135-.303-.54-1.523.105-3.176 0 0 1.005-.322 3.3 1.23.96-.267 1.98-.399 3-.405 1.02.006 2.04.138 3 .405 2.28-1.552 3.285-1.23 3.285-1.23.645 1.653.24 2.873.12 3.176.765.84 1.23 1.91 1.23 3.22 0 4.61-2.805 5.625-5.475 5.92.42.36.81 1.096.81 2.22 0 1.606-.015 2.896-.015 3.286 0 .315.21.69.825.57C20.565 22.092 24 17.592 24 12.297c0-6.627-5.373-12-12-12"/></svg></span>
                     <span>Code</span>
                   </a>
                 </span>
 
-                <!-- RELEASE: point at the YouTube video of the real-world demos
-                     and drop is-pending. -->
                 <span class="link-block">
-                  <a href="#" class="external-link button is-normal is-rounded is-dark is-pending"
-                     aria-disabled="true" tabindex="-1">
+                  <a href="https://youtu.be/wsqTSdGBZrw" target="_blank" rel="noopener"
+                     class="external-link button is-normal is-rounded is-dark">
                     <span class="icon"><svg class="ic" viewBox="0 0 24 24" aria-hidden="true"><path fill="currentColor" d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg></span>
                     <span>Video</span>
                   </a>
@@ -217,24 +204,10 @@
 
               </div>
 
-              <!-- RELEASE: delete this line once the four buttons above point
-                   somewhere real. -->
               <p class="link-note">
-                Links become active on publication.
+                The paper links go live when the preprint is posted.
               </p>
 
-              <!-- RELEASE: delete this note, the .draft-note / .draft-banner
-                   rules in sogudiff.css, and the draft-mode block at the top of
-                   sogudiff.js. It is hidden unless ?draft is in the URL, so it
-                   is invisible to visitors, but it has no purpose once the page
-                   is public. -->
-              <div class="draft-note">
-                <b>Draft note.</b> The <code>RELEASE:</code> markers in
-                <code>index.html</code> gate everything that must change before this
-                page goes public: robots meta, author block, four link buttons,
-                Scholar citation tags, JSON-LD, canonical URL, the BibTeX entry, and
-                this note. Run <code>grep -n "RELEASE:" index.html</code> to list them.
-              </div>
             </div>
 
           </div>
@@ -932,12 +905,6 @@
         <input class="sync-scrub" type="range" min="0" max="1000" value="0" step="1"
                data-sync-scrub aria-label="Scrub all four composition clips together">
       </div>
-
-      <div class="draft-note">
-        <b>Draft note.</b> Style vectors above were read off each clip's own title bar,
-        so they match the runs exactly. If you re-render these videos, re-check the
-        vectors here.
-      </div>
     </div>
   </section>
 
@@ -1172,13 +1139,13 @@
           <span class="copy-text">Copy</span>
         </button>
       </div>
-      <!-- RELEASE: replace with the real citation once published. -->
-      <pre id="bibtex-code"><code>@misc{sogudiff2026,
+      <pre id="bibtex-code"><code>@misc{schaible2026sogudiff,
   title  = {SoGuDiff: Socially Guided Diffusion for Steerable,
             Norm-Grounded Robot Navigation},
-  author = {Anonymous Authors},
+  author = {Schaible, Christian and Ji, Haoran and
+            Pant, Yash Vardhan and Smith, Stephen L.},
   year   = {2026},
-  note   = {Under review}
+  url    = {https://sogudiff.github.io/}
 }</code></pre>
     </div>
   </section>
@@ -1190,6 +1157,13 @@
       <div class="columns is-centered">
         <div class="column is-8">
           <div class="content">
+            <p class="funding">
+              This research is supported in part by the Natural Sciences and
+              Engineering Research Council of Canada (NSERC). Resources used in
+              preparing this research were provided, in part, by the Province of
+              Ontario, the Government of Canada through CIFAR, and companies
+              sponsoring the Vector Institute.
+            </p>
             <p>
               This website was constructed using the
               <a href="https://github.com/eliahuhorwitz/Academic-project-page-template" target="_blank" rel="noopener">Academic Project Page Template</a>.

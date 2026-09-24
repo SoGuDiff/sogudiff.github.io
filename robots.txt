@@ -1,19 +1,14 @@
 # SoGuDiff project page — https://sogudiff.github.io/
 #
-# This is an organization site, served from the domain root, so crawlers do
-# read this file. (A project page at github.io/<repo>/ would serve it under
-# that subpath, where it is never fetched.)
+# An organization site is served from the domain root, so crawlers read this
+# file. (A project page at github.io/<repo>/ would serve it under that subpath,
+# where it is never fetched.)
 
-# RELEASE: while the paper is unpublished this mirrors the noindex meta in
-# index.html. Flip both together: delete the two lines below, and uncomment
-# the block beneath them.
 User-agent: *
-Disallow: /
+Allow: /
 
-# Once public. Crawling 27 MB of demonstration video gains a search engine
-# nothing and costs bandwidth; the page itself is what should be indexed.
-#User-agent: *
-#Allow: /
-#Disallow: /static/videos/
+# Crawling 27 MB of demonstration video gains a search engine nothing and costs
+# bandwidth; the page itself is what should be indexed.
+Disallow: /static/videos/
 
 Sitemap: https://sogudiff.github.io/sitemap.xml

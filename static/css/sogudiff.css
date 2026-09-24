@@ -37,6 +37,26 @@
   line-height: 1.22;
 }
 
+.publication-affiliations {
+  margin-top: 0.35rem;
+  color: var(--text-secondary);
+  line-height: 1.6;
+}
+
+.publication-affiliations .affiliation {
+  display: inline-block;
+  margin: 0 0.6rem;
+  font-size: 0.92rem;
+}
+
+.publication-affiliations sup { margin-right: 0.15rem; font-weight: 700; }
+
+.footer .funding {
+  margin-top: 0.75rem;
+  font-size: 0.82rem;
+  color: var(--text-light);
+}
+
 .venue-badge {
   display: inline-block;
   margin-top: 0.6rem;
@@ -379,45 +399,6 @@
 
 /* For a lead short enough to sit on one line, given the room. */
 .section-lead.is-wide { max-width: 88ch; }
-
-/* --------------------------------------------------------------------------
-   Editorial notes — visible only when the page is served with ?draft
-   so you can audit what is still unfilled, then share without the clutter.
-   -------------------------------------------------------------------------- */
-
-.draft-note { display: none; }
-
-body.is-draft .draft-note {
-  display: block;
-  margin: 0.9rem auto 0;
-  max-width: 70ch;
-  padding: 0.75rem 1rem;
-  border: 1px dashed #f59e0b;
-  border-radius: 8px;
-  background: #fffbeb;
-  color: #92400e;
-  font-size: 0.83rem;
-  line-height: 1.55;
-  text-align: left;
-}
-
-body.is-draft .draft-note code {
-  background: rgba(146, 64, 14, 0.1);
-  padding: 0.1rem 0.35rem;
-  border-radius: 4px;
-}
-
-.draft-banner {
-  position: sticky;
-  top: 0;
-  z-index: 60;
-  padding: 0.5rem 1rem;
-  background: #92400e;
-  color: #fff;
-  font-size: 0.85rem;
-  font-weight: 600;
-  text-align: center;
-}
 
 /* --------------------------------------------------------------------------
    Responsive

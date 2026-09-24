@@ -180,6 +180,12 @@ as 216/232/236/253/263).
 Per-panel outcomes are stored in the `OUTCOMES` table in the comparison block of
 `static/js/sogudiff.js`. Re-rendering the clips means updating that table.
 
+### Composition style vectors
+
+The `[x, x, x, x]` vectors shown on the composition cards were read off each
+clip's own title bar, so they match the runs exactly. Re-check them if those
+videos are re-rendered.
+
 ### Synchronized playback
 
 The triptychs, the composition grid and the real-world pairs each form a sync
@@ -227,6 +233,25 @@ named `sogudiff.github.io`. Settings → Pages → *Deploy from a branch*,
 Because the site is at a domain root, `robots.txt` is read by crawlers and
 `sitemap.xml` is discovered through it — neither would be true from a
 `github.io/<repo>/` project page.
+
+---
+
+## When the preprint is posted
+
+Four things are deliberately left undone until there is an arXiv entry, because
+each would otherwise point at something that does not exist:
+
+1. The **Paper** and **arXiv** buttons in the hero — remove `is-pending` and
+   `aria-disabled`, give them real `href`s, and delete the "The paper links go
+   live when the preprint is posted" note beneath them
+2. `<meta name="citation_pdf_url">` in the head — Google Scholar requires it to
+   resolve to a real PDF, so it is absent rather than pointing at a 404
+3. `datePublished` and `publisher` in the JSON-LD block
+4. The BibTeX entry — add `eprint`, `archivePrefix` and `primaryClass`
+
+```bash
+grep -n "is-pending" index.html
+```
 
 ---
 

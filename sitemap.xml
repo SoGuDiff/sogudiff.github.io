@@ -1,7 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <!-- One page, so one entry. Served from the domain root, so Google finds this
-     through the Sitemap line in robots.txt; no manual submission needed.
-     RELEASE: set <lastmod> to the publication date. -->
+     through the Sitemap line in robots.txt; no manual submission needed. -->
 <urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
   <url>
     <loc>https://sogudiff.github.io/</loc>

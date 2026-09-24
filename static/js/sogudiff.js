@@ -9,20 +9,6 @@
   'use strict';
 
   /* ----------------------------------------------------------------------
-     Draft mode: append ?draft to the URL to reveal the editorial notes
-     marking everything still unfilled. Off by default so the page can be
-     shared as-is.
-     ---------------------------------------------------------------------- */
-  if (/[?&]draft\b/.test(window.location.search)) {
-    document.body.classList.add('is-draft');
-    var banner = document.createElement('div');
-    banner.className = 'draft-banner';
-    banner.textContent =
-      'Draft mode — editorial notes visible. Remove ?draft from the URL to preview the page as visitors see it.';
-    document.body.insertBefore(banner, document.body.firstChild);
-  }
-
-  /* ----------------------------------------------------------------------
      Synchronized playback groups
      Every [data-sync-group] contains videos that should play as one. The
      group's controls live in [data-sync-controls] with a matching name.
