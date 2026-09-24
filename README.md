@@ -1,286 +1,52 @@
 # SoGuDiff — Project Website
 
-Project page for *SoGuDiff: Socially Guided Diffusion for Steerable,
-Norm-Grounded Robot Navigation*.
+Source for <https://sogudiff.github.io/>, the project page for *SoGuDiff:
+Socially Guided Diffusion for Steerable, Norm-Grounded Robot Navigation*.
 
-Static site: plain HTML, CSS and vanilla JS. No build step, no npm, no
-dependencies to install.
+Code for the method itself lives at
+<https://github.com/schaiblc/SoGuDiff>.
 
-> **This repo is private and the page is configured for double-blind review.**
-> There are no author names, no affiliations, no lab links, and the page asks
-> search engines not to index it. See [Before going public](#before-going-public).
+Static site: plain HTML, CSS and vanilla JS. No build step, no npm, nothing to
+install.
 
 ---
 
-## Viewing it locally
+## Running it locally
 
 ```bash
-git clone <repo-url>
-cd project_website
+git clone git@github.com:SoGuDiff/sogudiff.github.io.git
+cd sogudiff.github.io
 python3 -m http.server 8000
 ```
 
-Open <http://localhost:8000>.
-
-Open `file://.../index.html` directly works too, but a couple of things behave
-differently (clipboard copy needs a secure context), so the local server is
-preferred.
-
-### Draft mode
-
-Append `?draft` to the URL — <http://localhost:8000/?draft> — to reveal the
-editorial notes marking everything still unfilled, plus a banner. Without the
-flag the page renders exactly as a visitor would see it. Nothing in draft mode
-is visible to a normal viewer.
-
-Draft mode is itself pre-publication scaffolding: one of the `RELEASE:` markers
-says to delete it, along with the `.draft-note` / `.draft-banner` rules and the
-draft block at the top of `sogudiff.js`.
-
----
-
-## Assets
-
-Everything the page references is in place. Nothing is a placeholder — the
-build-time scaffolding that used to draw a dashed box in place of a missing
-video has been removed now that every asset exists.
-
-### The teaser
-
-The teaser is five renders sharing one camera and one pixel size, stacked on
-top of each other in `static/images/`:
-
-| File | Contents |
-| --- | --- |
-| `teaser_base.webp` | The scene: room, floor, the three pedestrians, their motion arrows, the goal flag, the robot. No trajectories, no legend. |
-| `teaser_neutral.webp` | Neutral's three curves — dashed samples, selected, projected — transparent background. |
-| `teaser_cautious.webp` | Cautious & Yielding. |
-| `teaser_assertive.webp` | Assertive & Group-Agnostic. |
-| `teaser_nonyield.webp` | Non-Yielding & Right-Side Passing. |
-| `teaser_robot.webp` | The robot alone, transparent background, so it sits **above** the trajectories and the paths appear to leave from behind it. Currently derived from `teaser_base.webp` by keying out the floor colour; replace it with a proper render if you re-export. |
-
-The four style layers are **visible by default**, so with JavaScript disabled
-the teaser is the figure exactly as printed in the paper. Script adds
-`.is-interactive` to the stage, which dims them and brings one back at a time,
-cycling every `DWELL` milliseconds and ending on "All four". Hovering holds the
-current style; clicking one in the legend stops the cycle for good.
-
-Layer order is base, then the four trajectory layers, then the robot.
-
-The legend is HTML, not pixels, so it stays sharp and is clickable. The four
-styles sit in a 2x2 grid; each row carries that style's own line key — dashed
-samples, solid selected, thick projected — and its four axis values written
-out (`prox +1`, `pass 0`, and so on) rather than as a bare vector, since the
-teaser is the first thing a reader meets and the notation has not been
-introduced yet. A key row underneath names the three line weights, the goal
-flag and the pedestrian motion arrows.
-
-The figure is capped at 780px wide rather than filling the container: at 1.6:1
-it otherwise pushes the abstract a long way down the page. The renders are
-1600px wide, so that is still a little over 2x for sharpness. Colors and values
-live in the teaser markup in `index.html`; `DWELL` is in the teaser block of
-`static/js/sogudiff.js`.
-
-To re-render: keep one camera and one pixel size across all six files, since
-they are stacked directly. Replacing them needs no code changes.
-
-They are **WebP**, not PNG. These are photographic 3D renders, which PNG stores
-badly: the set was 711 KB as PNG and is 128 KB as WebP at quality 88, with the
-alpha channel kept lossless so the trajectory layers still composite cleanly.
-Convert with:
-
-```bash
-cwebp -q 88 -alpha_q 100 teaser_base.png -o static/images/teaser_base.webp
-```
-
-`social_preview.png` deliberately stays PNG — social-card crawlers do not all
-read WebP.
-
-### Real-world clips (in `static/videos/real/`)
-
-Fifteen clips from the Jackal deployment, all 1280x720:
-
-| Files | Shown as |
-| --- | --- |
-| `neutral1`, `neutral2` | Two unstructured runs, three pedestrians, neutral style |
-| `prox_pos/neg`, `pass_pos/neg`, `yield_pos/neg`, `group_pos/neg` | Tabbed per axis, the two ends side by side and synced |
-| `comp_pp`, `comp_pm`, `comp_mp`, `comp_mm` | A 2x2 matrix of proxemic against passing side, all four synced |
-| `liveswitch` | The style vector rewritten mid-episode |
-
-The originals were 1080p30 at roughly 2 MB/s with AAC audio — **534 MB for the
-set**. Re-encoded to 720p at CRF 25 with audio stripped they come to about
-20 MB, with the occupancy-map inset and the trajectory overlay still crisp
-(checked against the originals frame by frame before settling on the setting).
-Every clip on the page is muted, so the audio was pure weight. The 1080p
-originals are kept outside the repo, in `../real_world_source_1080p/`, so
-clips can be re-encoded without re-recording.
-
-They are `preload="none"` and only fetched when their tab or block is first
-scrolled to; loading fifteen 720p files up front would dwarf the rest of the
-page. Posters in `static/videos/real/posters/` are WebP stills taken a third of
-the way in, so a panel shows the interaction rather than an empty room before
-it plays.
-
-The real-world tabs use `.rw-tab` / `.rw-panel` rather than the simulated
-explorer's `.axis-tab` / `.axis-panel`, because that explorer queries its
-classes across the whole document and would otherwise drive both blocks at once.
-
-### Video encoding
-
-Keep clips web-friendly, or the page gets slow:
-
-```bash
-ffmpeg -i input.mp4 -c:v libx264 -profile:v main -pix_fmt yuv420p \
-       -crf 26 -preset slow -movflags +faststart -an output.mp4
-```
-
-- `-movflags +faststart` matters: without it the browser downloads the whole
-  file before the first frame appears.
-- `-an` strips audio. All clips here are silent; audio only adds bytes.
-- Target under ~5 MB per clip. Anything over ~10 MB belongs on YouTube instead.
-- GitHub refuses files over 100 MB and warns over 50 MB.
-
-### Poster frames
-
-Every existing clip has a poster in `static/videos/posters/` so a still shows
-before the video loads. Regenerate for a new clip with:
-
-```bash
-ffmpeg -i static/videos/NAME.mp4 -vf "select=eq(n\,10)" -vframes 1 -q:v 4 \
-       static/videos/posters/NAME.jpg
-```
-
-Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>` tag.
+Open <http://localhost:8000>. Opening `index.html` over `file://` mostly works,
+but the clipboard copy needs a secure context and the method figure cannot be
+fetched for inlining, so the local server is preferred.
 
 ---
 
 ## Layout of the page
 
-1. **Hero** — title, anonymous author block, inert Paper/arXiv/Code/Video buttons
+1. **Hero** — title, authors, links
 2. **Teaser** — the layered interactive Fig. 1
-3. **Abstract** — verbatim from the paper
+3. **Abstract**
 4. **How It Works** — an animated ten-step walkthrough of the architecture
 5. **The Style Vector** — four cards explaining the axes and what ±1 mean
 6. **Neutral Style and Baseline Comparisons** — 11 methods × 5 scenes, synced,
-   with per-panel outcomes. Sits here because it shows the planner with every
-   axis at its default, which is the reference the styled behaviour below is
-   measured against.
-7. **Steering One Axis at a Time** — tabbed explorer; per axis, the −1 / 0 / +1
-   clips play in step with shared play / restart / scrub controls
+   with per-panel outcomes. It sits here because it shows the planner with
+   every axis at its default, which is the reference the styled behaviour
+   below is measured against.
+7. **Steering One Axis at a Time** — tabbed explorer; per axis the −1 / 0 / +1
+   clips play in step under shared play / restart / scrub controls
 8. **Composing Axes at Inference** — the four composed-style runs, also synced
 9. **Real-World Deployment** — unstructured neutral runs, the four axes tabbed
-   with both ends synced, a 2x2 composed matrix, and a live style switch
+   with both ends synced, a 2×2 composed matrix, and a live style switch
 10. **BibTeX** and footer
 
-### The animated walkthrough
-
-"How It Works" shows `static/images/method_overview.svg` — the manuscript's own
-vector export, **unmodified**. On load the page fetches that file and swaps the
-`<img>` for the same SVG inlined, which makes each shape in it addressable.
-A step then simply lights its own shapes and dims the rest.
-
-Ten steps, five on training and five on deployment, with autoplay on
-scroll-into-view, pause on scroll-away, prev / play / next controls and
-clickable step dots.
-
-Selecting **shapes** rather than rectangular areas is the point: a box, an
-arrow or a label is always either wholly lit or wholly dim, so nothing is ever
-clipped halfway through — which rectangles could not avoid, since they have no
-relationship to the artwork underneath them.
-
-To edit it, everything lives in the `STEPS` array in `static/js/sogudiff.js`:
-
-```js
-{ phase: 'a', at: [9, [41, 42], 68, 71], title: '...', body: '...' }
-```
-
-- `phase` is `'a'` (training) or `'b'` (deployment); it only drives the
-  Training/Deployment pill.
-- `at` lists shapes by their position among the figure's top-level elements.
-  `[a, b]` is an inclusive range. Index 0 is the white page backing and is
-  never dimmed.
-- `DWELL` sets the milliseconds per step.
-
-#### Editing the steps
-
-Change the `at` list for a step. Numbers are positions among the figure's
-top-level elements, so to find the one you want, render the figure with each
-element labelled:
-
-```python
-# from the repo root, with the SVG open in any text editor:
-#   the Nth top-level child of the single <g> is element N (0 is the backing)
-```
-
-A drag-and-drop picker for this lived at `tools/region-picker.html` and was
-removed when the repo was tidied for publication — it is in the git history if
-the steps ever need reworking wholesale:
-
-```bash
-git log --diff-filter=D --name-only -- tools/region-picker.html
-git checkout <commit>^ -- tools/region-picker.html
-```
-
-#### The one edit made to the figure
-
-`method_overview.svg` carries a single added element, `#dg-input-riser`, at the
-very end. The figure draws each of the three return paths as one element that
-runs along the loop's bottom horizontal *and* then up into its net, so the
-vertical could not be lit without dragging the horizontal along with it. The
-added element is that vertical on its own. It lies exactly under the existing
-paths, so it is invisible in the figure as drawn, and it exists only so step 7
-can light the input rising into the nets while step 9 keeps the loop.
-**Re-add it after re-exporting the figure**, or drop it from step 7.
-
-If the figure is re-exported from Lucidchart, the element order can change, so
-re-check the steps in the picker — the **Select nothing-assigned shapes**
-button makes gaps obvious. If the SVG cannot be fetched at all (opening the
-page over `file://`, for instance) the figure stays a plain `<img>` and reads
-as a normal static diagram.
-
-### The baseline comparison
-
-`static/videos/compare/<method>_scene<N>.mp4` — 11 methods × 5 scenes, already
-in place. These are scenes **215, 231, 235, 252, 262** of the randomized
-evaluation set behind the paper's baseline table (the renderer labels episodes
-1-indexed, so those display as 216/232/236/253/263).
-
-They were produced by new, self-contained infrastructure in
-`CrowdNav_DiffusionEnv/crowd_nav/`: `test_evaluateWEB5.py` plus
-`test_evalWEB5_{BASELINES,SOGUDIFF,SICNAV}.slurm`. **`crowd_sim.py` is not
-modified** — the caption, the legend and the attention overlay are overridden
-from inside that script and only when `--cases` is passed, so every other job
-in that repo behaves exactly as before.
-
-Outcomes are baked into the `OUTCOMES` table in the comparison block of
-`static/js/sogudiff.js`. Re-running the clips means updating that table; the
-job logs print a `Test N: ... | <outcome> |` line per episode.
-
-### Synchronized playback
-
-The triptychs and the composition grid each form a sync group. The clips in a
-group share one wall-clock timeline: a clip that finishes early **holds on its
-last frame** until every clip in the group has finished, and only then do they
-all restart together. Individual `loop` attributes would break that alignment,
-so synced clips deliberately do not carry one — the standalone slot videos in
-the later sections still do, since they play independently.
-
-### Axis colors
-
-Each axis is drawn in the clips with a matplotlib sequential colormap that
-darkens from +1 to −1: **prox = Purples, pass = Blues, yield = Greens,
-group = Oranges**. The style chips and the explorer tabs in `sogudiff.css`
-are set to the exact shades sampled from the robot marker in the clips, so
-the page and the videos agree. If you re-render the videos with a different
-colormap, update the `--prox-*` / `--pass-*` / `--yield-*` / `--group-*`
-variables at the top of that file.
-
-### Scope
-
-Beyond the two figures above, the page deliberately does **not** reproduce the
-paper's tables or results plots. It carries the video evidence that would not
-fit in the page limit, and the captions describe what each clip does rather
-than restating numbers the paper already reports.
+The page deliberately does **not** reproduce the paper's tables or results
+plots. It carries the video evidence that did not fit in the page limit, and
+the captions describe what each clip does rather than restating numbers the
+paper already reports.
 
 ---
 
@@ -288,22 +54,29 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
-robots.txt                    crawl rules; works, this is a domain root
+robots.txt                    crawl rules (this is a domain root, so they apply)
 sitemap.xml                   one entry, pointed at from robots.txt
-static/css/index.css          template base styles (trimmed, see below)
+static/css/index.css          template base styles, trimmed
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
 static/js/index.js            BibTeX copy + scroll-to-top
 static/js/sogudiff.js         axis tabs, synchronized playback, walkthrough, teaser
 static/images/favicon.svg     source for the favicon
 static/images/favicon.ico     generated: rsvg-convert + ImageMagick
-static/images/social_preview.svg  source for the link-preview card
-static/images/social_preview.png  generated: rsvg-convert -w 1200 -h 630
-static/videos/                clips
-static/videos/posters/        poster frames
+static/images/social_preview.svg   source for the link-preview card
+static/images/social_preview.png   generated: rsvg-convert -w 1200 -h 630
+static/videos/                simulated clips
+static/videos/real/           hardware clips
+static/videos/*/posters/      poster frames
 ```
 
-Regenerate the icons after editing `favicon.svg`:
+`bulma-carousel` and `bulma-slider` are not used and have been removed; the
+page uses CSS grid. Every icon is inline SVG and **no icon library is loaded** —
+the GitHub and YouTube marks are [Simple Icons](https://simpleicons.org/) (CC0),
+the arXiv mark is [Academicons](https://jpswalsh.github.io/academicons/)
+(SIL OFL 1.1). To add an icon, paste its SVG path at the use site.
+
+Regenerate the favicons after editing `favicon.svg`:
 
 ```bash
 cd static/images
@@ -311,108 +84,149 @@ convert -background none favicon.svg -define icon:auto-resize=64,48,32,16 favico
 convert -background "#1b2a4a" favicon.svg -flatten -resize 180x180 apple-touch-icon.png
 ```
 
-`bulma-carousel`, `bulma-slider` and their stylesheets have been deleted: the
-page uses CSS grid, and nothing loaded them. `index.css` has also had the
-template's rules for the removed "More Works" dropdown and carousel stripped.
+---
 
-### Icons
+## The animated walkthrough
 
-Every icon is inline SVG; **no icon library is loaded**. Font Awesome was
-removed: it cost 1.3 MB of JavaScript for seven glyphs, the template shipped
-its stylesheet without the `static/webfonts/` directory it references, and its
-build rewrites `<i>` elements into `<svg>` at runtime — which silently broke
-two scripts here before it was tracked down. Academicons went the same way,
-since it came from a CDN ad blockers commonly refuse.
+"How It Works" shows `static/images/method_overview.svg`, the manuscript's own
+vector export. On load the page fetches that file and swaps the `<img>` for the
+same SVG inlined, which makes each shape addressable; a step then lights its
+own shapes and dims the rest. Selecting shapes rather than rectangular regions
+means a box, an arrow or a label is always wholly lit or wholly dim, never
+clipped part-way. If the SVG cannot be fetched, the figure stays a plain `<img>`
+and reads as a normal static diagram.
 
-To add an icon, paste an SVG path. The GitHub and YouTube marks are Simple
-Icons (CC0); the arXiv mark is Academicons (SIL OFL 1.1), inlined at its use
-site with its viewBox cropped to the artwork so `height: 1em` matches the
-others.
+Steps are defined by the `STEPS` array in `static/js/sogudiff.js`:
+
+```js
+{ phase: 'a', at: [9, [41, 42], 68, 71], title: '...', body: '...' }
+```
+
+- `phase` is `'a'` (training) or `'b'` (deployment), and only drives the
+  Training/Deployment pill.
+- `at` lists shapes by position among the figure's top-level elements;
+  `[a, b]` is an inclusive range. Index 0 is the white page backing and is
+  never dimmed.
+- `DWELL` sets the milliseconds per step.
+
+### One addition to the figure
+
+`method_overview.svg` carries a single added element, `#dg-input-riser`, at the
+end of the file. The export draws each of the three return paths as one element
+covering both the loop's bottom horizontal *and* the rise into its net, so the
+vertical could not be lit without dragging the horizontal along with it. The
+added element is that vertical alone. It lies exactly under the existing paths,
+so it is invisible as drawn, and exists only so that step 7 can light the input
+rising into the nets while step 9 keeps the loop.
+
+**Re-add it after any re-export of the figure**, or drop it from step 7.
+Re-exporting can also change element order, so the `at` indices need
+re-checking when that happens.
 
 ---
 
-## Before going public
+## Videos
 
-The site URL is settled: **https://sogudiff.github.io/**, served as a GitHub
-Pages *organization site* from the repo `sogudiff.github.io` in an org named
-`sogudiff`. That is a domain root, which is why `robots.txt` works here and
-would not from a project page. The URL is already substituted into `og:url`,
-`og:image`, `twitter:image`, the canonical link, the JSON-LD, `citation_pdf_url`,
-`robots.txt` and `sitemap.xml`.
-
-The code lives separately at <https://github.com/schaiblc/SoGuDiff>, which is
-why the site is not simply a `gh-pages` branch there: cloning the code repo
-would then pull ~40 MB of demonstration video with it.
-
-`index.html` carries **`RELEASE:` markers** over everything that still has to
-change. Grep for them, or append `?draft` to the URL to read the same list on
-the page:
+### Encoding
 
 ```bash
-grep -n "RELEASE:" index.html robots.txt sitemap.xml
+ffmpeg -i input.mp4 -c:v libx264 -profile:v main -pix_fmt yuv420p \
+       -crf 26 -preset slow -movflags +faststart -an output.mp4
 ```
 
-What they gate:
+- `-movflags +faststart` matters: without it a browser downloads the whole file
+  before showing a frame.
+- `-an` strips audio. Every clip here is silent and muted on the page.
+- Keep clips under ~5 MB. GitHub warns over 50 MB and refuses over 100 MB.
 
-1. `robots` meta — `noindex, nofollow` → `index, follow`, and the matching
-   `Disallow: /` → the commented block in `robots.txt`
-2. `author` meta and the hero author block — real names, affiliations, links
-3. `og:site_name` — institution or lab
-4. The venue badge and the "Paper under review" line
-5. Google Scholar `citation_*` tags — currently commented out. Uncomment and
-   complete them; Scholar skips a page with a partial author list, so fill
-   every field or leave them commented
-6. The four link buttons — remove `is-pending` from each, delete the "Links
-   become active on publication" note, and point them at:
-   Paper (drop the PDF into `static/pdfs/`), arXiv, the code repo
-   (<https://github.com/schaiblc/SoGuDiff>), and the YouTube video
-7. JSON-LD — `author`, `datePublished`, `publisher`, `url`
-8. BibTeX — the real citation
-9. Draft mode itself — the note, the `.draft-note` / `.draft-banner` rules,
-   and the block at the top of `sogudiff.js`
-10. `sitemap.xml` — `<lastmod>` to the publication date
+Poster frames, so a still shows before a clip loads:
 
-Also consider re-adding the upstream template's "More Works" lab dropdown,
-which was removed here because it would identify the authors.
+```bash
+ffmpeg -i static/videos/NAME.mp4 -vf "select=eq(n\,10)" -vframes 1 -q:v 4 \
+       static/videos/posters/NAME.jpg
+```
 
-### robots.txt and sitemap.xml
+Then add `poster="static/videos/posters/NAME.jpg"` to that `<video>`.
 
-Both work as written, because an organization site is served from the domain
-root. `robots.txt` currently mirrors the `noindex` meta with `Disallow: /`; the
-open version is sitting commented beneath it. Flip the two together — the meta
-tag is what search engines actually obey for indexing, `robots.txt` only
-controls crawling.
+### Real-world clips
 
-`sitemap.xml` is pointed at from `robots.txt`, so Google discovers it without
-manual submission once crawling is allowed.
+Fifteen clips from the Jackal deployment in `static/videos/real/`, all
+1280×720, re-encoded from 1080p30 at CRF 25 with audio stripped (~23 MB for the
+set).
 
-### Publishing with GitHub Pages
+| Files | Shown as |
+| --- | --- |
+| `neutral1`, `neutral2` | Two unstructured runs, three pedestrians, neutral style |
+| `prox_pos/neg`, `pass_pos/neg`, `yield_pos/neg`, `group_pos/neg` | Tabbed per axis, the two ends side by side and synced |
+| `comp_pp`, `comp_pm`, `comp_mp`, `comp_mm` | A 2×2 matrix of proxemic against passing side, all four synced |
+| `liveswitch` | The style vector rewritten mid-episode |
 
-On GitHub Free and Pro, publishing a **private** repo through Pages makes the
-*site* publicly reachable even though the source stays private; access-controlled
-Pages needs Enterprise Cloud. So the repo going public and the site going live
-are effectively the same step here.
+They are `preload="none"` and fetched only when their tab or block is first
+scrolled to; loading fifteen clips up front would dwarf the rest of the page.
+Posters are WebP stills taken a third of the way in, so a panel shows the
+interaction rather than an empty room.
 
-One thing the page cannot hide: **the git history is authored under a real name
-and institutional email.** Anonymity on the rendered page does not survive a
-public repo. If the paper is still in double-blind review, the repo must stay
-private.
+The real-world tabs use `.rw-tab` / `.rw-panel` rather than the simulated
+explorer's `.axis-tab` / `.axis-panel`: that explorer queries its classes across
+the whole document and would otherwise drive both blocks at once.
 
-To publish:
+### Baseline comparison
 
-1. Create a free GitHub organization named `sogudiff`
-2. Settings → General → rename this repo from `temp` to `sogudiff.github.io`,
-   then Settings → General → Transfer ownership → the `sogudiff` org
-   (or create the repo in the org and push to it; GitHub redirects the old URL
-   either way, and `git remote set-url` locally)
-3. Settings → General → Danger Zone → change visibility to Public
-4. Settings → Pages → Source: *Deploy from a branch*, Branch `master`, folder
-   `/ (root)` → Save
-5. Wait a minute, then load https://sogudiff.github.io/
+`static/videos/compare/<method>_scene<N>.mp4` — 11 methods × 5 scenes. These are
+scenes **215, 231, 235, 252, 262** of the randomized evaluation set behind the
+paper's baseline table (the renderer labels episodes 1-indexed, so they display
+as 216/232/236/253/263).
 
-A repo named `<org>.github.io` serves at the org root; the branch still has to
-be selected under Settings → Pages. `.nojekyll` is already present, which is
-what stops Jekyll from discarding `static/`.
+Per-panel outcomes are stored in the `OUTCOMES` table in the comparison block of
+`static/js/sogudiff.js`. Re-rendering the clips means updating that table.
+
+### Synchronized playback
+
+The triptychs, the composition grid and the real-world pairs each form a sync
+group. Clips in a group share one wall-clock timeline: a clip that finishes
+early **holds on its last frame** until every clip in the group has finished,
+and only then do they all restart together. A per-clip `loop` attribute would
+break that alignment, so synced clips deliberately do not carry one.
+
+### Axis colors
+
+Each axis is drawn in the clips with a matplotlib sequential colormap that
+darkens from +1 to −1: **prox = Purples, pass = Blues, yield = Greens,
+group = Oranges**. The style chips and explorer tabs in `sogudiff.css` use the
+exact shades sampled from the robot marker in the clips, so page and video
+agree. Re-rendering with a different colormap means updating the `--prox-*` /
+`--pass-*` / `--yield-*` / `--group-*` variables at the top of that file.
+
+---
+
+## The teaser
+
+Five renders sharing one camera and one pixel size, stacked in `static/images/`:
+
+| File | Contents |
+| --- | --- |
+| `teaser_base.webp` | The scene: room, floor, three pedestrians, motion arrows, goal flag, robot. No trajectories. |
+| `teaser_neutral.webp` | Neutral's three curves — dashed samples, selected, projected — transparent background. |
+| `teaser_cautious.webp` | Cautious & Yielding. |
+| `teaser_assertive.webp` | Assertive & Group-Agnostic. |
+| `teaser_nonyield.webp` | Non-Yielding & Right-Side Passing. |
+| `teaser_robot.webp` | The robot alone, transparent, so it sits above the trajectories and paths appear to leave from behind it. |
+
+With JavaScript the styles cycle one at a time and can be picked from the
+legend; without it every layer stays visible, which is the figure as printed.
+
+---
+
+## Deployment
+
+GitHub Pages serves this repo at the organization root, because the repo is
+named `sogudiff.github.io`. Settings → Pages → *Deploy from a branch*,
+`master`, `/ (root)`. `.nojekyll` is what stops Jekyll from discarding
+`static/`.
+
+Because the site is at a domain root, `robots.txt` is read by crawlers and
+`sitemap.xml` is discovered through it — neither would be true from a
+`github.io/<repo>/` project page.
 
 ---
 
