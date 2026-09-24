@@ -91,6 +91,12 @@
 
 .skip-link:focus { top: 0; }
 
+.bibtex-note {
+  margin-top: 0.75rem;
+  color: var(--text-light);
+  font-size: 0.85rem;
+}
+
 .link-note {
   margin-top: 1rem;
   color: var(--text-light);

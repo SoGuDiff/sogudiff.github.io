@@ -259,7 +259,9 @@ something that does not exist:
 - `<meta name="citation_pdf_url">` is absent — Google Scholar requires it to
   resolve to a real PDF, and a 404 there is worse than omitting it
 - `datePublished` and `publisher` are absent from the JSON-LD
-- BibTeX is a plain `@misc` pointing at this site
+- BibTeX is a plain `@misc` with title, authors and year only — no arXiv
+  identifier yet, and deliberately no link to this website: the entry is meant
+  to cite the paper
 
 ### Stage 1 — the preprint goes up
 
@@ -270,8 +272,9 @@ something that does not exist:
 3. Add `<meta name="citation_pdf_url" content="https://arxiv.org/pdf/XXXXX">`
 4. JSON-LD: add `"datePublished"` (the arXiv submission date) and
    `"publisher": { "@type": "Organization", "name": "arXiv" }`
-5. BibTeX: keep `@misc`, add `eprint`, `archivePrefix = {arXiv}` and
-   `primaryClass` (whichever arXiv category it is submitted under)
+5. BibTeX: replace the entry with arXiv's own, and delete the
+   "The arXiv identifier is added here once the preprint is posted" note
+   beneath it. The entry on the page cites the paper, never this website
 6. Venue badge stays **Preprint · 2026**
 
 ### Stage 2 — accepted at a venue
