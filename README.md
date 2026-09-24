@@ -288,8 +288,8 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
-robots.txt                    inert at a project-page path; see below
-sitemap.xml                   one entry; submit manually in Search Console
+robots.txt                    crawl rules; works, this is a domain root
+sitemap.xml                   one entry, pointed at from robots.txt
 static/css/index.css          template base styles (trimmed, see below)
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
@@ -333,11 +333,16 @@ others.
 
 ## Before going public
 
-The site URL is settled: **https://schaiblc.github.io/sogudiff/**, served as a
-GitHub Pages project page from the `sogudiff` repo (renamed from `temp`). It is
-already substituted into `og:url`, `og:image`, `twitter:image`, the canonical
-link, the JSON-LD, `citation_pdf_url`, `robots.txt` and `sitemap.xml`. Every
-asset path on the page is relative, so the subpath needs no other change.
+The site URL is settled: **https://sogudiff.github.io/**, served as a GitHub
+Pages *organization site* from the repo `sogudiff.github.io` in an org named
+`sogudiff`. That is a domain root, which is why `robots.txt` works here and
+would not from a project page. The URL is already substituted into `og:url`,
+`og:image`, `twitter:image`, the canonical link, the JSON-LD, `citation_pdf_url`,
+`robots.txt` and `sitemap.xml`.
+
+The code lives separately at <https://github.com/schaiblc/SoGuDiff>, which is
+why the site is not simply a `gh-pages` branch there: cloning the code repo
+would then pull ~40 MB of demonstration video with it.
 
 `index.html` carries **`RELEASE:` markers** over everything that still has to
 change. Grep for them, or append `?draft` to the URL to read the same list on
@@ -350,16 +355,17 @@ grep -n "RELEASE:" index.html robots.txt sitemap.xml
 What they gate:
 
 1. `robots` meta — `noindex, nofollow` → `index, follow`, and the matching
-   `Disallow: /` → `Allow: /` in `robots.txt`
+   `Disallow: /` → the commented block in `robots.txt`
 2. `author` meta and the hero author block — real names, affiliations, links
 3. `og:site_name` — institution or lab
 4. The venue badge and the "Paper under review" line
 5. Google Scholar `citation_*` tags — currently commented out. Uncomment and
    complete them; Scholar skips a page with a partial author list, so fill
    every field or leave them commented
-6. The four link buttons (Paper, arXiv, Code, Video) — real URLs, remove
-   `is-pending` from each, and delete the "Links become active on publication"
-   note below them
+6. The four link buttons — remove `is-pending` from each, delete the "Links
+   become active on publication" note, and point them at:
+   Paper (drop the PDF into `static/pdfs/`), arXiv, the code repo
+   (<https://github.com/schaiblc/SoGuDiff>), and the YouTube video
 7. JSON-LD — `author`, `datePublished`, `publisher`, `url`
 8. BibTeX — the real citation
 9. Draft mode itself — the note, the `.draft-note` / `.draft-banner` rules,
@@ -371,17 +377,14 @@ which was removed here because it would identify the authors.
 
 ### robots.txt and sitemap.xml
 
-`robots.txt` is only ever read at a **domain root**. From a project page it is
-served at `/sogudiff/robots.txt`, which no crawler fetches — the root belongs
-to a `schaiblc.github.io` user-site repo, not this one. The file is kept
-because it is correct the moment the site moves to a custom domain or an
-organization root, but **the crawl control that actually works from here is the
-`robots` meta tag in `index.html`.**
+Both work as written, because an organization site is served from the domain
+root. `robots.txt` currently mirrors the `noindex` meta with `Disallow: /`; the
+open version is sitting commented beneath it. Flip the two together — the meta
+tag is what search engines actually obey for indexing, `robots.txt` only
+controls crawling.
 
-`sitemap.xml` does work under a subpath — a sitemap may list any URL at or
-below its own path. It is just not auto-discovered, since discovery goes
-through the root `robots.txt`. Submit it by hand in Google Search Console after
-publication.
+`sitemap.xml` is pointed at from `robots.txt`, so Google discovers it without
+manual submission once crawling is allowed.
 
 ### Publishing with GitHub Pages
 
@@ -397,15 +400,19 @@ private.
 
 To publish:
 
-1. Settings → General → rename `temp` to `sogudiff` (GitHub redirects the old
-   URL, and `git remote set-url` locally)
-2. Settings → General → Danger Zone → change visibility to Public
-3. Settings → Pages → Source: *Deploy from a branch*, Branch `master`, folder
+1. Create a free GitHub organization named `sogudiff`
+2. Settings → General → rename this repo from `temp` to `sogudiff.github.io`,
+   then Settings → General → Transfer ownership → the `sogudiff` org
+   (or create the repo in the org and push to it; GitHub redirects the old URL
+   either way, and `git remote set-url` locally)
+3. Settings → General → Danger Zone → change visibility to Public
+4. Settings → Pages → Source: *Deploy from a branch*, Branch `master`, folder
    `/ (root)` → Save
-4. Wait a minute, then load https://schaiblc.github.io/sogudiff/
+5. Wait a minute, then load https://sogudiff.github.io/
 
-`.nojekyll` is already present, which is what stops Jekyll from discarding
-`static/`.
+A repo named `<org>.github.io` serves at the org root; the branch still has to
+be selected under Settings → Pages. `.nojekyll` is already present, which is
+what stops Jekyll from discarding `static/`.
 
 ---
 
