@@ -288,6 +288,8 @@ than restating numbers the paper already reports.
 
 ```
 index.html                    the whole page
+robots.txt                    inert at a project-page path; see below
+sitemap.xml                   one entry; submit manually in Search Console
 static/css/index.css          template base styles (trimmed, see below)
 static/css/sogudiff.css       everything specific to this project
 static/css/bulma.min.css      CSS framework
@@ -331,48 +333,79 @@ others.
 
 ## Before going public
 
-`index.html` contains **15 `RELEASE:` markers**, plus 6 occurrences of
-`REPLACE_WITH_PROJECT_URL`. Grep for both:
+The site URL is settled: **https://schaiblc.github.io/sogudiff/**, served as a
+GitHub Pages project page from the `sogudiff` repo (renamed from `temp`). It is
+already substituted into `og:url`, `og:image`, `twitter:image`, the canonical
+link, the JSON-LD, `citation_pdf_url`, `robots.txt` and `sitemap.xml`. Every
+asset path on the page is relative, so the subpath needs no other change.
+
+`index.html` carries **`RELEASE:` markers** over everything that still has to
+change. Grep for them, or append `?draft` to the URL to read the same list on
+the page:
 
 ```bash
-grep -n "RELEASE:\|REPLACE_WITH_PROJECT_URL" index.html
+grep -n "RELEASE:" index.html robots.txt sitemap.xml
 ```
 
-Between them they gate everything that must change before the page is public:
+What they gate:
 
-1. `robots` meta — `noindex, nofollow` → `index, follow`
-2. `author` meta — real names
+1. `robots` meta — `noindex, nofollow` → `index, follow`, and the matching
+   `Disallow: /` → `Allow: /` in `robots.txt`
+2. `author` meta and the hero author block — real names, affiliations, links
 3. `og:site_name` — institution or lab
-4. `og:url` and `<link rel="canonical">` — the live URL (also in `og:image`,
-   `twitter:image` and the JSON-LD `image`; search `REPLACE_WITH_PROJECT_URL`)
+4. The venue badge and the "Paper under review" line
 5. Google Scholar `citation_*` tags — currently commented out. Uncomment and
-   complete them; Scholar will skip a page with a partial author list, so fill
-   every field or leave them commented.
-6. Author block in the hero — replace "Anonymous Authors"
-7. The four link buttons (Paper, arXiv, Code, Video) — real URLs, and remove
-   `is-pending` from each
-8. JSON-LD — author, `datePublished`, publisher
-9. BibTeX — the real citation
+   complete them; Scholar skips a page with a partial author list, so fill
+   every field or leave them commented
+6. The four link buttons (Paper, arXiv, Code, Video) — real URLs, remove
+   `is-pending` from each, and delete the "Links become active on publication"
+   note below them
+7. JSON-LD — `author`, `datePublished`, `publisher`, `url`
+8. BibTeX — the real citation
+9. Draft mode itself — the note, the `.draft-note` / `.draft-banner` rules,
+   and the block at the top of `sogudiff.js`
+10. `sitemap.xml` — `<lastmod>` to the publication date
 
 Also consider re-adding the upstream template's "More Works" lab dropdown,
 which was removed here because it would identify the authors.
 
-`tools/` is a development directory. Nothing on the site links to it, but once
-Pages is enabled it would be reachable at `/tools/region-picker.html`. It gives
-nothing away — it only shows the figure the page already publishes — so it can
-stay. Delete the directory before publishing if you would rather it were not
-served.
+### robots.txt and sitemap.xml
+
+`robots.txt` is only ever read at a **domain root**. From a project page it is
+served at `/sogudiff/robots.txt`, which no crawler fetches — the root belongs
+to a `schaiblc.github.io` user-site repo, not this one. The file is kept
+because it is correct the moment the site moves to a custom domain or an
+organization root, but **the crawl control that actually works from here is the
+`robots` meta tag in `index.html`.**
+
+`sitemap.xml` does work under a subpath — a sitemap may list any URL at or
+below its own path. It is just not auto-discovered, since discovery goes
+through the root `robots.txt`. Submit it by hand in Google Search Console after
+publication.
 
 ### Publishing with GitHub Pages
 
-**Do not enable Pages while the repo is private and the paper is unpublished.**
-On GitHub Free and Pro, publishing a private repo through Pages makes the
-*site* publicly reachable even though the source stays private. Access-controlled
-Pages requires GitHub Enterprise Cloud.
+On GitHub Free and Pro, publishing a **private** repo through Pages makes the
+*site* publicly reachable even though the source stays private; access-controlled
+Pages needs Enterprise Cloud. So the repo going public and the site going live
+are effectively the same step here.
 
-When you are ready: Settings → Pages → Deploy from a branch → `master` / `/`
-(root). `.nojekyll` is already present, which is what stops Jekyll from
-discarding the `static/` directory.
+One thing the page cannot hide: **the git history is authored under a real name
+and institutional email.** Anonymity on the rendered page does not survive a
+public repo. If the paper is still in double-blind review, the repo must stay
+private.
+
+To publish:
+
+1. Settings → General → rename `temp` to `sogudiff` (GitHub redirects the old
+   URL, and `git remote set-url` locally)
+2. Settings → General → Danger Zone → change visibility to Public
+3. Settings → Pages → Source: *Deploy from a branch*, Branch `master`, folder
+   `/ (root)` → Save
+4. Wait a minute, then load https://schaiblc.github.io/sogudiff/
+
+`.nojekyll` is already present, which is what stops Jekyll from discarding
+`static/`.
 
 ---
 

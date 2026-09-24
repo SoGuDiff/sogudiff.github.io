@@ -1,0 +1,22 @@
+# SoGuDiff project page.
+#
+# NOTE: a project page is served from https://schaiblc.github.io/sogudiff/, so
+# this file lands at /sogudiff/robots.txt. Crawlers only ever read the one at
+# the domain root, which belongs to a schaiblc.github.io user-site repo, not
+# this one. This file is therefore INERT as things stand. It is kept so that
+# the rules are already right if the site ever moves to a custom domain or an
+# organization root, and as a record of the intent.
+#
+# The crawl control that does work from here is the robots meta tag in
+# index.html, which is honoured wherever the page is served.
+
+# RELEASE: while the paper is unpublished this matches the noindex meta.
+# Change to "Allow: /" at the same time as flipping that tag.
+User-agent: *
+Disallow: /
+
+# Once open: crawling 27 MB of demonstration video gains a search engine
+# nothing and costs bandwidth. The page itself is what should be indexed.
+# Disallow: /static/videos/
+
+Sitemap: https://schaiblc.github.io/sogudiff/sitemap.xml

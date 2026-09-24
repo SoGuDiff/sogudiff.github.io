@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- One page, so one entry. A sitemap may only list URLs at or below its own
+     path, which https://schaiblc.github.io/sogudiff/ satisfies.
+     RELEASE: set <lastmod> to the publication date, then submit this URL in
+     Google Search Console - a sitemap under a subpath is not auto-discovered,
+     because the robots.txt that would point at it is not ours to write. -->
+<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
+  <url>
+    <loc>https://schaiblc.github.io/sogudiff/</loc>
+    <lastmod>2026-09-24</lastmod>
+    <changefreq>monthly</changefreq>
+    <priority>1.0</priority>
+  </url>
+</urlset>
