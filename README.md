@@ -271,13 +271,13 @@ something that does not exist:
 4. JSON-LD: add `"datePublished"` (the arXiv submission date) and
    `"publisher": { "@type": "Organization", "name": "arXiv" }`
 5. BibTeX: keep `@misc`, add `eprint`, `archivePrefix = {arXiv}` and
-   `primaryClass = {cs.RO}`
+   `primaryClass` (whichever arXiv category it is submitted under)
 6. Venue badge stays **Preprint · 2026**
 
 ### Stage 2 — accepted at a venue
 
 1. **Paper button** — point at the official version and drop `is-pending`
-2. Venue badge → the venue and year, e.g. `IROS 2026`
+2. Venue badge → the venue and year
 3. Add `<meta name="citation_conference_title">` (or `citation_journal_title`
    for a journal), and point `citation_pdf_url` at whichever version should be
    indexed — usually the venue's
